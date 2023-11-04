@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Project from "./project";
 
 export default function Home() {
-    const [projectDescription, setProjectDescription] = useState<String>("No project imported.");
+    const [projectDescription, setProjectDescription] = useState<Project>(new Project());
 
     function handleProjectImport(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.files === null) {
@@ -13,12 +14,12 @@ export default function Home() {
 
         var file: File = event.target.files[0];
         var fileReader: FileReader;
-        var newDescription: String = "Unable to load file.";
+        var newDescription: Project = new Project();
         fileReader = new FileReader();
         fileReader.onloadend = function(event) {
             let target = event.target;
             if ((target !== null) && (target.result !== null)) {
-                newDescription = target.result.toString();
+                newDescription.setFromJson(target.result.toString());
             }
             setProjectDescription(newDescription);
         };
@@ -29,7 +30,7 @@ export default function Home() {
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
                 <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
-                <p>Project Info: {projectDescription}</p>
+                {projectDescription.toHtml()}
             </div>
         </main>
     )
