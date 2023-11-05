@@ -1,0 +1,21 @@
+# Mission Statement
+- Platform for open source hardware development
+- - Platform is fundamentally a project planner from start to finish
+- - - Aggregates the various design documents as well as implementation details
+- Operating walls:
+- - Start: Setting up a project
+- - End: Outputting an execution document
+- Question: How many implementation tools should the platform have? How much should the platform help with implementation?
+- - Ex. Should it have a code editor? Should it have component simulators? etc
+- Tools for mapping out hardware and software stack
+- - Integrate tools for designing
+- - - 3d printing designs
+- - - CAD drawings
+- - - Git repos
+- - - Simulation tools
+- - AI assistant for APIs between layers in the stack
+- The tool is meant for e2e open source development - includes both hardware and software stack
+- - Maps out architecture
+- - Solicit open source contributions
+- - Output of the tool should be a recipe that someone with the needed materials and skills could follow to put together the whole project
+- The way to think about it is a factory serviced by robots should be able to use the output to create the project to spec

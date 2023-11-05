@@ -1,36 +1,69 @@
 class Project {
-    projectSet: Boolean = false;
-    documentationLink: string = "";
+    DEFAULT_PROJECT_NAME = "No project name stored in project";
+    DEFAULT_REPO_LINK = "No repo stored in project.";
+    DEFAULT_ROADMAP_LINK = "No roadmap stored in project.";
+    DEFAULT_EXECUTION_FILE_LINK = "No execution file stored in project";
+
+    projectName: string = this.DEFAULT_PROJECT_NAME;
+    repoLink: string = this.DEFAULT_REPO_LINK;
+    roadmapLink: string = this.DEFAULT_ROADMAP_LINK;
+    executionFileLink: string = this.DEFAULT_EXECUTION_FILE_LINK;
 
     constructor() {}
 
     setFromJson(jsonStr: string) {
         let parsedJson = JSON.parse(jsonStr);
-        if (parsedJson.hasOwnProperty("documentationLink")) {
-            this.documentationLink = parsedJson["documentationLink"];
-        } else {
-            this.documentationLink = "No documentation stored in project.";
-        }
-        this.projectSet = true;
+        this.projectName = this.getValueFromJson(parsedJson, "projectName", this.DEFAULT_PROJECT_NAME)!;
+        this.repoLink = this.getValueFromJson(parsedJson, "repoLink", this.DEFAULT_REPO_LINK)!;
+        this.roadmapLink = this.getValueFromJson(parsedJson, "roadmapLink", this.DEFAULT_ROADMAP_LINK)!;
+        this.executionFileLink = this.getValueFromJson(parsedJson, "executionFileLink", this.DEFAULT_EXECUTION_FILE_LINK)!;
     }
 
-    toHtml() {
-        if (!this.projectSet) {
-            return (
-                <div>
-                    <p>Project Description: No project imported.</p>
-                </div>
-            );
+    toJson() {
+        return {
+            "projectName": this.projectName,
+            "repoLink": this.repoLink,
+            "roadmapLink": this.roadmapLink
         }
+    }
 
-        return (
-            <div>
-                <p>Project Description:</p>
-                <p>Documentation: 
-                    <a href={this.documentationLink}> {this.documentationLink}</a>
-                </p>
-            </div>            
-        )
+    getValueFromJson(jsonObj: any, key: string, defaultValue: any) {
+        if (jsonObj.hasOwnProperty(key)) {
+            return jsonObj[key];
+        }
+        return defaultValue;
+    }
+
+    getProjectName() {
+        return this.projectName;
+    }
+
+    getRepoLink() {
+        return this.repoLink;
+    }
+
+    getRoadmapLink() {
+        return this.roadmapLink;
+    }
+
+    getExecutionFileLink() {
+        return this.executionFileLink;
+    }
+
+    setProjectName(newProjectName: string) {
+        this.projectName = newProjectName;
+    }
+
+    setRepoLink(newRepoLink: string) {
+        this.repoLink = newRepoLink;
+    }
+
+    setRoadmapLink(newRoadmapLink: string) {
+        this.roadmapLink = newRoadmapLink;
+    }
+
+    setExecutionFileLink(newExecutionFileLink: string) {
+        this.executionFileLink = newExecutionFileLink;
     }
 }
 
