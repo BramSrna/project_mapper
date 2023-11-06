@@ -13,6 +13,11 @@
 - - - CAD drawings
 - - - Git repos
 - - - Simulation tools
+- - - Circuitry
+- - - Firmware/software
+- - - Marketing
+- - - Social
+- - - Fundraising
 - - AI assistant for APIs between layers in the stack
 - The tool is meant for e2e open source development - includes both hardware and software stack
 - - Maps out architecture

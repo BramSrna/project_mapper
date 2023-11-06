@@ -31,23 +31,12 @@ export default function Home() {
         fileReader.readAsText(file);
     }
 
-    function saveExecutionFileOnClickHandler() {
-        // Create a link element
-        const link = document.createElement('a');
-        link.href = '/sample_execution_file.json';
-        link.download = 'sample_execution_file.json'; // Optional: Set the download filename
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
                 <div>
                     <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
                     <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
-                    <button onClick={saveExecutionFileOnClickHandler}>Save execution file...</button>
                 </div>
                 <div>
                     {(new ProjectEditor(currProjectDescription)).toHtml()}
