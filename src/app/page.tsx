@@ -2,9 +2,14 @@
 
 import { useState } from 'react';
 import Project from "./project";
+import ProjectEditor from "./project_editor";
 
 export default function Home() {
-    const [projectDescription, setProjectDescription] = useState<Project>(new Project());
+    const [currProjectDescription, setCurrProjectDescription] = useState<Project>(new Project());
+
+    function initProjectOnClickHandler() {
+        setCurrProjectDescription(new Project());
+    }
 
     function handleProjectImport(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.files === null) {
@@ -21,7 +26,7 @@ export default function Home() {
             if ((target !== null) && (target.result !== null)) {
                 newDescription.setFromJson(target.result.toString());
             }
-            setProjectDescription(newDescription);
+            setCurrProjectDescription(newDescription);
         };
         fileReader.readAsText(file);
     }
@@ -29,8 +34,13 @@ export default function Home() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-                <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
-                {projectDescription.toHtml()}
+                <div>
+                    <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
+                    <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
+                </div>
+                <div>
+                    {(new ProjectEditor(currProjectDescription)).toHtml()}
+                </div>
             </div>
         </main>
     )
