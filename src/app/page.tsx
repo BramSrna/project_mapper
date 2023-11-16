@@ -1,14 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent } from "react";
+import React, { useState } from 'react';
 import Project from "./project";
 import ProjectEditor from "./project_editor";
+import Modal from 'react-modal';
 
-export default function Home() {
+Modal.setAppElement(".root");
+
+const DropdownMenu = () => {
+    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
     const [currProjectDescription, setCurrProjectDescription] = useState<Project>(new Project());
+    const [initProjWizardIsOpen, setInitProjWizardIsOpen] = React.useState(false);
+
+    function closeInitProjWizard() {
+        setInitProjWizardIsOpen(false);
+    }
+
+    function toggleFileDropdown() {
+        setFileDropdownVisible(!fileDropdownVisible);
+    }
+
+    function initWizardOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+        const formData: FormData = new FormData(event.currentTarget);
+        const newProj: Project = new Project();
+        if (formData.has("projectType")) {
+            const projectType = formData.get("projectType");
+            if ((projectType !== null) && (projectType !== "None")) {
+                newProj.setProjectType(projectType.toString());
+            }
+        }
+        setCurrProjectDescription(newProj);
+        closeInitProjWizard();
+    }
 
     function initProjectOnClickHandler() {
-        setCurrProjectDescription(new Project());
+        setInitProjWizardIsOpen(true);
     }
 
     function handleProjectImport(event: React.ChangeEvent<HTMLInputElement>) {
@@ -17,12 +44,11 @@ export default function Home() {
             return null;
         }
 
-        var file: File = event.target.files[0];
-        var fileReader: FileReader;
-        var newDescription: Project = new Project();
-        fileReader = new FileReader();
+        const file: File = event.target.files[0];
+        const newDescription: Project = new Project();
+        const fileReader = new FileReader();
         fileReader.onloadend = function(event) {
-            let target = event.target;
+            const target = event.target;
             if ((target !== null) && (target.result !== null)) {
                 newDescription.setFromJson(target.result.toString());
             }
@@ -32,16 +58,40 @@ export default function Home() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-                <div>
-                    <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
-                    <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
-                </div>
-                <div>
-                    {(new ProjectEditor(currProjectDescription)).toHtml()}
-                </div>
+        <div className="root">
+            <div className="dropdown-menu">
+                <button onClick={toggleFileDropdown}>File</button>
+                {
+                    fileDropdownVisible && (
+                        <div className="dropdown-content">
+                            <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
+                            <input type="file" accept=".json" onChange={e => handleProjectImport(e)}/>
+                        </div>
+                    )
+                }
             </div>
-        </main>
-    )
-}
+
+            <div className="project-editor">
+                {(new ProjectEditor(currProjectDescription)).toHtml()}
+            </div>
+
+            <div className="init-proj-wizard">
+                <Modal
+                    isOpen={initProjWizardIsOpen}
+                    onRequestClose={closeInitProjWizard}
+                >
+                    <div>Project Initialization Wizard</div>
+                    <form onSubmit={initWizardOnSubmitHandler}>
+                        <select name="projectType" id="template">
+                            <option value="None">None</option>
+                            <option value="Website">Website</option>
+                        </select>
+                        <button type="submit">Close Wizard And Go To Editor</button>
+                    </form>
+                </Modal>
+            </div>
+        </div>
+    );
+};
+
+export default DropdownMenu;

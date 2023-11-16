@@ -12,13 +12,17 @@ class ProjectEditor {
     saveProjectOnClickHandler = (event: FormEvent<HTMLFormElement>) => {
         const formData = new FormData(event.currentTarget);
 
-        let projectName = formData.get("projectName");
-        let repoLink = formData.get("repoLink");
-        let roadmapLink = formData.get("roadmapLink");
-        let executionFileLink = formData.get("executionFileLink");
+        const projectName = formData.get("projectName");
+        const projectType = formData.get("projectType");
+        const repoLink = formData.get("repoLink");
+        const roadmapLink = formData.get("roadmapLink");
+        const executionFileLink = formData.get("executionFileLink");
 
         if (projectName !== null) {
             this.projectToEdit.setProjectName(projectName.toString());
+        }
+        if (projectType !== null) {
+            this.projectToEdit.setProjectType(projectType.toString());
         }
         if (repoLink !== null) {
             this.projectToEdit.setRepoLink(repoLink.toString());
@@ -40,6 +44,7 @@ class ProjectEditor {
         return (
             <form onSubmit={this.saveProjectOnClickHandler}>
                 <p>Project Name: <input type="text" name="projectName" defaultValue={this.projectToEdit.getProjectName()}/></p>
+                <p>Project Type: <input type="text" name="projectType" defaultValue={this.projectToEdit.getProjectType()}/></p>
                 <p>Repo Link: <input type="text" name="repoLink" defaultValue={this.projectToEdit.getRepoLink()}/></p>
                 <p>Roadmap Link: <input type="text" name="roadmapLink" defaultValue={this.projectToEdit.getRoadmapLink()}/></p>
                 <p>Execution File Link: <input type="text" name="executionFileLink" defaultValue={this.projectToEdit.getExecutionFileLink()}/></p>
