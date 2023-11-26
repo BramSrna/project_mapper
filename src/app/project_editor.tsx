@@ -1,57 +1,38 @@
-import { FormEvent } from "react";
-import Project from "./project";
-import { saveAs } from 'file-saver';
+import Project from "./project_components/project";
+import { useState } from "react";
+import Xarrow, {Xwrapper} from 'react-xarrows';
 
-class ProjectEditor {
-    projectToEdit: Project;
+const ProjectEditor = (props: {projectToEdit: Project}) => {
+    const [arrowDeleted, setArrowDelete] = useState(true);
 
-    constructor(projectToEdit: Project) {
-        this.projectToEdit = projectToEdit;
-    }
+    const components = props.projectToEdit.getComponents().map(function(currParentComponent, index) {
+        return currParentComponent.toElement(index);
+    });
 
-    saveProjectOnClickHandler = (event: FormEvent<HTMLFormElement>) => {
-        const formData = new FormData(event.currentTarget);
+    let xArrowCounter = 0;
+    const connections = props.projectToEdit.getComponents().map(function(currParentComponent) {
+        const currConnections = currParentComponent.getConnections().map(function(currEndTarget) {
+            return (
+                <div
+                    key={xArrowCounter++}
+                    onClick={() => {
+                        currParentComponent.deleteConnection(currEndTarget);
+                        setArrowDelete(!arrowDeleted);
+                    }}>
+                    <Xarrow start={currParentComponent.getComponentName()} end={currEndTarget}/>
+                </div>
+            );
+        });
 
-        const projectName = formData.get("projectName");
-        const projectType = formData.get("projectType");
-        const repoLink = formData.get("repoLink");
-        const roadmapLink = formData.get("roadmapLink");
-        const executionFileLink = formData.get("executionFileLink");
+        return currConnections;
+    });
 
-        if (projectName !== null) {
-            this.projectToEdit.setProjectName(projectName.toString());
-        }
-        if (projectType !== null) {
-            this.projectToEdit.setProjectType(projectType.toString());
-        }
-        if (repoLink !== null) {
-            this.projectToEdit.setRepoLink(repoLink.toString());
-        }
-        if (roadmapLink !== null) {
-            this.projectToEdit.setRoadmapLink(roadmapLink.toString());
-        }
-        if (executionFileLink !== null) {
-            this.projectToEdit.setExecutionFileLink(executionFileLink.toString());
-        }
-        
-        const file = new Blob([JSON.stringify(this.projectToEdit.toJson())], { type: "application/json" });
-        saveAs(file, this.projectToEdit.getProjectName() + ".json");
-        
-        event.preventDefault()
-    }
-
-    toHtml() {
-        return (
-            <form onSubmit={this.saveProjectOnClickHandler}>
-                <p>Project Name: <input type="text" name="projectName" defaultValue={this.projectToEdit.getProjectName()}/></p>
-                <p>Project Type: <input type="text" name="projectType" defaultValue={this.projectToEdit.getProjectType()}/></p>
-                <p>Repo Link: <input type="text" name="repoLink" defaultValue={this.projectToEdit.getRepoLink()}/></p>
-                <p>Roadmap Link: <input type="text" name="roadmapLink" defaultValue={this.projectToEdit.getRoadmapLink()}/></p>
-                <p>Execution File Link: <input type="text" name="executionFileLink" defaultValue={this.projectToEdit.getExecutionFileLink()}/></p>
-                <button type="submit">Save Project</button>
-            </form>
-        );
-    }
+    return (
+        <Xwrapper>
+            {components}
+            {connections}
+        </Xwrapper>
+    );
 }
 
 export default ProjectEditor;
