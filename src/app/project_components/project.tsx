@@ -73,16 +73,28 @@ class Project {
         saveAs(file, this.projectName + ".json");
     }
 
-    downloadExecutionFile() {
-        let executionFileContents: string = "";
+    downloadSetupFile() {
+        let setupFileContents: string = "";
         for (const component of this.components) {
-            const newContents = component.getExecutionFileContents();
+            const newContents = component.getSetupFileContents();
             if (newContents !== "") {
-                executionFileContents += newContents + "\n";
+                setupFileContents += newContents + "\n";
             }
         }
-        const file = new Blob([executionFileContents], { type: "application/json" });
-        saveAs(file, this.projectName + "_execution_file.ps1");
+        const file = new Blob([setupFileContents], { type: "application/json" });
+        saveAs(file, this.projectName + "setup_file.ps1");
+    }
+
+    downloadDeployFile() {
+        let deployFileContents: string = "";
+        for (const component of this.components) {
+            const newContents = component.getDeployFileContents();
+            if (newContents !== "") {
+                deployFileContents += newContents + "\n";
+            }
+        }
+        const file = new Blob([deployFileContents], { type: "application/json" });
+        saveAs(file, this.projectName + "deploy_file.ps1");
     }
 
     saveToBrowser() {

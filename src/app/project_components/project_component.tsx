@@ -18,7 +18,8 @@ abstract class ProjectComponent {
     }
 
     abstract toElement(listKey: number) : ReactElement;
-    abstract getExecutionFileContents() : string;
+    abstract getSetupFileContents() : string;
+    abstract getDeployFileContents() : string;
 
     toJSON() : ProjectComponentToJsonInterface {
         return {

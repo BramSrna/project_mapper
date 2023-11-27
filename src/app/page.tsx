@@ -93,8 +93,12 @@ const Page = () => {
         loadedProject.downloadProjectAsJson();
     }
 
-    function saveExecutionFileOnClickHandler() {
-        loadedProject.downloadExecutionFile();
+    function saveSetupFileOnClickHandler() {
+        loadedProject.downloadSetupFile();
+    }
+
+    function saveDeployFileOnClickHandler() {
+        loadedProject.downloadDeployFile();
     }
 
     function addDependencyOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
@@ -124,7 +128,8 @@ const Page = () => {
                             <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
                             <input type="file" accept=".json" onChange={handleProjectImport}/>
                             <button onClick={saveProjectOnClickHandler}>Save Project</button>
-                            <button onClick={saveExecutionFileOnClickHandler}>Save Execution File</button>
+                            <button onClick={saveSetupFileOnClickHandler}>Save Setup File</button>
+                            <button onClick={saveDeployFileOnClickHandler}>Save Deploy File</button>
                         </div>
                     )
                 }

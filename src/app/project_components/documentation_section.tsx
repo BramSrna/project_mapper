@@ -42,7 +42,11 @@ class DocumentationSection extends ProjectComponent {
         )
     }
 
-    getExecutionFileContents() {
+    getSetupFileContents() {
+        return `echo "${this.content}" > "${this.componentName}.txt"`;
+    }
+
+    getDeployFileContents() {
         return "";
     }
 }
