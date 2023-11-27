@@ -66,12 +66,27 @@ class SoftwareRepo extends ProjectComponent {
         this.saveToBrowser();
     }
 
-    getExecutionFileContents() {
+    getSetupFileContents() {
         if (this.createUsingInit) {
             return `mkdir ${this.initRepoName} \ncd ${this.initRepoName}\ngit init\ncd ..`;
         } else {
             return `git clone ${this.cloneTarget}`;
         }
+    }
+
+    getDeployFileContents() {
+        let contents: string = "";
+        let folderName: string = "";
+        if (this.createUsingInit) {
+            contents += `mkdir ${this.initRepoName} \ncd ${this.initRepoName}\ngit init\ncd ..`;
+            folderName = this.initRepoName;
+        } else {
+            contents += `git clone ${this.cloneTarget}`;
+            let cloneTargetParts: string[] = this.cloneTarget.split("/")
+            folderName = cloneTargetParts[cloneTargetParts.length - 1].replace(".git", "");
+        }
+        contents += `\ncd ${folderName}\n.\\\startup.ps1`;
+        return contents;
     }
 }
 

@@ -90,7 +90,19 @@ class ProjectDescription extends ProjectComponent {
         )
     }
 
-    getExecutionFileContents() {
+    getSetupFileContents() {
+        const setupContents = {
+            "projectName": this.projectName,
+            "projectType": this.projectType,
+            "repoLink": this.repoLink,
+            "roadmapLink": this.roadmapLink,
+            "executionFileLink": this.executionFileLink
+        }
+
+        return `echo '${JSON.stringify(setupContents)}' > "${this.componentName}.json"`;
+    }
+
+    getDeployFileContents() {
         return "";
     }
 }

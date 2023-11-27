@@ -1,0 +1,2 @@
+# Execution File
+The execution file shall be a bundle of files instead of a single file. The reason for this is that the scope of the execution file is to large. From one angle, the execution file could be a file to run to download the project locally to a user's machine so they can start working on it. From another angle, the execution file could be used for deploying a project. Switching from a single file to a bundle will allow for multiple areas to be covered.
