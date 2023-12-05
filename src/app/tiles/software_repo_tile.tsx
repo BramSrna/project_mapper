@@ -1,16 +1,10 @@
-import { useRef, ChangeEvent, MutableRefObject, useState } from "react";
-import Draggable from 'react-draggable';
-import {useXarrow} from 'react-xarrows';
+import { ChangeEvent, useState } from "react";
 import SoftwareRepo from "../project_components/software_repo";
 import Toggle from 'react-toggle'
+import TileContainer from "./tile_container";
 
 const SoftwareRepoTile = (props: {parentComponent: SoftwareRepo}) => {
-    const updateXarrow = useXarrow();
-
-    const [stillExists, setStillExists] = useState(true);
-    const [displayInitNameTargetField, setDisplayInitNameTargetField] = useState(props.parentComponent.getCreateUsingInit())
-    
-    const nodeRef: MutableRefObject<null> = useRef(null);
+    const [displayInitNameTargetField, setDisplayInitNameTargetField] = useState(props.parentComponent.getCreateUsingInit());
 
     function cloneTargetOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
         props.parentComponent.setCloneTarget(event.target.value);
@@ -18,11 +12,6 @@ const SoftwareRepoTile = (props: {parentComponent: SoftwareRepo}) => {
 
     function initRepoNameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
         props.parentComponent.setInitRepoName(event.target.value);
-    }
-
-    function deleteSectionHandler() {
-        props.parentComponent.removeFromProject();
-        setStillExists(false);
     }
 
     function switchDisplayedFields() {
@@ -37,27 +26,74 @@ const SoftwareRepoTile = (props: {parentComponent: SoftwareRepo}) => {
         return (<p>Clone Repo Target: <input type="text" name="cloneRepoTarget" defaultValue={props.parentComponent.getCloneTarget()} onChange={cloneTargetOnChangeHandler}/></p>);
     }
 
-    return (
-        stillExists &&
-        <Draggable nodeRef={nodeRef} onDrag={updateXarrow} onStop={updateXarrow}>
-            <div style={{ position: 'absolute', zIndex: 1000, background: "#f56c42" }} ref={nodeRef} id={props.parentComponent.getComponentName()}>
-                <div ref={nodeRef} className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
-                    {props.parentComponent.getComponentName()}
-                    <button onClick={deleteSectionHandler}>Delete</button>
-                </div>
-                <label>
-                    <Toggle
-                        defaultChecked={displayInitNameTargetField}
-                        icons={false}
-                        onChange={switchDisplayedFields}
-                    />
-                    <span>Toggle Init Method</span>
-                </label>
-                <form ref={nodeRef} id="SoftwareRepo">
-                    {getFormFields()}
-                </form>
+    function mockInputOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
+        props.parentComponent.setMockInput(rowIndex, event.target.value);
+    }
+
+    function mockOutputOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
+        props.parentComponent.setMockOutput(rowIndex, event.target.value);
+    }
+
+    function deleteMockOnClickHandler(rowIndex: number) {
+        props.parentComponent.deleteMock(rowIndex);
+    }
+
+    function addMockOnClickHandler() {
+        props.parentComponent.addMock();
+    }
+
+    function getMocksTable() {
+        let keyVal = 0;
+        return (
+            <div>
+                <p>Mocks</p>
+                <table>
+                    <thead>
+                        <tr key={keyVal++}>
+                            <td key={keyVal++}>Input</td>
+                            <td key={keyVal++}>Output</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {props.parentComponent.getMocks().map(function(currMock, rowIndex) {
+                            return (
+                            <tr key={keyVal++}>
+                                <td key={keyVal++}><input type="text" name="mockInput" defaultValue={currMock.getInput()} onChange={e => mockInputOnChangeHandler(e, rowIndex)}/></td>
+                                <td key={keyVal++}><input type="text" name="mockOutput" defaultValue={currMock.getOutput()} onChange={e => mockOutputOnChangeHandler(e, rowIndex)}/></td>
+                                <td key={keyVal++}><button onClick={() => deleteMockOnClickHandler(rowIndex)}>Delete Mock</button></td>
+                            </tr>);
+                        })}
+                    </tbody>
+                </table>
+                <button onClick={addMockOnClickHandler}>Add Mock</button>
             </div>
-        </Draggable>
+        )
+    }
+
+    return (
+        <TileContainer
+            parentComponent={props.parentComponent}
+            containerContents={
+                <div>
+                    <label>
+                        <Toggle
+                            defaultChecked={displayInitNameTargetField}
+                            icons={false}
+                            onChange={switchDisplayedFields}
+                        />
+                        <span>Toggle Init Method</span>
+                    </label>
+
+                    <form id="SoftwareRepo">
+                        {getFormFields()}
+                    </form>
+
+                    <form>
+                        {getMocksTable()}
+                    </form>                    
+                </div>
+            }
+        />
     );
 }
 

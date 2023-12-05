@@ -7,6 +7,8 @@ import ProjectEditor from "./project_editor";
 import ProjectDescription from './project_components/project_description';
 import DocumentationSection from './project_components/documentation_section';
 import SoftwareRepo from './project_components/software_repo';
+import Roadmap from './project_components/roadmap';
+import Todo from './project_components/todo';
 
 Modal.setAppElement(".root");
 
@@ -22,7 +24,7 @@ const Page = () => {
             const newProj: Project = new Project(savedProject);
             setLoadedProject(newProj);
         }
-      }, []);
+    }, []);
 
     function closeInitProjWizard() {
         setInitProjWizardIsOpen(false);
@@ -38,7 +40,7 @@ const Page = () => {
         if (formData.has("projectType")) {
             const projectType = formData.get("projectType");
             if ((projectType !== null) && (projectType !== "None")) {
-                new ProjectDescription(newProj, "Project Description", [], "", projectType.toString(), "", "", "");
+                new ProjectDescription(newProj, "Project Description", [], {x: 0, y: 0}, "", projectType.toString());
             }
         }
         newProj.saveToBrowser();
@@ -74,14 +76,19 @@ const Page = () => {
             const tileType = formData.get("tileType");
             switch (tileType) {
                 case "Project Description":
-                    new ProjectDescription(loadedProject, "Project Description", [], "", "", "", "", "");
+                    new ProjectDescription(loadedProject, "Project Description", [], {x: 0, y: 0}, "", "");
                     break;
                 case "Documentation Box":
-                    new DocumentationSection(loadedProject, "Documentation Section", [], "");
+                    new DocumentationSection(loadedProject, "Documentation Section", [], {x: 0, y: 0}, "");
                     break;
                 case "Software Repo":
-                    // SoftwareRepo will be used to test implementation feature (i.e. Users clicks on repo component, open modal, can hit "implement")
-                    new SoftwareRepo(loadedProject, "Software Repo", [], true, "", "");
+                    new SoftwareRepo(loadedProject, "Software Repo", [], {x: 0, y: 0}, true, "", "", []);
+                    break;
+                case "Roadmap":
+                    new Roadmap(loadedProject, "Roadmap", [], {x: 0, y: 0}, true, "", [], []);
+                    break;
+                case "Todo":
+                    new Todo(loadedProject, "Todo", [], {x: 0, y: 0}, []);
                     break;
                 default:
                     throw new Error("Unknown tile type: " + tileType);
@@ -141,6 +148,8 @@ const Page = () => {
                         <option value="Project Description">Project Description</option>
                         <option value="Documentation Box">Documentation Box</option>
                         <option value="Software Repo">Software Repo</option>
+                        <option value="Roadmap">Roadmap</option>
+                        <option value="Todo">Todo</option>
                     </select>
                     <button type="submit">Add Tile</button>
                 </form>
