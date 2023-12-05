@@ -1,0 +1,3 @@
+- Add a button to the component tile that when pressed will simulate the component using the dependencies to build up the simulation
+- Simulator used will be dependent on the component type
+- User can add mock hooks for more complicated components

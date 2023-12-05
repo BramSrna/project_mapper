@@ -3,6 +3,8 @@ import ProjectDescription from "./project_description";
 import ProjectComponent from "./project_component";
 import DocumentationSection from "./documentation_section";
 import SoftwareRepo from './software_repo';
+import Roadmap from './roadmap';
+import Todo from './todo';
 
 class Project {
     projectName: string = "project";
@@ -23,11 +25,9 @@ class Project {
                         this,
                         parsedJson[currName]["componentName"],
                         parsedJson[currName]["connections"],
+                        parsedJson[currName]["position"],
                         parsedJson[currName]["projectName"],
-                        parsedJson[currName]["projectType"],
-                        parsedJson[currName]["repoLink"],
-                        parsedJson[currName]["roadmapLink"],
-                        parsedJson[currName]["executionFileLink"]
+                        parsedJson[currName]["projectType"]
                     );
                     this.projectName = newProjectDescription.getProjectName();
                     break;
@@ -37,6 +37,7 @@ class Project {
                         this,
                         parsedJson[currName]["componentName"],
                         parsedJson[currName]["connections"],
+                        parsedJson[currName]["position"],
                         parsedJson[currName]["content"]
                     );
                     break;
@@ -46,9 +47,34 @@ class Project {
                         this,
                         parsedJson[currName]["componentName"],
                         parsedJson[currName]["connections"],
+                        parsedJson[currName]["position"],
                         parsedJson[currName]["createUsingInit"],
                         parsedJson[currName]["cloneTarget"],
-                        parsedJson[currName]["initRepoName"]
+                        parsedJson[currName]["initRepoName"],
+                        parsedJson[currName]["mocks"]
+                    );
+                    break;
+                }
+                case "Roadmap": {
+                    new Roadmap(
+                        this,
+                        parsedJson[currName]["componentName"],
+                        parsedJson[currName]["connections"],
+                        parsedJson[currName]["position"],
+                        parsedJson[currName]["internallyDefined"],
+                        parsedJson[currName]["linkToRoadmap"],
+                        parsedJson[currName]["roadmapHeaders"],
+                        parsedJson[currName]["entries"]
+                    );
+                    break;
+                }
+                case "Todo": {
+                    new Todo(
+                        this,
+                        parsedJson[currName]["componentName"],
+                        parsedJson[currName]["connections"],
+                        parsedJson[currName]["position"],
+                        parsedJson[currName]["items"]
                     );
                     break;
                 }
@@ -82,7 +108,7 @@ class Project {
             }
         }
         const file = new Blob([setupFileContents], { type: "application/json" });
-        saveAs(file, this.projectName + "setup_file.ps1");
+        saveAs(file, this.projectName + "_setup_file.ps1");
     }
 
     downloadDeployFile() {
@@ -94,7 +120,7 @@ class Project {
             }
         }
         const file = new Blob([deployFileContents], { type: "application/json" });
-        saveAs(file, this.projectName + "deploy_file.ps1");
+        saveAs(file, this.projectName + "_deploy_file.ps1");
     }
 
     saveToBrowser() {
@@ -128,6 +154,13 @@ class Project {
         this.components.push(newComponent);
         this.saveToBrowser()
         return true;
+    }
+
+    notifyComponentNameChange(originalComponentName: string, newComponentName: string) {
+        for (const component of this.components) {
+            component.notifyComponentNameChange(originalComponentName, newComponentName);
+        }
+        this.saveToBrowser();
     }
 
     removeComponent(componentToRemove: ProjectComponent) {

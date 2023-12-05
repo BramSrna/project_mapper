@@ -2,22 +2,17 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_com
 import ProjectDescriptionTile from "../tiles/project_description_tile";
 import { ReactElement } from "react";
 import Project from "./project";
+import { ControlPosition } from "react-draggable";
 
 class ProjectDescription extends ProjectComponent {
     projectName: string;
     projectType: string;
-    repoLink: string;
-    roadmapLink: string;
-    executionFileLink: string;
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, projectName: string, projectType: string, repoLink: string, roadmapLink: string, executionFileLink: string) {
-        super(parentProject, componentName, connections);
+    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, projectName: string, projectType: string) {
+        super(parentProject, componentName, connections, position);
 
         this.projectName = projectName;
         this.projectType = projectType;
-        this.repoLink = repoLink;
-        this.roadmapLink = roadmapLink;
-        this.executionFileLink = executionFileLink;
 
         parentProject.addComponent(this);
     }
@@ -26,14 +21,19 @@ class ProjectDescription extends ProjectComponent {
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
-            "type": "ProjectDescription",
-            "projectName": this.projectName,
-            "projectType": this.projectType,
-            "repoLink": this.repoLink,
-            "roadmapLink": this.roadmapLink,
-            "executionFileLink": this.executionFileLink
+            ...this.getDisplayableContentsJson(),
+            "type": "ProjectDescription"
         }
         return finalJson;
+    }
+
+    getDisplayableContentsJson() {
+        const setupContents = {
+            "projectName": this.projectName,
+            "projectType": this.projectType
+        };
+
+        return setupContents;
     }
 
     getProjectName() {
@@ -44,18 +44,6 @@ class ProjectDescription extends ProjectComponent {
         return this.projectType;
     }
 
-    getRepoLink() {
-        return this.repoLink;
-    }
-
-    getRoadmapLink() {
-        return this.roadmapLink;
-    }
-
-    getExecutionFileLink() {
-        return this.executionFileLink;
-    }
-
     setProjectName(newProjectName: string) {
         this.projectName = newProjectName;
         this.saveToBrowser()
@@ -63,21 +51,6 @@ class ProjectDescription extends ProjectComponent {
 
     setProjectType(newProjectType: string) {
         this.projectType = newProjectType;
-        this.saveToBrowser()
-    }
-
-    setRepoLink(newRepoLink: string) {
-        this.repoLink = newRepoLink;
-        this.saveToBrowser()
-    }
-
-    setRoadmapLink(newRoadmapLink: string) {
-        this.roadmapLink = newRoadmapLink;
-        this.saveToBrowser()
-    }
-
-    setExecutionFileLink(newExecutionFileLink: string) {
-        this.executionFileLink = newExecutionFileLink;
         this.saveToBrowser()
     }
 
@@ -91,19 +64,19 @@ class ProjectDescription extends ProjectComponent {
     }
 
     getSetupFileContents() {
-        const setupContents = {
-            "projectName": this.projectName,
-            "projectType": this.projectType,
-            "repoLink": this.repoLink,
-            "roadmapLink": this.roadmapLink,
-            "executionFileLink": this.executionFileLink
-        }
-
-        return `echo '${JSON.stringify(setupContents)}' > "${this.componentName}.json"`;
+        return `echo '${JSON.stringify(this.getDisplayableContentsJson())}' > "${this.componentName}.json"`;
     }
 
     getDeployFileContents() {
         return "";
+    }
+
+    getVisualizerContents() {
+        return (
+            <pre>
+                {JSON.stringify(this.getDisplayableContentsJson(), null, 2)}
+            </pre>
+        )
     }
 }
 
