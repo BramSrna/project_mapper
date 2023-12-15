@@ -1,0 +1,12 @@
+{
+    "Documentation Section": {
+        "componentName": "Documentation Section",
+        "connections": [],
+        "position": {
+            "x": 88,
+            "y": 11
+        },
+        "type": "DocumentationSection",
+        "content": "- Similarities: \n  - Work in computer vision for identifying objects\n  - Robotics/automation for controlling the factories/farms\n  - Modular design for factories/farms\n  - Drone system for collection + distribution\n  - Moving processing to the ocean surface or space\n- Differences: \n  - The major differences are in the actual implementation. The areas of study are similar, so there is overlap and reuse available. That being said, trying to use too general of an approach may result in burning through runway.\n- One potential e2e might be to start by focusing on using compost as a means to create seeds and grow media for vertical farms\n  - From there, expand into recycling other materials for containers, packaging, robots, etc\n- I think it would be better to hyper focus on one area first and then grow from there\n  - There are kind of four general ideas here:\n    - Recycling plants + associated technologies\n    - Vertical farms + associated technologies\n    - Delivery + collection system\n    - Robotics + sensor company (this may count under associated technologies depending on how general it is)\n    - Decentralized collaboration system:\n      - For large world-wide and industry spanning projects, there needs to be an autonomous way for individual contributors and larger operations to contribute. The system needs to be federated, autonomous, and verifiable. It needs to prioritize the most efficient and reliable contributors to deliver the best product. Finally, the system needs to be able to reliably pay contributors depending on their contribution.\n      - This could potentially be built on top of blockchain technology, but it might be best to go with a different tech stack to disassociate with blockchain's negative connotation\n  - Recycling is probably the best place to start\n    - Combination of a lot of the areas connecting the various ideas\n    - Once the idea hits it's running state, there should be a steady state of raw materials for use in other projects"
+    }
+}

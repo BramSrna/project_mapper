@@ -5,6 +5,8 @@ import RoadmapTile from "../tiles/roadmap_tile";
 import { ControlPosition } from "react-draggable";
 
 class Roadmap extends ProjectComponent {
+    type = "Roadmap";
+
     internallyDefined: boolean = true;
     linkToRoadmap: string = "";
     entries: string[][] = [[]];
@@ -29,7 +31,6 @@ class Roadmap extends ProjectComponent {
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
-            "type": "Roadmap",
             "internallyDefined": this.internallyDefined,
             "linkToRoadmap": this.linkToRoadmap,
             "roadmapHeaders": this.roadmapHeaders,
@@ -129,62 +130,47 @@ class Roadmap extends ProjectComponent {
         }
     }
 
-    toElement(listKey: number): ReactElement {
-        return (
-            <RoadmapTile
-                parentComponent={this}
-                key={listKey}
-            />
-        )
-    }
-
     getSetupFileContents() {    
         if (this.internallyDefined) {
-            return `echo '${JSON.stringify(this.entries)}' > "${this.componentName}.json"`;
+            let content: string = "";
+
+            let currLineContent: string = "";
+            for (let i: number = 0; i < this.roadmapHeaders.length; i++) {
+                if (i === 0) {
+                    currLineContent += "|";
+                }
+                currLineContent += this.roadmapHeaders[i] + "|";
+            }
+            content += `echo '${currLineContent}' > "${this.componentName}.md"`;
+
+            currLineContent = "";
+            for (let i: number = 0; i < this.roadmapHeaders.length; i++) {
+                if (i === 0) {
+                    currLineContent += "|";
+                }
+                currLineContent += ":---|";
+            }
+            content += `\necho '${currLineContent}' >> "${this.componentName}.md"`;
+
+            for (let i: number = 0; i < this.entries.length; i++) {
+                currLineContent = "";
+                for (let j: number = 0; j < this.entries[i].length; j++) {
+                    if (j === 0) {
+                        currLineContent += "|";
+                    }
+                    currLineContent += this.entries[i][j] + "|";
+                }
+                content += `\necho '${currLineContent}' >> "${this.componentName}.md"`;
+            }
+
+            return content;
         } else {
-            return `echo '${JSON.stringify({"RoadmapLink": this.linkToRoadmap})}' > "${this.componentName}.json"`;
+            return `echo 'Roadmap Link: ${this.linkToRoadmap}' > "${this.componentName}.md"`;
         }
     }
 
     getDeployFileContents() {
         return "";
-    }
-
-    getVisualizerContents() {
-        if (this.internallyDefined) {
-            let keyVal = 0;
-            const tableHeaders = this.roadmapHeaders.map(function(currHeader) {
-                return (<th key={keyVal++}>{currHeader}</th>);
-            });
-            const tableRows = this.entries.map(function(currEntry) {
-                const rowVals = currEntry.map(function(currVal) {
-                    return (<td key={keyVal++}>{currVal}</td>);
-                })
-                return (
-                    <tr key={keyVal++}>
-                        {rowVals}
-                    </tr>
-                );
-            });
-            return (
-                <table>
-                    <thead>
-                        <tr>
-                            {tableHeaders}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tableRows}
-                    </tbody>
-                </table>
-            );
-        } else {
-            return (
-                <p>
-                    {this.linkToRoadmap}
-                </p>
-            )
-        }
     }
 }
 

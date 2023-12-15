@@ -71,29 +71,26 @@ const SoftwareRepoTile = (props: {parentComponent: SoftwareRepo}) => {
     }
 
     return (
-        <TileContainer
-            parentComponent={props.parentComponent}
-            containerContents={
-                <div>
-                    <label>
-                        <Toggle
-                            defaultChecked={displayInitNameTargetField}
-                            icons={false}
-                            onChange={switchDisplayedFields}
-                        />
-                        <span>Toggle Init Method</span>
-                    </label>
+        <TileContainer parentComponent={props.parentComponent}>
+            <div>
+                <label>
+                    <Toggle
+                        defaultChecked={displayInitNameTargetField}
+                        icons={false}
+                        onChange={switchDisplayedFields}
+                    />
+                    <span>Toggle Init Method</span>
+                </label>
 
-                    <form id="SoftwareRepo">
-                        {getFormFields()}
-                    </form>
+                <form id="SoftwareRepo">
+                    {getFormFields()}
+                </form>
 
-                    <form>
-                        {getMocksTable()}
-                    </form>                    
-                </div>
-            }
-        />
+                <form>
+                    {getMocksTable()}
+                </form>                    
+            </div>
+        </TileContainer>
     );
 }
 

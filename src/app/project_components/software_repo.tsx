@@ -38,6 +38,8 @@ class Mock {
 }
 
 class SoftwareRepo extends ProjectComponent {
+    type = "SoftwareRepo";
+
     createUsingInit: boolean = true;
     cloneTarget: string = "";
     initRepoName: string = "";
@@ -50,21 +52,11 @@ class SoftwareRepo extends ProjectComponent {
         this.cloneTarget = cloneTarget;
         this.initRepoName = initRepoName;
         this.mocks = [];
-        console.log(mocks);
         for (const currMock of mocks) {
             this.mocks.push(new Mock(currMock["input" as keyof typeof currMock], currMock["output" as keyof typeof currMock]));
         }
 
         parentProject.addComponent(this);
-    }
-
-    toElement(listKey: number): ReactElement {
-        return (
-            <SoftwareRepoTile
-                parentComponent={this}
-                key={listKey}
-            />
-        )
     }
 
     toJSON() {
@@ -75,7 +67,6 @@ class SoftwareRepo extends ProjectComponent {
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
-            "type": "SoftwareRepo",
             "createUsingInit": this.createUsingInit,
             "cloneTarget": this.cloneTarget,
             "initRepoName": this.initRepoName,
@@ -143,9 +134,17 @@ class SoftwareRepo extends ProjectComponent {
 
     getSetupFileContents() {
         if (this.createUsingInit) {
-            return `mkdir ${this.initRepoName} \ncd ${this.initRepoName}\ngit init\ncd ..`;
+            if (this.initRepoName === "") {
+                return "";
+            } else {
+                return `mkdir ${this.initRepoName} \ncd ${this.initRepoName}\ngit init\ncd ..`;
+            }
         } else {
-            return `git clone ${this.cloneTarget}`;
+            if (this.cloneTarget === "") {
+                return "";
+            } else {
+                return `git clone ${this.cloneTarget}`;
+            }
         }
     }
 
@@ -153,38 +152,21 @@ class SoftwareRepo extends ProjectComponent {
         let contents: string = "";
         let folderName: string = "";
         if (this.createUsingInit) {
+            if (this.initRepoName === "") {
+                return "";
+            }
             contents += `mkdir ${this.initRepoName} \ncd ${this.initRepoName}\ngit init\ncd ..`;
             folderName = this.initRepoName;
         } else {
+            if (this.cloneTarget === "") {
+                return "";
+            }
             contents += `git clone ${this.cloneTarget}`;
             const cloneTargetParts: string[] = this.cloneTarget.split("/")
             folderName = cloneTargetParts[cloneTargetParts.length - 1].replace(".git", "");
         }
         contents += `\ncd ${folderName}\n.\\startup.ps1`;
         return contents;
-    }
-
-    getVisualizerContents() {
-        let keyVal: number = 0;
-        return (            
-            <table>
-                <thead>
-                    <tr key={keyVal++}>
-                        <td key={keyVal++}>Input</td>
-                        <td key={keyVal++}>Output</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.mocks.map(function(currMock) {
-                        return (
-                        <tr key={keyVal++}>
-                            <td key={keyVal++}>{currMock.getInput()}</td>
-                            <td key={keyVal++}>{currMock.getOutput()}</td>
-                        </tr>);
-                    })}
-                </tbody>
-            </table>
-        )
     }
 }
 

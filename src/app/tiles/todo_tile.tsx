@@ -4,7 +4,6 @@ import Todo from "../project_components/todo";
 
 const TodoTile = (props: {parentComponent: Todo}) => {
     function checkboxOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        console.log(event.target.checked)
         props.parentComponent.setIsComplete(rowIndex, event.target.checked)
     }
 
@@ -44,16 +43,13 @@ const TodoTile = (props: {parentComponent: Todo}) => {
     }
 
     return (
-        <TileContainer
-            parentComponent={props.parentComponent}
-            containerContents={
-                <div>
-                    <form id="Todo">
-                        {getFormFields()}
-                    </form>
-                </div>
-            }
-        />
+        <TileContainer parentComponent={props.parentComponent}>
+            <div>
+                <form id="Todo">
+                    {getFormFields()}
+                </form>
+            </div>
+        </TileContainer>
     );
 }
 

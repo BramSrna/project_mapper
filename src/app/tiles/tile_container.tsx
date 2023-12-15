@@ -1,16 +1,17 @@
-import { useRef, ChangeEvent, MutableRefObject, useState, ReactElement, useEffect, FormEvent } from "react";
+import { useRef, ChangeEvent, MutableRefObject, useState, ReactElement, useEffect, FormEvent, cloneElement } from "react";
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import {useXarrow} from 'react-xarrows';
 import ProjectComponent from "../project_components/project_component";
 import Modal from 'react-modal';
 import Visualizer from "../visualizer/visualizer";
 
-const TileContainer = (props: {parentComponent: ProjectComponent, containerContents: ReactElement}) => {
+const TileContainer = (props: {parentComponent: ProjectComponent, children: ReactElement}) => {
     const updateXarrow = useXarrow();
 
     const [stillExists, setStillExists] = useState(true);
     const [visualizerIsOpen, setvisualizerIsOpen] = useState(false);
     const [position, setPosition] = useState(props.parentComponent.getPosition());
+    const [view, setView] = useState("ViewEditor");
 
     const nodeRef: MutableRefObject<null> = useRef(null);
 
@@ -31,7 +32,7 @@ const TileContainer = (props: {parentComponent: ProjectComponent, containerConte
         props.parentComponent.setComponentName(event.target.value);
     }
 
-    function componentActionMenuOnChangeHandler(event: FormEvent<HTMLFormElement>) {
+    function componentActionMenuOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
         const formData: FormData = new FormData(event.currentTarget);
         if (formData.has("componentActionMenu")) {
             const action = formData.get("componentActionMenu");
@@ -56,6 +57,38 @@ const TileContainer = (props: {parentComponent: ProjectComponent, containerConte
         event.preventDefault();
     }
 
+    function componentViewMenuOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+        const formData: FormData = new FormData(event.currentTarget);
+        if (formData.has("componentViewMenu")) {
+            const view = formData.get("componentViewMenu");
+            if ((view !== null) && (["ViewEditor", "ViewSetupFile", "ViewDeployFile", "ViewJson"].indexOf(view.toString()) !== -1)) {
+                setView(view.toString());
+            } else {
+                setView("ViewEditor");
+            }
+        }
+        event.preventDefault();
+    }
+
+    function renderChildren(component: ProjectComponent, children: ReactElement) {
+        let renderedElement: ReactElement;
+        switch (view) {
+            case "ViewSetupFile":
+                renderedElement = (<textarea key="1" name="viewSetup" value={component.getSetupFileContents()} readOnly={true}/>);
+                break;
+            case "ViewDeployFile":
+                renderedElement = (<textarea key="2" name="viewDeploy" value={component.getDeployFileContents()} readOnly={true}/>);
+                break;
+            case "ViewJson":
+                renderedElement = (<textarea key="3" name="viewJson" value={JSON.stringify(props.parentComponent.toJSON(), null, 2)} readOnly={true}/>);
+                break;
+            default:
+                renderedElement = (children);
+                break;
+        }
+        return renderedElement;
+    }
+
     return (
         stillExists &&
         <div>
@@ -64,7 +97,17 @@ const TileContainer = (props: {parentComponent: ProjectComponent, containerConte
                     <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
                         <input type="text" name="componentName" defaultValue={props.parentComponent.getComponentName()} onChange={componentNameOnChangeHandler}/>
 
-                        <form onSubmit={componentActionMenuOnChangeHandler}>
+                        <form onSubmit={componentViewMenuOnSubmitHandler}>
+                            <select name="componentViewMenu" className="dont-move-draggable">
+                                <option value="ViewEditor">View Editor</option>
+                                <option value="ViewSetupFile">View Setup File</option>
+                                <option value="ViewDeployFile">View Deploy File</option>
+                                <option value="ViewJson">View JSON</option>
+                            </select>
+                            <button type="submit">Change View</button>
+                        </form>
+
+                        <form onSubmit={componentActionMenuOnSubmitHandler}>
                             <select name="componentActionMenu" className="dont-move-draggable">
                                 <option value="SaveSetupFile">Save Setup File</option>
                                 <option value="SaveDeployFile">Save Deploy File</option>
@@ -76,7 +119,7 @@ const TileContainer = (props: {parentComponent: ProjectComponent, containerConte
                     </div>
 
                     <div className="dont-move-draggable">
-                        {props.containerContents}
+                        {renderChildren(props.parentComponent, props.children)}
                     </div>
                 </div>
             </Draggable>

@@ -8,18 +8,16 @@ const DocumentationBoxTile = (props: {parentComponent: DocumentationSection}) =>
     }
 
     return (
-        <TileContainer
-            parentComponent={props.parentComponent}
-            containerContents={
-                <textarea
-                    name="documentation"
-                    rows={4}
-                    cols={40}
-                    defaultValue={props.parentComponent.getContent()}
-                    onChange={e => documentationOnChangeHandler(e)}
-                />
-            }
-        />
+        <TileContainer parentComponent={props.parentComponent}>
+            <textarea
+                name="documentation"
+                key = "4"
+                rows={4}
+                cols={40}
+                defaultValue={props.parentComponent.getContent()}
+                onChange={e => documentationOnChangeHandler(e)}
+            />
+        </TileContainer>
     );
 
 }

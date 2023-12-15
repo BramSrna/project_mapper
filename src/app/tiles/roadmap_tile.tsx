@@ -117,24 +117,21 @@ const RoadmapTile = (props: {parentComponent: Roadmap}) => {
     }
 
     return (
-        <TileContainer
-            parentComponent={props.parentComponent}
-            containerContents={
-                <div>
-                    <label>
-                        <Toggle
-                            defaultChecked={displayInternallyDefinedField}
-                            icons={false}
-                            onChange={switchDisplayedFields}
-                        />
-                        <span>Toggle Init Method</span>
-                    </label>
-                    <form id="Roadmap">
-                        {getFormFields()}
-                    </form>
-                </div>
-            }
-        />
+        <TileContainer parentComponent={props.parentComponent}>
+            <div>
+                <label>
+                    <Toggle
+                        defaultChecked={displayInternallyDefinedField}
+                        icons={false}
+                        onChange={switchDisplayedFields}
+                    />
+                    <span>Toggle Init Method</span>
+                </label>
+                <form id="Roadmap">
+                    {getFormFields()}
+                </form>
+            </div>
+        </TileContainer>
     );
 }
 

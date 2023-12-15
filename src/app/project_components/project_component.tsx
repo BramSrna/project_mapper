@@ -6,7 +6,8 @@ import saveAs from "file-saver";
 export interface ProjectComponentToJsonInterface {
     "componentName": string,
     "connections": Array<string>,
-    "position": ControlPosition
+    "position": ControlPosition,
+    "type": string
 }
 
 abstract class ProjectComponent {
@@ -14,6 +15,8 @@ abstract class ProjectComponent {
     componentName: string = "";
     connections: Array<string> = [];
     position: ControlPosition = {x: 0, y: 0};
+
+    abstract readonly type: string;
 
     constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition) {
         this.parentProject = parentProject;
@@ -28,16 +31,19 @@ abstract class ProjectComponent {
         this.position = position;
     }
 
-    abstract toElement(listKey: number) : ReactElement;
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
-    abstract getVisualizerContents() : ReactElement;
+
+    getType() {
+        return this.type;
+    }
 
     toJSON() : ProjectComponentToJsonInterface {
         return {
             "componentName": this.componentName,
             "connections": this.connections,
-            "position": this.position
+            "position": this.position,
+            "type": this.type
         }
     }
 

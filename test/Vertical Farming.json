@@ -1,0 +1,134 @@
+{
+    "Veritcal Farming": {
+        "componentName": "Veritcal Farming",
+        "connections": [],
+        "position": {
+            "x": 47,
+            "y": 2
+        },
+        "type": "ComponentDescription",
+        "name": "Veritcal Farming",
+        "componentType": "Robotics",
+        "endGoal": "End world hunger",
+        "missionStatement": "Develop the capability to sustainably grow and deliver food to everyone"
+    },
+    "Use Cases": {
+        "componentName": "Use Cases",
+        "connections": [],
+        "position": {
+            "x": 603,
+            "y": -54
+        },
+        "type": "UseCases",
+        "startOperatingWall": "Growing food to provide",
+        "endOperatingWall": "Delivering grown food",
+        "useCases": []
+    },
+    "Difficulties": {
+        "componentName": "Difficulties",
+        "connections": [],
+        "position": {
+            "x": 486,
+            "y": 297
+        },
+        "type": "Difficulties",
+        "difficulties": [
+            {
+                "description": "High initial and operational costs",
+                "possibleSolutions": [
+                    "Modular design so farms can start small and grow as needed",
+                    "Self-sustaining unit so farms can operate in remote areas off-grid"
+                ]
+            },
+            {
+                "description": "Limited number of crops can be grown economically and grown crops have small caloric density",
+                "possibleSolutions": [
+                    "Platform and infrastructure for sharing recipes (recipes are lighting, fertilizer, growth medium, seed, etc combinations)",
+                    "Develop marketplace for incentivising recipe creation"
+                ]
+            },
+            {
+                "description": "High dependence on technology working correctly - very exposed to power outages",
+                "possibleSolutions": [
+                    "Modular design so farms can start small and grow as needed",
+                    "Self-sustaining unit so farms can operate in remote areas off-grid"
+                ]
+            },
+            {
+                "description": "Building up delivery infrastructure",
+                "possibleSolutions": [
+                    "Automated drone swarm for delivery enabled alongside GPS connected trackers similar to airtags",
+                    "Accessible collection sites for people without homes and do not want GPS tracking"
+                ]
+            },
+            {
+                "description": "Large land use",
+                "possibleSolutions": [
+                    "Farms that can float on the ocean",
+                    "Farms that can orbit the earth in space"
+                ]
+            }
+        ]
+    },
+    "Roadmap": {
+        "componentName": "Roadmap",
+        "connections": [],
+        "position": {
+            "x": 1301,
+            "y": -127
+        },
+        "type": "Roadmap",
+        "internallyDefined": true,
+        "linkToRoadmap": "",
+        "roadmapHeaders": [
+            "Phase 1: Plant the seeds for the market",
+            ""
+        ],
+        "entries": [
+            [
+                "",
+                "Platform and infrastructure for sharing recipes (recipes are lighting, fertilizer, growth medium, seed, etc combinations)"
+            ],
+            [
+                "",
+                "Develop marketplace for incentivising recipe creation"
+            ],
+            [
+                "Phase 2: Sell technology to existing farms and run farm",
+                ""
+            ],
+            [
+                "",
+                "Modular design so farms can start small and grow as needed"
+            ],
+            [
+                "",
+                "Self-sustaining unit so farms can operate in remote areas off-grid"
+            ],
+            [
+                "Phase 3: Build up delivery infrastructure",
+                ""
+            ],
+            [
+                "",
+                "Automated drone swarm for delivery enabled alongside GPS connected trackers similar to airtags"
+            ],
+            [
+                "",
+                "Accessible collection sites for people without homes and do not want GPS tracking"
+            ],
+            [
+                "Phase 4: Minimize land use",
+                ""
+            ],
+            [
+                "",
+                "Farms that can float on the ocean"
+            ],
+            [
+                "",
+                "Farms that can orbit the earth in space"
+            ]
+        ]
+    }
+}

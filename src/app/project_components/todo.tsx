@@ -33,12 +33,12 @@ class TodoItem {
     }
 
     setIsComplete(newValue: boolean) {
-        console.log("Changing to " + newValue.toString())
         this.isComplete = newValue;
     }
 }
 
 class Todo extends ProjectComponent {
+    type = "Todo";
     items: TodoItem[] = [];
 
     constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, items: object[]) {
@@ -82,15 +82,6 @@ class Todo extends ProjectComponent {
         this.saveToBrowser();
     }
 
-    toElement(listKey: number): ReactElement {
-        return (
-            <TodoTile
-                parentComponent={this}
-                key={listKey}
-            />
-        )
-    }
-
     toJSON() {
         const itemsAsJson: object[] = [];
         for (const currItem of this.items) {
@@ -99,7 +90,6 @@ class Todo extends ProjectComponent {
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
-            "type": "Todo",
             "items": itemsAsJson
         }
         return finalJson;
@@ -107,35 +97,22 @@ class Todo extends ProjectComponent {
 
     getSetupFileContents() {
         let content: string = "";
-        for (const item of this.items) {
-            content += `- ${item}\n`;
+        for (let i: number = 0; i < this.items.length; i++) {
+            let item = this.items[i];
+            if (item.getIsComplete()) {
+                content += `- ${item.getItemDescription()}`;
+            } else {
+                content += `- ~~${item.getItemDescription()}~~`;
+            }
+            if (i < this.items.length - 1) {
+                content += "\n";
+            }
         }
-        return `echo "${content}" > "${this.componentName}.txt"`;
+        return `echo "${content}" > "${this.componentName}.md"`;
     }
 
     getDeployFileContents() {
         return "";
-    }
-
-    getVisualizerContents() {
-        let keyVal = 0;
-        const itemRows = this.items.map(function(currItem) {
-            return (
-                <tr key={keyVal++}>
-                    <td key={keyVal++}><input type="checkbox" checked={currItem.getIsComplete()} readOnly={true}></input></td>
-                    <td key={keyVal++}>{currItem.getItemDescription()}</td>
-                </tr>
-            )
-        });
-        return (
-            <div>
-                <table>
-                    <tbody>
-                        {itemRows}
-                    </tbody>
-                </table>
-            </div>
-        );
     }
 }
 

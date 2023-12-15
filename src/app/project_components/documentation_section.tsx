@@ -6,6 +6,7 @@ import { ControlPosition } from "react-draggable";
 
 class DocumentationSection extends ProjectComponent {
     content = "";
+    type = "DocumentationSection";
 
     constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, content: string) {
         super(parentProject, componentName, connections, position);
@@ -19,7 +20,6 @@ class DocumentationSection extends ProjectComponent {
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
-            "type": "DocumentationSection",
             "content": this.content
         }
         return finalJson;
@@ -34,34 +34,24 @@ class DocumentationSection extends ProjectComponent {
         this.saveToBrowser();
     }
 
-    toElement(listKey: number): ReactElement {
-        return (
-            <DocumentationBoxTile
-                parentComponent={this}
-                key={listKey}
-            />
-        )
-    }
-
     getSetupFileContents() {
-        return `echo "${this.content}" > "${this.componentName}.txt"`;
+        let content: string = "";
+        let lines: string[] = this.content.split("\n");
+        for (let i: number = 0; i < lines.length; i++) {
+            if (i === 0) {
+                content += `echo "${lines[i]}" > "${this.componentName}.md"`;
+            } else {
+                content += `echo "${lines[i]}" >> "${this.componentName}.md"`;
+            }
+            if (i < lines.length - 1) {
+                content += "\n";
+            }
+        }
+        return content;
     }
 
     getDeployFileContents() {
         return "";
-    }
-
-    getVisualizerContents() {
-        console.log(this.content)
-        let keyIndex = 0;
-        const lines = this.content.split("\n").map(function(currLine) {
-            return (<p key={keyIndex++}>{currLine}</p>);
-        })
-        return (
-            <div>
-                {lines}
-            </div>
-        )
     }
 }
 
