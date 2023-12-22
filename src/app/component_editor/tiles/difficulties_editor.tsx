@@ -1,37 +1,34 @@
-import { ChangeEvent, useState } from "react";
-import Toggle from 'react-toggle'
-import TileContainer from "./tile_container";
-import Roadmap from "../project_components/roadmap";
-import Difficulties from "../project_components/difficulties";
+import Difficulties from "@/app/project/project_component/components/difficulties/difficulties";
+import { ChangeEvent } from "react";
 
-const DifficultiesTile = (props: {parentComponent: Difficulties}) => {
+const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
     function addDifficulty() {
-        props.parentComponent.addDifficulty();
+        props.difficultiesComp.addDifficulty();
     }
 
     function difficultyDescriptionOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.parentComponent.setDifficultyDescription(rowIndex, event.target.value);
+        props.difficultiesComp.setDifficultyDescription(rowIndex, event.target.value);
     }
 
     function possibleSolutionOnChangeHandler(event: ChangeEvent<HTMLInputElement>, difficultyIndex: number, possibleSolutionIndex: number) {
-        props.parentComponent.setPossibleSolution(difficultyIndex, possibleSolutionIndex, event.target.value);
+        props.difficultiesComp.setPossibleSolution(difficultyIndex, possibleSolutionIndex, event.target.value);
     }
 
     function deleteDifficultyOnClickHandler(index: number) {
-        props.parentComponent.deleteDifficulty(index);
+        props.difficultiesComp.deleteDifficulty(index);
     }
 
     function addPossibleSolutionOnClickHandler(index: number) {
-        props.parentComponent.addPossibleSolution(index);
+        props.difficultiesComp.addPossibleSolution(index);
     }
 
     function deletePossibleSolutionOnClickHandler(difficultyIndex: number, possibleSolutionIndex: number) {
-        props.parentComponent.deletePossibleSolution(difficultyIndex, possibleSolutionIndex);
+        props.difficultiesComp.deletePossibleSolution(difficultyIndex, possibleSolutionIndex);
     }
 
     function getTableBody() {
         let keyVal: number = 0;
-        const difficultyRows = props.parentComponent.getDifficulties().map(function(currDifficulty, difficultyIndex) {
+        const difficultyRows = props.difficultiesComp.getDifficulties().map(function(currDifficulty, difficultyIndex) {
             let numPossibleSolutions: number = currDifficulty.getPossibleSolutions().length;
             if (numPossibleSolutions <= 0) {
                 return (
@@ -87,12 +84,10 @@ const DifficultiesTile = (props: {parentComponent: Difficulties}) => {
     }
 
     return (
-        <TileContainer parentComponent={props.parentComponent}>
-            <div>
-                {getTableBody()}
-            </div>
-        </TileContainer>
+        <div>
+            {getTableBody()}
+        </div>
     );
 }
 
-export default DifficultiesTile;
+export default DifficultiesEditor;

@@ -1,21 +1,24 @@
 import { saveAs } from 'file-saver';
-import ProjectComponent from "./project_component";
-import DocumentationSection from "./documentation_section";
-import SoftwareRepo from './software_repo';
-import Roadmap from './roadmap';
-import Todo from './todo';
-import UseCases from './use_cases';
-import Difficulties from './difficulties';
-import ComponentDescription from './component_description';
+import ProjectComponent from "./project_component/project_component";
+import DocumentationSection from "./project_component/components/documentation_section";
+import SoftwareRepo from './project_component/components/software_repo/software_repo';
+import Roadmap from './project_component/components/roadmap/roadmap';
+import Todo from './project_component/components/todo/todo';
+import UseCases from './project_component/components/use_cases';
+import Difficulties from './project_component/components/difficulties/difficulties';
+import ComponentDescription from './project_component/components/component_description';
+import IdGenerator from '../id_generator';
 
 class Project {
     projectName: string = "";
     components: Array<ProjectComponent> = [];
-    projectId: string = "";
+    projectId: string;
 
     constructor(projectId?: string, jsonStr?: string) {
         if (typeof(projectId) === "undefined") {
-            projectId = this.makeId(12);
+            projectId = IdGenerator.generateId();
+        } else {
+            IdGenerator.addGeneratedId(projectId);
         }
         this.projectId = projectId;
 
@@ -34,6 +37,7 @@ class Project {
                 switch(compType) {
                     case "ComponentDescription": {
                         new ComponentDescription(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -47,6 +51,7 @@ class Project {
                     }
                     case "DocumentationSection": {
                         new DocumentationSection(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -57,6 +62,7 @@ class Project {
                     }
                     case "SoftwareRepo": {
                         new SoftwareRepo(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -70,19 +76,18 @@ class Project {
                     }
                     case "Roadmap": {
                         new Roadmap(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
                             parsedJson[currName]["position"],
-                            parsedJson[currName]["internallyDefined"],
-                            parsedJson[currName]["linkToRoadmap"],
-                            parsedJson[currName]["roadmapHeaders"],
                             parsedJson[currName]["entries"]
                         );
                         break;
                     }
                     case "Todo": {
                         new Todo(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -93,6 +98,7 @@ class Project {
                     }
                     case "UseCases":
                         new UseCases(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -104,6 +110,7 @@ class Project {
                         break;
                     case "Difficulties":
                         new Difficulties(
+                            parsedJson[currName]["id"],
                             this,
                             parsedJson[currName]["componentName"],
                             parsedJson[currName]["connections"],
@@ -117,18 +124,6 @@ class Project {
                 }
             }
         }
-    }
-
-    makeId(length: number) {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        let counter = 0;
-        while (counter < length) {
-          result += characters.charAt(Math.floor(Math.random() * charactersLength));
-          counter += 1;
-        }
-        return result;
     }
 
     toJSON() {
@@ -182,7 +177,10 @@ class Project {
         }
 
         let projJson: object = this.toJSON();
-        projJson["projectName"] = this.projectName;
+        projJson = {
+            ...projJson,
+            "projectName": this.projectName
+        };
 
         localStorage.setItem(this.projectId, JSON.stringify(projJson));
     }

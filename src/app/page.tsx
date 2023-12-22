@@ -1,58 +1,67 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
-import Project from "./project_components/project";
+import React, { useState, FormEvent, useEffect, useCallback } from 'react';
+import Project from "./project/project";
 import Modal from 'react-modal';
-import ProjectEditor from "./project_editor";
-import DocumentationSection from './project_components/documentation_section';
-import SoftwareRepo from './project_components/software_repo';
-import Roadmap from './project_components/roadmap';
-import Todo from './project_components/todo';
-import UseCases from './project_components/use_cases';
-import Difficulties from './project_components/difficulties';
-import ComponentDescription from './project_components/component_description';
-import {Canvas} from "@react-three/fiber";
-import {OrbitControls} from "@react-three/drei";
+import ComponentDescription from './project/project_component/components/component_description';
+import EditorCanvas from './editor_canvas';
 
 // Modal.setAppElement(".root");
 
 const Page = () => {
-    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
+    const [mainMenuDropdownVisible, setMainMenuDropdownVisible] = useState(false);
     const [initProjWizardIsOpen, setInitProjWizardIsOpen] = useState(false);
-    const [loadedProject, setLoadedProject] = useState<Project>(new Project());
-    const [loadedProjectIds, setLoadedProjectIds] = useState<string[]>([]);
+    const [projectToEdit, setProjectToEdit] = useState<Project>(new Project());
+    const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
 
     useEffect(() => {
+        reloadLocalStorage();
+    }, []);
+
+    function reloadLocalStorage() {
         const storedProjIds = localStorage.getItem("loadedProjectIds");
-        let projIds: string[] = [];
+        let projects: Project[] = [];
         if (storedProjIds !== null) {
-            projIds = JSON.parse(storedProjIds);
-        }
-        setLoadedProjectIds(projIds);
+            let projIds: string[] = JSON.parse(storedProjIds);
 
-        const loadedProjectId = localStorage.getItem("loadedProjectId");
-        if ((loadedProjectId === null) && (storedProjIds !== null) && (storedProjIds.length > 0)) {
-            loadedProjectId === storedProjIds[0];
+            for (var currId of projIds) {
+                const project = localStorage.getItem(currId);
+        
+                if (project !== null) {
+                    const newProj: Project = new Project(currId, project);
+                    projects.push(newProj);
+                }
+            }
+        }
+        setLoadedProjects(projects);
+
+        const projectToEditId = localStorage.getItem("projectToEditId");
+        if ((projectToEditId === null) && (storedProjIds !== null) && (storedProjIds.length > 0)) {
+            projectToEditId === storedProjIds[0];
         }
 
-        if (loadedProjectId !== null) {
-            const loadedProjectInfo = localStorage.getItem(loadedProjectId);
+        if (projectToEditId !== null) {
+            const loadedProjectInfo = localStorage.getItem(projectToEditId);
             if (loadedProjectInfo !== null) {
-                const newProj: Project = new Project(loadedProjectId, loadedProjectInfo);
-                setLoadedProject(newProj);
+                const newProj: Project = new Project(projectToEditId, loadedProjectInfo);
+                setProjectToEdit(newProj);
             }
         } else {
-            loadedProject.setProjectName("New Project");
-            localStorage.setItem("loadedProjectId", loadedProject.getProjectId())
+            projectToEdit.setProjectName("New Project");
+            localStorage.setItem("projectToEditId", projectToEdit.getProjectId())
         }
-    }, []);
+    }
 
     function closeInitProjWizard() {
         setInitProjWizardIsOpen(false);
     }
 
-    function toggleFileDropdown() {
-        setFileDropdownVisible(!fileDropdownVisible);
+    function toggleMainMenuDropdown() {
+        let newVal: boolean = !mainMenuDropdownVisible;
+        if (newVal) {
+            reloadLocalStorage();
+        }
+        setMainMenuDropdownVisible(newVal);
     }
 
     function initWizardOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
@@ -65,8 +74,13 @@ const Page = () => {
             }
         }
         newProj.saveToBrowser();
-        localStorage.setItem("loadedProjectId", newProj.getProjectId());
-        setLoadedProject(newProj);
+        newProj.setProjectName("New Project");
+        localStorage.setItem("projectToEditId", newProj.getProjectId());
+        setProjectToEdit(newProj);
+        setLoadedProjects([
+            ...loadedProjects,
+            newProj
+        ]);
         closeInitProjWizard();
     }
 
@@ -86,94 +100,30 @@ const Page = () => {
             if ((target !== null) && (target.result !== null)) {
                 const newProject: Project = new Project(undefined, target.result.toString());
                 newProject.saveToBrowser();
-                localStorage.setItem("loadedProjectId", newProject.getProjectId());
-                setLoadedProject(newProject);
+                localStorage.setItem("projectToEditId", newProject.getProjectId());
+                setProjectToEdit(newProject);
+                setLoadedProjects([
+                    ...loadedProjects,
+                    newProject
+                ])
             }
         };
         fileReader.readAsText(file);
     }
-
-    function addTileOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
-        const formData: FormData = new FormData(event.currentTarget);
-        if (formData.has("tileType")) {
-            const tileType = formData.get("tileType");
-            switch (tileType) {
-                case "Component Description":
-                    new ComponentDescription(loadedProject, "Component Description", [], {x: 0, y: 0}, "", "", "", "");
-                    break;
-                case "Documentation Box":
-                    new DocumentationSection(loadedProject, "Documentation Section", [], {x: 0, y: 0}, "");
-                    break;
-                case "Software Repo":
-                    new SoftwareRepo(loadedProject, "Software Repo", [], {x: 0, y: 0}, true, "", "", []);
-                    break;
-                case "Roadmap":
-                    new Roadmap(loadedProject, "Roadmap", [], {x: 0, y: 0}, true, "", [], []);
-                    break;
-                case "Todo":
-                    new Todo(loadedProject, "Todo", [], {x: 0, y: 0}, []);
-                    break;
-                case "UseCases":
-                    new UseCases(loadedProject, "Use Cases", [], {x: 0, y: 0}, "", "", []);
-                    break;
-                case "Difficulties":
-                    new Difficulties(loadedProject, "Difficulties", [], {x: 0, y: 0}, []);
-                    break;
-                default:
-                    throw new Error("Unknown tile type: " + tileType);
-            }
-        }
-    }
     
     function saveProjectOnClickHandler() {
-        loadedProject.downloadProjectAsJson();
+        projectToEdit.downloadProjectAsJson();
     }
 
     function saveSetupFileOnClickHandler() {
-        loadedProject.downloadSetupFile();
+        projectToEdit.downloadSetupFile();
     }
 
     function saveDeployFileOnClickHandler() {
-        loadedProject.downloadDeployFile();
+        projectToEdit.downloadDeployFile();
     }
 
-    function addDependencyOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
-        const formData: FormData = new FormData(event.currentTarget);
-        const rootName: string = formData.get("rootSelector")!.toString();
-        const targetName: string = formData.get("targetSelector")!.toString();
-
-        if (rootName === targetName) {
-            return false;
-        }
-
-        const rootComponent = loadedProject.getComponentWithName(rootName);
-        const targetComponent = loadedProject.getComponentWithName(targetName);
-
-        if ((rootComponent !== null) && (targetComponent !== null)) {
-            rootComponent.addConnection(targetComponent);
-        }
-    }
-
-    function getLoadedProjectNames() {
-        let keyVal: number = 0;
-        let options = [];
-        for (var currId of loadedProjectIds) {
-            const project = localStorage.getItem(currId);
-    
-            if (project !== null) {
-                const newProj: Project = new Project(currId, project);
-                let element = <option key={keyVal++} value={currId}>{newProj.getProjectName()}</option>
-                if (currId === loadedProject.getProjectId()) {
-                    options.unshift(element);
-                } else {
-                    options.push(element);
-                }
-            }
-        }
-        return options;
-    }
-
-    function changeLoadedProjectMenu(event: FormEvent<HTMLFormElement>) {
+    function changeLoadedProjectMenuOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
         const formData: FormData = new FormData(event.currentTarget);
         if (formData.has("action")) {
             const action = formData.get("action");
@@ -191,8 +141,8 @@ const Page = () => {
                             }
                         }
                     }
-                    localStorage.setItem("loadedProjectId", newProj.getProjectId());
-                    setLoadedProject(newProj)
+                    localStorage.setItem("projectToEditId", newProj.getProjectId());
+                    setProjectToEdit(newProj)
                     break;
                 }
                 case "Close Project": {
@@ -211,8 +161,11 @@ const Page = () => {
                                 }
                             }
                             localStorage.removeItem(projId.toString());
+                            setLoadedProjects(loadedProjects.filter(function(project) {
+                                return (project.getProjectId() !== projId);
+                            }));
 
-                            if (loadedProject.getProjectId() === projId) {
+                            if (projectToEdit.getProjectId() === projId) {
                                 let newProj: Project = new Project(undefined, "{}");
 
                                 if (parsedIds.length > 0) {
@@ -223,10 +176,14 @@ const Page = () => {
                                     }
                                 } else {
                                     newProj.setProjectName("New Project");
+                                    setLoadedProjects([
+                                        ...loadedProjects,
+                                        newProj
+                                    ]);
                                 }
 
-                                localStorage.setItem("loadedProjectId", newProj.getProjectId());
-                                setLoadedProject(newProj)
+                                localStorage.setItem("projectToEditId", newProj.getProjectId());
+                                setProjectToEdit(newProj)
                             }
                         }
                     }
@@ -237,73 +194,68 @@ const Page = () => {
                 }
             }
         }
+        event.preventDefault();
     }
 
     return (
-        <div className="root">
-            <div className="loaded-projects-menu">
-                <form onSubmit={changeLoadedProjectMenu}>
-                    <select name="projectId">
-                        {getLoadedProjectNames()}
-                    </select>
-                    <select name="action">
-                        <option value="Load Project">Load Project</option>
-                        <option value="Close Project">Close Project</option>
-                    </select>
-                    <button type="submit">Execute Action</button>
-                </form>
-            </div>
-
+        <div
+            className="project-mapper-container"
+            style={{
+                height: "100vh"
+            }}
+        >
             <div className="dropdown-menu">
-                <button onClick={toggleFileDropdown}>File</button>
+                <button onClick={toggleMainMenuDropdown}>Main Menu</button>
                 {
-                    fileDropdownVisible && (
+                    mainMenuDropdownVisible && (
                         <div className="dropdown-content">
-                            <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
-                            <input type="file" accept=".json" onChange={handleProjectImport}/>
-                            <button onClick={saveProjectOnClickHandler}>Save Project</button>
-                            <button onClick={saveSetupFileOnClickHandler}>Save Setup File</button>
-                            <button onClick={saveDeployFileOnClickHandler}>Save Deploy File</button>
+                            <div className="loaded-projects-menu">
+                                <form onSubmit={changeLoadedProjectMenuOnSubmitHandler}>
+                                    <select name="projectId" defaultValue={projectToEdit.getProjectId()}>
+                                        {
+                                            loadedProjects.map(function(currProject: Project) {
+                                                return(
+                                                    <option
+                                                        key={currProject.getProjectId()}
+                                                        value={currProject.getProjectId()}
+                                                    >
+                                                        {currProject.getProjectName()}
+                                                    </option>
+                                                );
+                                            })
+                                        }
+                                    </select>
+                                    <select name="action">
+                                        <option value="Load Project">Load Project</option>
+                                        <option value="Close Project">Close Project</option>
+                                    </select>
+                                    <button type="submit">Execute Action</button>
+                                </form>
+                            </div>
+
+                            <div className="dropdown-content">
+                                <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
+                                <input type="file" accept=".json" onChange={handleProjectImport}/>
+                                <button onClick={saveProjectOnClickHandler}>Save Project</button>
+                                <button onClick={saveSetupFileOnClickHandler}>Save Setup File</button>
+                                <button onClick={saveDeployFileOnClickHandler}>Save Deploy File</button>
+                            </div>
                         </div>
                     )
                 }
             </div>
 
-            <div className="tile-menu">
-                <form onSubmit={addTileOnSubmitHandler}>
-                    <select name="tileType">
-                        <option value="Component Description">Component Description</option>
-                        <option value="Documentation Box">Documentation Box</option>
-                        <option value="Software Repo">Software Repo</option>
-                        <option value="Roadmap">Roadmap</option>
-                        <option value="Todo">Todo</option>
-                        <option value="UseCases">Use Cases</option>
-                        <option value="Difficulties">Difficulties</option>
-                    </select>
-                    <button type="submit">Add Tile</button>
-                </form>
+            <div
+                className="project-editor-container"
+                style={{
+                    height: "80vh"
+                }}
+                onClick={e => setMainMenuDropdownVisible(false)}
+            >
+                <EditorCanvas projectToEdit={projectToEdit}></EditorCanvas>
             </div>
 
-            <div className="dependency-menu">
-                <form onSubmit={addDependencyOnSubmitHandler}>
-                    <select name="rootSelector">
-                        {loadedProject.getComponentNames().map((compName: string, index) => <option value={compName} key={index}>{compName}</option>)}
-                    </select>
-                    <select name="connectionType">
-                        <option value="Uses">Uses</option>
-                    </select>
-                    <select name="targetSelector">
-                        {loadedProject.getComponentNames().map((compName: string, index) => <option value={compName} key={index}>{compName}</option>)}
-                    </select>
-                    <button type="submit">Add Dependency</button>
-                </form>
-            </div>
-
-            <div>
-                <ProjectEditor projectToEdit={loadedProject}></ProjectEditor>
-            </div>
-
-            <div className="init-proj-wizard">
+            <div className="init-proj-wizard" onClick={e => setMainMenuDropdownVisible(false)}>
                 <Modal
                     style={{overlay: {zIndex: 1000}}}
                     isOpen={initProjWizardIsOpen}
@@ -319,20 +271,6 @@ const Page = () => {
                         <button type="submit">Close Wizard And Go To Editor</button>
                     </form>
                 </Modal>
-            </div>
-
-            <div className="App">
-                <div className="App-header">
-                    <Canvas>
-                        <OrbitControls />
-                        <ambientLight intensity ={0.5} />
-                        <spotLight position={[10, 15,10]} angle={0.3} />
-                        <mesh>
-                            <boxGeometry attach ="geometry" />
-                            <meshLambertMaterial attach="material" color="hotpink" />
-                        </mesh>
-                    </Canvas>
-                </div>
             </div>
         </div>
     );

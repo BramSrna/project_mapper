@@ -1,7 +1,5 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component";
-import ProjectDescriptionTile from "../tiles/component_description_tile";
-import { ReactElement } from "react";
-import Project from "./project";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
+import Project from "../../project";
 import { ControlPosition } from "react-draggable";
 
 class UseCases extends ProjectComponent {
@@ -11,8 +9,8 @@ class UseCases extends ProjectComponent {
     endOperatingWall: string;
     useCases: string[];
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, startOperatingWall: string, endOperatingWall: string, useCases: string[]) {
-        super(parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, startOperatingWall: string, endOperatingWall: string, useCases: string[]) {
+        super(id, parentProject, componentName, connections, position);
 
         this.startOperatingWall = startOperatingWall;
         this.endOperatingWall = endOperatingWall;

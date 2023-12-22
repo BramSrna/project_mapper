@@ -1,15 +1,13 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component";
-import { ReactElement } from "react";
-import DocumentationBoxTile from "../tiles/documentation_box_tile";
-import Project from "./project";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
+import Project from "../../project";
 import { ControlPosition } from "react-draggable";
 
 class DocumentationSection extends ProjectComponent {
     content = "";
     type = "DocumentationSection";
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, content: string) {
-        super(parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, content: string) {
+        super(id, parentProject, componentName, connections, position);
 
         this.content = content;
 

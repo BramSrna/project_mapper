@@ -1,11 +1,11 @@
 import { useRef, ChangeEvent, MutableRefObject, useState, ReactElement, useEffect, FormEvent, cloneElement } from "react";
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import {useXarrow} from 'react-xarrows';
-import ProjectComponent from "../project_components/project_component";
+import ProjectComponent from "../project/project_component/project_component";
 import Modal from 'react-modal';
 import Visualizer from "../visualizer/visualizer";
 
-const TileContainer = (props: {parentComponent: ProjectComponent, children: ReactElement}) => {
+const PreviewTileContainer = (props: {parentComponent: ProjectComponent, children: ReactElement}) => {
     const updateXarrow = useXarrow();
 
     const [stillExists, setStillExists] = useState(true);
@@ -139,4 +139,4 @@ const TileContainer = (props: {parentComponent: ProjectComponent, children: Reac
 
 }
 
-export default TileContainer;
+export default PreviewTileContainer;

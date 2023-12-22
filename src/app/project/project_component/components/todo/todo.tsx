@@ -1,48 +1,15 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component";
-import { ReactElement } from "react";
-import Project from "./project";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
+import Project from "../../../project";
 import { ControlPosition } from "react-draggable";
-import TodoTile from "../tiles/todo_tile";
-
-class TodoItem {
-    itemDescription: string = "";
-    isComplete: boolean = false;
-
-    constructor(itemDescription: string, isComplete: boolean) {
-        this.itemDescription = itemDescription;
-        this.isComplete = isComplete;
-    }
-
-    toJSON() {
-        return {
-            "description": this.itemDescription,
-            "isComplete": this.isComplete
-        }
-    }
-
-    getIsComplete() {
-        return this.isComplete;
-    }
-
-    getItemDescription() {
-        return this.itemDescription;
-    }
-
-    setItemDescription(newDescription: string) {
-        this.itemDescription = newDescription;
-    }
-
-    setIsComplete(newValue: boolean) {
-        this.isComplete = newValue;
-    }
-}
+import TodoItem from "./todo_item";
+import Connection from "../../connection";
 
 class Todo extends ProjectComponent {
     type = "Todo";
     items: TodoItem[] = [];
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, items: object[]) {
-        super(parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, items: object[]) {
+        super(id, parentProject, componentName, connections, position);
 
         this.items = [];
         for (const currItem of items) {

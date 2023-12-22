@@ -1,27 +1,26 @@
+import Todo from "@/app/project/project_component/components/todo/todo";
 import { ChangeEvent } from "react";
-import TileContainer from "./tile_container";
-import Todo from "../project_components/todo";
 
-const TodoTile = (props: {parentComponent: Todo}) => {
+const TodoEditor = (props: {todoComp: Todo}) => {
     function checkboxOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.parentComponent.setIsComplete(rowIndex, event.target.checked)
+        props.todoComp.setIsComplete(rowIndex, event.target.checked)
     }
 
     function itemDescriptionOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.parentComponent.setItemDescription(rowIndex, event.target.value);
+        props.todoComp.setItemDescription(rowIndex, event.target.value);
     }
 
     function deleteItemOnClickHandler(rowIndex: number) {
-        props.parentComponent.deleteItem(rowIndex);
+        props.todoComp.deleteItem(rowIndex);
     }
 
     function addItemOnClickHandler() {
-        props.parentComponent.addItem();
+        props.todoComp.addItem();
     }
 
     function getFormFields() {
         let keyVal = 0;
-        const itemRows = props.parentComponent.getItems().map(function(currItem, rowIndex) {
+        const itemRows = props.todoComp.getItems().map(function(currItem, rowIndex) {
             return (
                 <tr key={keyVal++}>
                     <td key={keyVal++}><input type="checkbox" defaultChecked={currItem.getIsComplete()} onChange={e => checkboxOnChangeHandler(e, rowIndex)}></input></td>
@@ -43,14 +42,12 @@ const TodoTile = (props: {parentComponent: Todo}) => {
     }
 
     return (
-        <TileContainer parentComponent={props.parentComponent}>
-            <div>
-                <form id="Todo">
-                    {getFormFields()}
-                </form>
-            </div>
-        </TileContainer>
+        <div>
+            <form id="Todo">
+                {getFormFields()}
+            </form>
+        </div>
     );
 }
 
-export default TodoTile;
+export default TodoEditor;

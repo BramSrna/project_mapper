@@ -1,24 +1,26 @@
-import { ReactElement } from "react";
-import Project from "./project";
+import Project from "../project";
 import { ControlPosition } from "react-draggable";
 import saveAs from "file-saver";
 
 export interface ProjectComponentToJsonInterface {
+    "id": string,
     "componentName": string,
-    "connections": Array<string>,
+    "connections": string[],
     "position": ControlPosition,
     "type": string
 }
 
 abstract class ProjectComponent {
+    id: string;
     parentProject: Project;
     componentName: string = "";
-    connections: Array<string> = [];
+    connections: string[] = [];
     position: ControlPosition = {x: 0, y: 0};
 
     abstract readonly type: string;
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition) {
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[], position: ControlPosition) {
+        this.id = id;
         this.parentProject = parentProject;
         this.componentName = componentName;
         this.connections = connections;
@@ -34,12 +36,17 @@ abstract class ProjectComponent {
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
 
+    getId() {
+        return this.id;
+    }
+
     getType() {
         return this.type;
     }
 
     toJSON() : ProjectComponentToJsonInterface {
         return {
+            "id": this.id,
             "componentName": this.componentName,
             "connections": this.connections,
             "position": this.position,
@@ -80,27 +87,19 @@ abstract class ProjectComponent {
         this.saveToBrowser();
     }
 
-    addConnection(targetComponent: ProjectComponent) {
-        if (this.connections.indexOf(targetComponent.getComponentName(), 0) === -1) {
-            this.connections.push(targetComponent.getComponentName());
+    addConnection(newId: string) {
+        if (this.connections.indexOf(newId) === -1) {
+            this.connections.push(newId);
             this.saveToBrowser();
         }
     }
 
     notifyComponentRemoval(removedComponent: ProjectComponent) {
-        this.deleteConnection(removedComponent.getComponentName());
+        this.deleteConnection(removedComponent.getId());
     }
 
-    notifyComponentNameChange(originalName: string, newName: string) {
-        const index: number = this.connections.indexOf(originalName, 0);
-        if (index !== -1) {
-            this.connections[index] = newName;
-            this.saveToBrowser();
-        }
-    }
-
-    deleteConnection(connectionTargetName: string) {
-        const index: number = this.connections.indexOf(connectionTargetName, 0);
+    deleteConnection(idToDelete: string) {
+        const index: number = this.connections.indexOf(idToDelete);
         if (index !== -1) {
             this.connections.splice(index, 1);
             this.saveToBrowser();

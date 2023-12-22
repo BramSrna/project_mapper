@@ -1,61 +1,16 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component";
-import { ReactElement } from "react";
-import Project from "./project";
-import RoadmapTile from "../tiles/roadmap_tile";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
+import Project from "../../../project";
 import { ControlPosition } from "react-draggable";
-
-class DifficultyEntry {
-    description: string = "";
-    possibleSolutions: string[] = [];
-
-    constructor(description: string, possibleSolutions: string[]) {
-        this.description = description;
-        this.possibleSolutions = possibleSolutions;
-    }
-
-    toJSON() {
-        return {
-            "description": this.description,
-            "possibleSolutions": this.possibleSolutions
-        }
-    }
-
-    deletePossibleSolution(index: number) {
-        if ((index >= 0) || (index < this.possibleSolutions.length)) {
-            this.possibleSolutions.splice(index, 1);
-        }
-    }
-    
-    addPossibleSolution(solution: string) {
-        this.possibleSolutions.push(solution);
-    }
-
-    getDescription() {
-        return this.description;
-    }
-
-    getPossibleSolutions() {
-        return this.possibleSolutions;
-    }
-
-    setDescription(newDescription: string) {
-        this.description = newDescription;
-    }
-
-    setPossibleSolution(possibleSolutionIndex: number, newPossibleSolution: string){
-        if ((possibleSolutionIndex >= 0) || (possibleSolutionIndex < this.possibleSolutions.length)) {
-            this.possibleSolutions[possibleSolutionIndex] = newPossibleSolution;
-        }
-    }
-}
+import DifficultyEntry from "./difficulty_entry";
+import Connection from "../../connection";
 
 class Difficulties extends ProjectComponent {
     type = "Difficulties";
 
     difficulties: DifficultyEntry[] = [];
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, difficulties: object[]) {
-        super(parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, difficulties: object[]) {
+        super(id, parentProject, componentName, connections, position);
 
         this.difficulties = [];
         for (const currDifficulty of difficulties) {

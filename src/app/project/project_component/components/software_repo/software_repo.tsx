@@ -1,41 +1,8 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component";
-import { ReactElement } from "react";
-import Project from "./project";
-import SoftwareRepoTile from "../tiles/software_repo_tile";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
+import Project from "../../../project";
 import { ControlPosition } from "react-draggable";
-
-class Mock {
-    input: string = "";
-    output: string = "";
-
-    constructor(input: string, output: string) {
-        this.input = input;
-        this.output = output;
-    }
-
-    getInput() {
-        return this.input;
-    }
-
-    getOutput() {
-        return this.output;
-    }
-
-    setInput(newInputValue: string) {
-        this.input = newInputValue;
-    }
-
-    setOutput(newOutputValue: string) {
-        this.output = newOutputValue;
-    }
-
-    toJSON() {
-        return {
-            "input": this.input,
-            "output": this.output
-        }
-    }
-}
+import Mock from "./mock";
+import Connection from "../../connection";
 
 class SoftwareRepo extends ProjectComponent {
     type = "SoftwareRepo";
@@ -45,8 +12,8 @@ class SoftwareRepo extends ProjectComponent {
     initRepoName: string = "";
     mocks: Mock[] = [];
 
-    constructor(parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, createUsingInit: boolean, cloneTarget: string, initRepoName: string, mocks: object[]) {
-        super(parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, createUsingInit: boolean, cloneTarget: string, initRepoName: string, mocks: object[]) {
+        super(id, parentProject, componentName, connections, position);
 
         this.createUsingInit = createUsingInit;
         this.cloneTarget = cloneTarget;
