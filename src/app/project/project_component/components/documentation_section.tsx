@@ -1,13 +1,12 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
-import { ControlPosition } from "react-draggable";
 
 class DocumentationSection extends ProjectComponent {
-    content = "";
-    type = "DocumentationSection";
+    content: string = "";
+    type: string = "DocumentationSection";
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, content: string) {
-        super(id, parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, content: string) {
+        super(id, parentProject, componentName, connections);
 
         this.content = content;
 

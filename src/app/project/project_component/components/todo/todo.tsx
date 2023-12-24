@@ -1,19 +1,17 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import { ControlPosition } from "react-draggable";
 import TodoItem from "./todo_item";
-import Connection from "../../connection";
 
 class Todo extends ProjectComponent {
-    type = "Todo";
-    items: TodoItem[] = [];
+    type: string = "Todo";
+    items: TodoItem[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, items: object[]) {
-        super(id, parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[], items: object[]) {
+        super(id, parentProject, componentName, connections);
 
         this.items = [];
         for (const currItem of items) {
-            this.items.push(new TodoItem(currItem["description" as keyof typeof currItem], currItem["isComplete" as keyof typeof currItem]));
+            this.items.push(new TodoItem(this, currItem["description" as keyof typeof currItem], currItem["isComplete" as keyof typeof currItem]));
         }
 
         parentProject.addComponent(this);
@@ -23,30 +21,19 @@ class Todo extends ProjectComponent {
         return this.items;
     }
 
-    setItemDescription(index: number, newDescription: string) {
-        if ((index >= 0) && (index < this.items.length)) {
-            this.items[index].setItemDescription(newDescription);
+    deleteItem(itemToDelete: TodoItem) {
+        let indexToDelete: number = this.items.indexOf(itemToDelete);
+        if (indexToDelete !== -1) {
+            this.items.splice(indexToDelete, 1);
             this.saveToBrowser();
         }
     }
 
-    setIsComplete(index: number, newStatus: boolean) {
-        if ((index >= 0) && (index < this.items.length)) {
-            this.items[index].setIsComplete(newStatus);
+    addItem(newItem: TodoItem) {
+        if (this.items.indexOf(newItem) === -1) {
+            this.items.push(newItem);
             this.saveToBrowser();
         }
-    }
-
-    deleteItem(index: number) {
-        if ((index >= 0) && (index < this.items.length)) {
-            this.items.splice(index, 1);
-            this.saveToBrowser();
-        }
-    }
-
-    addItem() {
-        this.items.push(new TodoItem("", false));
-        this.saveToBrowser();
     }
 
     toJSON() {

@@ -1,27 +1,55 @@
-class DifficultyEntry {
-    description: string = "";
-    possibleSolutions: string[] = [];
+import IdGenerator from "@/app/id_generator";
+import ProjectComponent from "../../project_component";
+import PossibleSolution from "./possible_solution";
 
-    constructor(description: string, possibleSolutions: string[]) {
+class DifficultyEntry {
+    id: string;
+    parentComponent: ProjectComponent;
+    description: string;
+    possibleSolutions: PossibleSolution[];
+
+    constructor(parentComponent: ProjectComponent, description: string, possibleSolutions: object[]) {
+        this.id = IdGenerator.generateId();
+        this.parentComponent = parentComponent;
         this.description = description;
-        this.possibleSolutions = possibleSolutions;
+        this.possibleSolutions = [];
+        for (const currPossibleSolution of possibleSolutions) {
+            this.possibleSolutions.push(new PossibleSolution(this, currPossibleSolution["description" as keyof typeof currPossibleSolution]));
+        }
+    }
+
+    getId() {
+        return this.id;
+    }
+
+    saveToBrowser() {
+        this.parentComponent.saveToBrowser();
     }
 
     toJSON() {
+        const possibleSolutionsAsJson: object[] = [];
+        for (const currPossibleSolution of this.possibleSolutions) {
+            possibleSolutionsAsJson.push(currPossibleSolution.toJSON());
+        }
         return {
             "description": this.description,
-            "possibleSolutions": this.possibleSolutions
+            "possibleSolutions": possibleSolutionsAsJson
         }
     }
 
-    deletePossibleSolution(index: number) {
-        if ((index >= 0) || (index < this.possibleSolutions.length)) {
-            this.possibleSolutions.splice(index, 1);
+    deletePossibleSolution(possibleSolutionToDelete: PossibleSolution) {
+        let indexToDelete: number = this.possibleSolutions.indexOf(possibleSolutionToDelete);
+        if (indexToDelete !== -1) {
+            this.possibleSolutions.splice(indexToDelete, 1);
+            this.saveToBrowser();
         }
     }
     
-    addPossibleSolution(solution: string) {
-        this.possibleSolutions.push(solution);
+    addPossibleSolution(newPossibleSolution: PossibleSolution) {
+        if (this.possibleSolutions.indexOf(newPossibleSolution) === -1) {
+            this.possibleSolutions.push(newPossibleSolution);
+            this.saveToBrowser();
+        }
     }
 
     getDescription() {
@@ -34,12 +62,7 @@ class DifficultyEntry {
 
     setDescription(newDescription: string) {
         this.description = newDescription;
-    }
-
-    setPossibleSolution(possibleSolutionIndex: number, newPossibleSolution: string){
-        if ((possibleSolutionIndex >= 0) || (possibleSolutionIndex < this.possibleSolutions.length)) {
-            this.possibleSolutions[possibleSolutionIndex] = newPossibleSolution;
-        }
+        this.saveToBrowser();
     }
 }
 

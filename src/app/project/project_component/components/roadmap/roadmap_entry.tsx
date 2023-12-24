@@ -1,64 +1,93 @@
-class RoadmapEntry {
-    isComplete: boolean;
-    content: string;
-    id: string;
-    blockTargets: string[];
+import ProjectComponent from "../../project_component";
+import Roadmap from "./roadmap";
 
-    constructor(id: string, isComplete: boolean, content: string, blockTargets: string[]) {
+class RoadmapEntry {
+    parentComponet: Roadmap;
+    id: string;
+    title: string;
+    isComplete: boolean;
+    description: string;
+    blockers: string[];
+
+    constructor(parentComponet: ProjectComponent, id: string, title: string, isComplete: boolean, description: string, blockers: string[]) {
+        this.parentComponet = parentComponet as Roadmap;
         this.id = id;
+        this.title = title;
         this.isComplete = isComplete;
-        this.content = content;
-        this.blockTargets = blockTargets;
+        this.description = description;
+        this.blockers = blockers;
+    }
+
+    saveToBrowser() {
+        this.parentComponet.saveToBrowser();
     }
 
     toJSON() {
         return {
             "id": this.id,
+            "title": this.title,
             "isComplete": this.isComplete,
-            "content": this.content,
-            "blockTargets": this.blockTargets
+            "description": this.description,
+            "blockers": this.blockers
         }
+    }
+
+    setTitle(newTitle: string) {
+        this.title = newTitle;
+        this.saveToBrowser();
+    }
+
+    getTitle() {
+        return this.title;
     }
 
     getIsComplete() {
         return this.isComplete;
     }
 
-    getContent() {
-        return this.content;
+    getDescription() {
+        return this.description;
     }
 
-    setContent(newContent: string) {
-        this.content = newContent;
+    setDescription(newDescription: string) {
+        this.description = newDescription;
+        this.saveToBrowser();
     }
 
     setIsComplete(newIsComplete: boolean) {
         this.isComplete = newIsComplete;
+        this.saveToBrowser();
     }
 
     getId() {
         return this.id;
     }
     
-    getBlockTargets() {
-        return this.blockTargets;
+    getBlockers() {
+        return this.blockers;
     }
 
-    deleteBlockTarget(idToDelete: string) {
-        let index: number = this.blockTargets.indexOf(idToDelete);
+    deleteBlocker(idToDelete: string) {
+        let index: number = this.blockers.indexOf(idToDelete);
         if (index !== -1) {
-            this.blockTargets.splice(index, 1);
+            this.blockers.splice(index, 1);
+            this.saveToBrowser();
             return true;
         }
         return false;
     }
 
-    addBlockTarget(newId: string) {
-        if (this.blockTargets.indexOf(newId) === -1) {
-            this.blockTargets.push(newId);
+    addBlocker(newId: string) {
+        if (this.blockers.indexOf(newId) === -1) {
+            this.blockers.push(newId);
+            this.saveToBrowser();
             return true;
         }
         return false;
+    }
+
+    deleteEntry() {
+        this.parentComponet.deleteEntry(this.id);
     }
 }
 

@@ -4,7 +4,7 @@ import ProjectComponent from "../project/project_component/project_component";
 import Roadmap from "../project/project_component/components/roadmap/roadmap";
 import SoftwareRepo from "../project/project_component/components/software_repo/software_repo";
 import Todo from "../project/project_component/components/todo/todo";
-import UseCases from "../project/project_component/components/use_cases";
+import UseCases from "../project/project_component/components/uses_cases/use_cases";
 import ComponentDescription from "../project/project_component/components/component_description";
 import TodoVisualizer from "./tiles/todo_visualizer";
 import DocumentationSectionVisualizer from "./tiles/documentation_box_visualizer";

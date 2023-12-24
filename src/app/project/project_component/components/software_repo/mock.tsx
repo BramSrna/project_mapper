@@ -1,10 +1,25 @@
-class Mock {
-    input: string = "";
-    output: string = "";
+import IdGenerator from "@/app/id_generator";
+import ProjectComponent from "../../project_component";
 
-    constructor(input: string, output: string) {
+class Mock {
+    parentComponent: ProjectComponent;
+    input: string;
+    output: string;
+    id: string;
+
+    constructor(parentComponent: ProjectComponent, input: string, output: string) {
+        this.id = IdGenerator.generateId();
+        this.parentComponent = parentComponent;
         this.input = input;
         this.output = output;
+    }
+
+    getId() {
+        return this.id;
+    }
+
+    saveToBrowser() {
+        this.parentComponent.saveToBrowser();
     }
 
     getInput() {
@@ -17,10 +32,12 @@ class Mock {
 
     setInput(newInputValue: string) {
         this.input = newInputValue;
+        this.saveToBrowser();
     }
 
     setOutput(newOutputValue: string) {
         this.output = newOutputValue;
+        this.saveToBrowser();
     }
 
     toJSON() {

@@ -4,7 +4,7 @@ import DocumentationSection from "./project_component/components/documentation_s
 import SoftwareRepo from './project_component/components/software_repo/software_repo';
 import Roadmap from './project_component/components/roadmap/roadmap';
 import Todo from './project_component/components/todo/todo';
-import UseCases from './project_component/components/use_cases';
+import UseCases from './project_component/components/uses_cases/use_cases';
 import Difficulties from './project_component/components/difficulties/difficulties';
 import ComponentDescription from './project_component/components/component_description';
 import IdGenerator from '../id_generator';
@@ -12,127 +12,123 @@ import IdGenerator from '../id_generator';
 class Project {
     projectName: string = "";
     components: Array<ProjectComponent> = [];
-    projectId: string;
+    id: string;
 
-    constructor(projectId?: string, jsonStr?: string) {
-        if (typeof(projectId) === "undefined") {
-            projectId = IdGenerator.generateId();
+    constructor(id?: string, jsonStr?: string) {
+        if (typeof(id) === "undefined") {
+            id = IdGenerator.generateId();
         } else {
-            IdGenerator.addGeneratedId(projectId);
+            IdGenerator.addGeneratedId(id);
         }
-        this.projectId = projectId;
+        this.id = id;
 
         if (typeof(jsonStr) === "undefined") {
             jsonStr = "{}";
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const parsedJson: any = JSON.parse(jsonStr);
-        const componentNames = Object.keys(parsedJson);
-        for (const currName of componentNames) {
-            if (currName === "projectName") {
-                this.projectName = parsedJson["projectName"];
-                this.saveToBrowser();
-            } else {
-                const compType = parsedJson[currName]["type"];
+        if ("projectName" in parsedJson) {
+            this.projectName = parsedJson["projectName"];
+            this.saveToBrowser();
+        }
+        if ("components" in parsedJson) {
+            const componentsBlock = parsedJson["components"];
+            for (const currCompInfo of componentsBlock) {
+                const compType = currCompInfo["type"];
                 switch(compType) {
                     case "ComponentDescription": {
                         new ComponentDescription(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["name"],
-                            parsedJson[currName]["componentType"],
-                            parsedJson[currName]["endGoal"],
-                            parsedJson[currName]["missionStatement"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["name"],
+                            currCompInfo["componentType"],
+                            currCompInfo["endGoal"],
+                            currCompInfo["missionStatement"]
                         );
                         break;
                     }
                     case "DocumentationSection": {
                         new DocumentationSection(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["content"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["content"]
                         );
                         break;
                     }
                     case "SoftwareRepo": {
                         new SoftwareRepo(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["createUsingInit"],
-                            parsedJson[currName]["cloneTarget"],
-                            parsedJson[currName]["initRepoName"],
-                            parsedJson[currName]["mocks"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["initRepoName"],
+                            currCompInfo["mocks"]
                         );
                         break;
                     }
                     case "Roadmap": {
                         new Roadmap(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["entries"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["entries"]
                         );
                         break;
                     }
                     case "Todo": {
                         new Todo(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["items"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["items"]
                         );
                         break;
                     }
                     case "UseCases":
                         new UseCases(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["startOperatingWall"],
-                            parsedJson[currName]["endOperatingWall"],
-                            parsedJson[currName]["useCases"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["startOperatingWall"],
+                            currCompInfo["endOperatingWall"],
+                            currCompInfo["useCases"]
                         );
                         break;
                     case "Difficulties":
                         new Difficulties(
-                            parsedJson[currName]["id"],
+                            currCompInfo["id"],
                             this,
-                            parsedJson[currName]["componentName"],
-                            parsedJson[currName]["connections"],
-                            parsedJson[currName]["position"],
-                            parsedJson[currName]["difficulties"]
+                            currCompInfo["componentName"],
+                            currCompInfo["connections"],
+                            currCompInfo["difficulties"]
                         );
                         break;
                     default: {
-                        throw("Unknown component name: " + currName);
+                        throw("Unknown component type: " + compType);
                     }
                 }
+                IdGenerator.addGeneratedId(currCompInfo["id"]);
             }
         }
     }
 
     toJSON() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const initialJson: any = {};
+        const components = [];
         for (const currComponent of this.components) {
-            initialJson[currComponent.getComponentName()] = currComponent.toJSON();
+            components.push(currComponent.toJSON());
         }
-        return initialJson;
+        return {
+            "components": components,
+            "projectName": this.projectName
+        };
     }
 
     downloadProjectAsJson() {
@@ -171,22 +167,18 @@ class Project {
             parsedIds = JSON.parse(storedProjIds);
         }
 
-        if (parsedIds.indexOf(this.projectId) === -1) {
-            parsedIds.push(this.projectId);
+        if (parsedIds.indexOf(this.id) === -1) {
+            parsedIds.push(this.id);
             localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
         }
 
         let projJson: object = this.toJSON();
-        projJson = {
-            ...projJson,
-            "projectName": this.projectName
-        };
 
-        localStorage.setItem(this.projectId, JSON.stringify(projJson));
+        localStorage.setItem(this.id, JSON.stringify(projJson));
     }
 
-    getProjectId() {
-        return this.projectId;
+    getId() {
+        return this.id;
     }
 
     setProjectName(newProjectName: string) {
@@ -202,36 +194,13 @@ class Project {
         return this.components;
     }
 
-    getComponentNames() {
-        const componentNames: Array<string> = [];
-        for (const component of this.components) {
-            componentNames.push(component.getComponentName());
-        }
-        return componentNames;
-    }
-
     addComponent(newComponent: ProjectComponent) {
-        if (this.components.indexOf(newComponent, 0) !== -1) {
-            return false;
+        if (this.components.indexOf(newComponent, 0) === -1) {
+            this.components.push(newComponent);
+            this.saveToBrowser()
+            return true;
         }
-
-        let suffix = 2;
-        const originalName = newComponent.getComponentName();
-        while (this.getComponentNames().indexOf(newComponent.getComponentName(), 0) !== -1) {
-            newComponent.setComponentName(originalName + " " + suffix.toString());
-            suffix += 1;
-        }
-
-        this.components.push(newComponent);
-        this.saveToBrowser()
-        return true;
-    }
-
-    notifyComponentNameChange(originalComponentName: string, newComponentName: string) {
-        for (const component of this.components) {
-            component.notifyComponentNameChange(originalComponentName, newComponentName);
-        }
-        this.saveToBrowser();
+        return false;
     }
 
     removeComponent(componentToRemove: ProjectComponent) {
@@ -245,9 +214,9 @@ class Project {
         this.saveToBrowser();
     }
 
-    getComponentWithName(componentName: string) {
+    getComponentWithId(componentId: string) {
         for (const currComponent of this.components) {
-            if (currComponent.getComponentName() === componentName) {
+            if (currComponent.getId() === componentId) {
                 return currComponent;
             }
         }

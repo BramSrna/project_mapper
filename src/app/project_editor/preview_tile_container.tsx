@@ -1,31 +1,28 @@
-import { useRef, ChangeEvent, MutableRefObject, useState, ReactElement, useEffect, FormEvent, cloneElement } from "react";
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import { useRef, ChangeEvent, MutableRefObject, useState, ReactElement, useEffect, FormEvent, cloneElement, SyntheticEvent, forwardRef, LegacyRef } from "react";
 import {useXarrow} from 'react-xarrows';
 import ProjectComponent from "../project/project_component/project_component";
 import Modal from 'react-modal';
 import Visualizer from "../visualizer/visualizer";
+import { Resizable, ResizableBox, ResizeCallbackData } from 'react-resizable';
+import { Rnd } from "react-rnd";
+import { ProjectEditorConstants } from "./project_editor_constants";
 
-const PreviewTileContainer = (props: {parentComponent: ProjectComponent, children: ReactElement}) => {
+const PreviewTileContainer = (props: {parentComponent: ProjectComponent, children: ReactElement, initialPosition: object}) => {
     const updateXarrow = useXarrow();
 
     const [stillExists, setStillExists] = useState(true);
     const [visualizerIsOpen, setvisualizerIsOpen] = useState(false);
-    const [position, setPosition] = useState(props.parentComponent.getPosition());
     const [view, setView] = useState("ViewEditor");
+    const [dimensions, setDimensions] = useState({width: 100, height: 100});
 
     const nodeRef: MutableRefObject<null> = useRef(null);
 
-    useEffect(() => {
-        setPosition(props.parentComponent.getPosition());
-    }, []);
+    function onResize(e: SyntheticEvent, data: ResizeCallbackData) {
+        setDimensions({width: data.size.width, height: data.size.height});
+    };
 
     function closeVisualizer() {
         setvisualizerIsOpen(false);
-    }
-
-    function onStopHandler(e: DraggableEvent, data: DraggableData) {
-        props.parentComponent.setPosition(data.x, data.y);
-        updateXarrow();
     }
 
     function componentNameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
@@ -74,13 +71,13 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, childre
         let renderedElement: ReactElement;
         switch (view) {
             case "ViewSetupFile":
-                renderedElement = (<textarea key="1" name="viewSetup" value={component.getSetupFileContents()} readOnly={true}/>);
+                renderedElement = (<textarea name="viewSetup" value={component.getSetupFileContents()} readOnly={true}/>);
                 break;
             case "ViewDeployFile":
-                renderedElement = (<textarea key="2" name="viewDeploy" value={component.getDeployFileContents()} readOnly={true}/>);
+                renderedElement = (<textarea name="viewDeploy" value={component.getDeployFileContents()} readOnly={true}/>);
                 break;
             case "ViewJson":
-                renderedElement = (<textarea key="3" name="viewJson" value={JSON.stringify(props.parentComponent.toJSON(), null, 2)} readOnly={true}/>);
+                renderedElement = (<textarea name="viewJson" value={JSON.stringify(props.parentComponent.toJSON(), null, 2)} readOnly={true}/>);
                 break;
             default:
                 renderedElement = (children);
@@ -92,37 +89,50 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, childre
     return (
         stillExists &&
         <div>
-            <Draggable nodeRef={nodeRef} onDrag={updateXarrow} onStop={(e, data) => onStopHandler(e, data)} defaultPosition={position} cancel=".dont-move-draggable">
-                <div style={{ position: 'absolute', zIndex: 1000, background: "#f56c42" }} ref={nodeRef} id={props.parentComponent.getComponentName()}>
-                    <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
-                        <input type="text" name="componentName" defaultValue={props.parentComponent.getComponentName()} onChange={componentNameOnChangeHandler}/>
+            <Rnd
+                style={{
+                    border: "solid 1px #ddd",
+                    background: "#f0f0f0",
+                    overflow: "hidden"
+                }}
+                default={{
+                  x: props.initialPosition["x" as keyof typeof props.initialPosition],
+                  y: props.initialPosition["y" as keyof typeof props.initialPosition],
+                  width: ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH,
+                  height: ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT
+                }}
+                onDrag={updateXarrow}
+                onDragStop={updateXarrow}
+                id={props.parentComponent.getId()}
+                minWidth={ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH}
+                minHeight={ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT}
+            >
+                <div>
+                    <input type="text" name="componentName" defaultValue={props.parentComponent.getComponentName()} onChange={componentNameOnChangeHandler}/>
 
-                        <form onSubmit={componentViewMenuOnSubmitHandler}>
-                            <select name="componentViewMenu" className="dont-move-draggable">
-                                <option value="ViewEditor">View Editor</option>
-                                <option value="ViewSetupFile">View Setup File</option>
-                                <option value="ViewDeployFile">View Deploy File</option>
-                                <option value="ViewJson">View JSON</option>
-                            </select>
-                            <button type="submit">Change View</button>
-                        </form>
+                    <form onSubmit={componentViewMenuOnSubmitHandler}>
+                        <select name="componentViewMenu" className="dont-move-draggable">
+                            <option value="ViewEditor">View Editor</option>
+                            <option value="ViewSetupFile">View Setup File</option>
+                            <option value="ViewDeployFile">View Deploy File</option>
+                            <option value="ViewJson">View JSON</option>
+                        </select>
+                        <button type="submit">Change View</button>
+                    </form>
 
-                        <form onSubmit={componentActionMenuOnSubmitHandler}>
-                            <select name="componentActionMenu" className="dont-move-draggable">
-                                <option value="SaveSetupFile">Save Setup File</option>
-                                <option value="SaveDeployFile">Save Deploy File</option>
-                                <option value="Visualize">Visualize</option>
-                                <option value="Delete">Delete</option>
-                            </select>
-                            <button type="submit">Execute Action</button>
-                        </form>
-                    </div>
+                    <form onSubmit={componentActionMenuOnSubmitHandler}>
+                        <select name="componentActionMenu" className="dont-move-draggable">
+                            <option value="SaveSetupFile">Save Setup File</option>
+                            <option value="SaveDeployFile">Save Deploy File</option>
+                            <option value="Visualize">Visualize</option>
+                            <option value="Delete">Delete</option>
+                        </select>
+                        <button type="submit">Execute Action</button>
+                    </form>
 
-                    <div className="dont-move-draggable">
-                        {renderChildren(props.parentComponent, props.children)}
-                    </div>
+                    {renderChildren(props.parentComponent, props.children)}
                 </div>
-            </Draggable>
+            </Rnd>
 
             <div className="visualizer">
                 <Modal

@@ -7,14 +7,15 @@ const DocumentationSectionEditor = (props: {documentationSectionComp: Documentat
     }
 
     return (
-        <textarea
-            name="documentation"
-            key = "4"
-            rows={4}
-            cols={40}
-            defaultValue={props.documentationSectionComp.getContent()}
-            onChange={e => documentationOnChangeHandler(e)}
-        />
+        <div>
+            <textarea
+                name="documentation"
+                rows={4}
+                cols={40}
+                defaultValue={props.documentationSectionComp.getContent()}
+                onChange={e => documentationOnChangeHandler(e)}
+            />
+        </div>
     );
 
 }

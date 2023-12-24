@@ -1,21 +1,21 @@
+import Mock from "@/app/project/project_component/components/software_repo/mock";
 import SoftwareRepo from "@/app/project/project_component/components/software_repo/software_repo";
 
 const SoftwareRepoVisualizer = (props: {softwareRepoComp: SoftwareRepo}) => {
-    let keyVal: number = 0;
     return (
         <table>
             <thead>
-                <tr key={keyVal++}>
-                    <td key={keyVal++}>Input</td>
-                    <td key={keyVal++}>Output</td>
+                <tr>
+                    <td>Input</td>
+                    <td>Output</td>
                 </tr>
             </thead>
             <tbody>
-                {props.softwareRepoComp.getMocks().map(function(currMock) {
+                {props.softwareRepoComp.getMocks().map(function(currMock: Mock) {
                     return (
-                        <tr key={keyVal++}>
-                            <td key={keyVal++}>{currMock.getInput()}</td>
-                            <td key={keyVal++}>{currMock.getOutput()}</td>
+                        <tr key={currMock.getId()}>
+                            <td>{currMock.getInput()}</td>
+                            <td>{currMock.getOutput()}</td>
                         </tr>
                     );
                 })}

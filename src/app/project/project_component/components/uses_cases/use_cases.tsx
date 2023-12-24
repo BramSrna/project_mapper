@@ -1,31 +1,38 @@
-import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
-import Project from "../../project";
-import { ControlPosition } from "react-draggable";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
+import Project from "../../../project";
+import UseCaseItem from "./use_case_item";
 
 class UseCases extends ProjectComponent {
-    type = "UseCases";
+    type: string = "UseCases";
 
     startOperatingWall: string;
     endOperatingWall: string;
-    useCases: string[];
+    useCases: UseCaseItem[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, position: ControlPosition, startOperatingWall: string, endOperatingWall: string, useCases: string[]) {
-        super(id, parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, startOperatingWall: string, endOperatingWall: string, useCases: object[]) {
+        super(id, parentProject, componentName, connections);
 
         this.startOperatingWall = startOperatingWall;
         this.endOperatingWall = endOperatingWall;
-        this.useCases = useCases;
+        this.useCases = [];
+        for (const currUseCase of useCases) {
+            this.useCases.push(new UseCaseItem(this, currUseCase["description" as keyof typeof currUseCase]));
+        }
 
         parentProject.addComponent(this);
     }
 
     toJSON(): ProjectComponentToJsonInterface {
+        const useCasesAsJson: object[] = [];
+        for (const currUseCase of this.useCases) {
+            useCasesAsJson.push(currUseCase.toJSON());
+        }
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
             "startOperatingWall": this.startOperatingWall,
             "endOperatingWall": this.endOperatingWall,
-            "useCases": this.useCases
+            "useCases": useCasesAsJson
         }
         return finalJson;
     }
@@ -52,23 +59,19 @@ class UseCases extends ProjectComponent {
         return this.useCases;
     }
 
-    setUseCase(index: number, newUseCase: string) {
-        if ((index >= 0) && (index < this.useCases.length)) {
-            this.useCases[index] = newUseCase;
+    deleteUseCase(useCase: UseCaseItem) {
+        let indexToDelete: number = this.useCases.indexOf(useCase);
+        if (indexToDelete !== -1) {
+            this.useCases.splice(indexToDelete, 1);
             this.saveToBrowser();
         }
     }
 
-    deleteUseCase(index: number) {
-        if ((index >= 0) && (index < this.useCases.length)) {
-            this.useCases.splice(index, 1);
+    addUseCase(newUseCase: UseCaseItem) {
+        if (this.useCases.indexOf(newUseCase) === -1) {
+            this.useCases.push(newUseCase);
             this.saveToBrowser();
         }
-    }
-
-    addUseCase() {
-        this.useCases.push("");
-        this.saveToBrowser();
     }
 
     getSetupFileContents() {

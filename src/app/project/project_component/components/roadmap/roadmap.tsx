@@ -1,24 +1,24 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import { ControlPosition } from "react-draggable";
 import RoadmapEntry from "./roadmap_entry";
-import Connection from "../../connection";
 
 class Roadmap extends ProjectComponent {
-    type = "Roadmap";
+    type: string = "Roadmap";
 
-    entries: RoadmapEntry[] = [];
+    entries: RoadmapEntry[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, initEntries: object[]) {
-        super(id, parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[], initEntries: object[]) {
+        super(id, parentProject, componentName, connections);
         
         this.entries = [];
         for (const currEntry of initEntries) {
             let newEntry = new RoadmapEntry(
+                this,
                 currEntry["id" as keyof typeof currEntry],
+                currEntry["title" as keyof typeof currEntry],
                 currEntry["isComplete" as keyof typeof currEntry],
-                currEntry["content" as keyof typeof currEntry],
-                currEntry["blockTargets" as keyof typeof currEntry]
+                currEntry["description" as keyof typeof currEntry],
+                currEntry["blockers" as keyof typeof currEntry]
             );
             this.entries.push(newEntry);
         }
@@ -92,28 +92,6 @@ class Roadmap extends ProjectComponent {
             }
         }
         return null;
-    }
-
-    deleteBlockTarget(blocker: RoadmapEntry, blockTargetId: string) {
-        let index: number = this.entries.indexOf(blocker);
-        if (index !== -1) {
-            let targetDeleted: boolean = this.entries[index].deleteBlockTarget(blockTargetId);
-            if (targetDeleted) {
-                this.saveToBrowser();
-            }
-        }
-    }
-
-    addBlockTarget(blockerId: string, blockTargetId: string) {
-        for (var currEntry of this.entries) {
-            if (currEntry.getId() === blockerId) {
-                let addedTarget: boolean = currEntry.addBlockTarget(blockTargetId);
-                if (addedTarget) {
-                    this.saveToBrowser();
-                }
-                return null;
-            }
-        }
     }
 }
 

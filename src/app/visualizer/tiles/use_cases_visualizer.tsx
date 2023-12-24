@@ -1,7 +1,7 @@
-import UseCases from "@/app/project/project_component/components/use_cases";
+import UseCaseItem from "@/app/project/project_component/components/uses_cases/use_case_item";
+import UseCases from "@/app/project/project_component/components/uses_cases/use_cases";
 
-const UseCasesVisualizer = (props: {useCasesComp: UseCases}) => {    
-    let keyVal: number = 0;
+const UseCasesVisualizer = (props: {useCasesComp: UseCases}) => {
     return (
         <div>
             <p>Operating Walls:</p>
@@ -10,9 +10,9 @@ const UseCasesVisualizer = (props: {useCasesComp: UseCases}) => {
             <p>Use Cases:</p>
             <table>
                 <tbody>
-                    {props.useCasesComp.getUseCases().map(function(currUseCase) {
+                    {props.useCasesComp.getUseCases().map(function(currUseCase: UseCaseItem) {
                         return (
-                            <tr key={keyVal++}><td key={keyVal++}>{currUseCase}</td></tr>
+                            <tr key={currUseCase.getId()}><td>{currUseCase.getDescription()}</td></tr>
                         )
                     })}
                 </tbody>

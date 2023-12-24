@@ -27,7 +27,6 @@ const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentD
             <p>End Goal:
                 <textarea
                     name="endGoal"
-                    key = "4"
                     rows={4}
                     cols={40}
                     defaultValue={props.componentDescriptionComp.getEndGoal()}
@@ -37,7 +36,6 @@ const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentD
             <p> Mission statement:
                 <textarea
                     name="missionStatement"
-                    key = "4"
                     rows={4}
                     cols={40}
                     defaultValue={props.componentDescriptionComp.getMissionStatement()}

@@ -5,6 +5,7 @@ import Project from "./project/project";
 import Modal from 'react-modal';
 import ComponentDescription from './project/project_component/components/component_description';
 import EditorCanvas from './editor_canvas';
+import IdGenerator from './id_generator';
 
 // Modal.setAppElement(".root");
 
@@ -48,7 +49,7 @@ const Page = () => {
             }
         } else {
             projectToEdit.setProjectName("New Project");
-            localStorage.setItem("projectToEditId", projectToEdit.getProjectId())
+            localStorage.setItem("projectToEditId", projectToEdit.getId())
         }
     }
 
@@ -70,12 +71,12 @@ const Page = () => {
         if (formData.has("projectType")) {
             const projectType = formData.get("projectType");
             if ((projectType !== null) && (projectType !== "None")) {
-                new ComponentDescription(newProj, "Component Description", [], {x: 0, y: 0}, "", projectType.toString(), "", "");
+                new ComponentDescription(IdGenerator.generateId(), newProj, "Component Description", [], {x: 0, y: 0}, "", projectType.toString(), "", "");
             }
         }
         newProj.saveToBrowser();
         newProj.setProjectName("New Project");
-        localStorage.setItem("projectToEditId", newProj.getProjectId());
+        localStorage.setItem("projectToEditId", newProj.getId());
         setProjectToEdit(newProj);
         setLoadedProjects([
             ...loadedProjects,
@@ -100,7 +101,7 @@ const Page = () => {
             if ((target !== null) && (target.result !== null)) {
                 const newProject: Project = new Project(undefined, target.result.toString());
                 newProject.saveToBrowser();
-                localStorage.setItem("projectToEditId", newProject.getProjectId());
+                localStorage.setItem("projectToEditId", newProject.getId());
                 setProjectToEdit(newProject);
                 setLoadedProjects([
                     ...loadedProjects,
@@ -141,7 +142,7 @@ const Page = () => {
                             }
                         }
                     }
-                    localStorage.setItem("projectToEditId", newProj.getProjectId());
+                    localStorage.setItem("projectToEditId", newProj.getId());
                     setProjectToEdit(newProj)
                     break;
                 }
@@ -162,10 +163,10 @@ const Page = () => {
                             }
                             localStorage.removeItem(projId.toString());
                             setLoadedProjects(loadedProjects.filter(function(project) {
-                                return (project.getProjectId() !== projId);
+                                return (project.getId() !== projId);
                             }));
 
-                            if (projectToEdit.getProjectId() === projId) {
+                            if (projectToEdit.getId() === projId) {
                                 let newProj: Project = new Project(undefined, "{}");
 
                                 if (parsedIds.length > 0) {
@@ -182,7 +183,7 @@ const Page = () => {
                                     ]);
                                 }
 
-                                localStorage.setItem("projectToEditId", newProj.getProjectId());
+                                localStorage.setItem("projectToEditId", newProj.getId());
                                 setProjectToEdit(newProj)
                             }
                         }
@@ -211,13 +212,13 @@ const Page = () => {
                         <div className="dropdown-content">
                             <div className="loaded-projects-menu">
                                 <form onSubmit={changeLoadedProjectMenuOnSubmitHandler}>
-                                    <select name="projectId" defaultValue={projectToEdit.getProjectId()}>
+                                    <select name="projectId" defaultValue={projectToEdit.getId()}>
                                         {
                                             loadedProjects.map(function(currProject: Project) {
                                                 return(
                                                     <option
-                                                        key={currProject.getProjectId()}
-                                                        value={currProject.getProjectId()}
+                                                        key={currProject.getId()}
+                                                        value={currProject.getId()}
                                                     >
                                                         {currProject.getProjectName()}
                                                     </option>

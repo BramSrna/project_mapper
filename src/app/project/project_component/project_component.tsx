@@ -1,12 +1,10 @@
 import Project from "../project";
-import { ControlPosition } from "react-draggable";
 import saveAs from "file-saver";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
     "componentName": string,
     "connections": string[],
-    "position": ControlPosition,
     "type": string
 }
 
@@ -15,22 +13,14 @@ abstract class ProjectComponent {
     parentProject: Project;
     componentName: string = "";
     connections: string[] = [];
-    position: ControlPosition = {x: 0, y: 0};
 
     abstract readonly type: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], position: ControlPosition) {
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[]) {
         this.id = id;
         this.parentProject = parentProject;
         this.componentName = componentName;
         this.connections = connections;
-        if (position.x < 0) {
-            position.x = 0;
-        }
-        if (position.y < 0) {
-            position.y = 0;
-        }
-        this.position = position;
     }
 
     abstract getSetupFileContents() : string;
@@ -49,7 +39,6 @@ abstract class ProjectComponent {
             "id": this.id,
             "componentName": this.componentName,
             "connections": this.connections,
-            "position": this.position,
             "type": this.type
         }
     }
@@ -83,7 +72,6 @@ abstract class ProjectComponent {
     setComponentName(newComponentName: string) {
         const originalName: string = this.componentName;
         this.componentName = newComponentName;
-        this.parentProject.notifyComponentNameChange(originalName, newComponentName);
         this.saveToBrowser();
     }
 
@@ -104,15 +92,6 @@ abstract class ProjectComponent {
             this.connections.splice(index, 1);
             this.saveToBrowser();
         }
-    }
-
-    getPosition() {
-        return this.position;
-    }
-
-    setPosition(newXPos: number, newYPos: number) {
-        this.position = {x: newXPos, y: newYPos};
-        this.saveToBrowser();
     }
 }
 

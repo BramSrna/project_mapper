@@ -1,92 +1,76 @@
+import Mock from "@/app/project/project_component/components/software_repo/mock";
 import SoftwareRepo from "@/app/project/project_component/components/software_repo/software_repo";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Toggle from 'react-toggle'
 
 const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
-    const [displayInitNameTargetField, setDisplayInitNameTargetField] = useState(props.softwareRepoComp.getCreateUsingInit());
+    const [mocks, setMocks] = useState<Mock[]>([]);
 
-    function cloneTargetOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
-        props.softwareRepoComp.setCloneTarget(event.target.value);
-    }
+    useEffect(() => {
+        setMocks([...props.softwareRepoComp.getMocks()]);
+    }, [props.softwareRepoComp]);
 
     function initRepoNameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
         props.softwareRepoComp.setInitRepoName(event.target.value);
     }
 
-    function switchDisplayedFields() {
-        props.softwareRepoComp.setCreateUsingInit(!props.softwareRepoComp.getCreateUsingInit());
-        setDisplayInitNameTargetField(!displayInitNameTargetField);
+    function mockInputOnChangeHandler(mock: Mock, newVal: string) {
+        mock.setInput(newVal);
     }
 
-    function getFormFields() {
-        if (displayInitNameTargetField) {
-            return (<p>Init Repo Name: <input type="text" name="initRepoName" defaultValue={props.softwareRepoComp.getInitRepoName()} onChange={initRepoNameOnChangeHandler}/></p>);
-        }
-        return (<p>Clone Repo Target: <input type="text" name="cloneRepoTarget" defaultValue={props.softwareRepoComp.getCloneTarget()} onChange={cloneTargetOnChangeHandler}/></p>);
+    function mockOutputOnChangeHandler(mock: Mock, newVal: string) {
+        mock.setOutput(newVal);
     }
 
-    function mockInputOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.softwareRepoComp.setMockInput(rowIndex, event.target.value);
-    }
-
-    function mockOutputOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.softwareRepoComp.setMockOutput(rowIndex, event.target.value);
-    }
-
-    function deleteMockOnClickHandler(rowIndex: number) {
-        props.softwareRepoComp.deleteMock(rowIndex);
+    function deleteMockOnClickHandler(mockToDelete: Mock) {
+        props.softwareRepoComp.deleteMock(mockToDelete);
+        setMocks(mocks.filter(function(currMock) {
+            return currMock !== mockToDelete
+        }))
     }
 
     function addMockOnClickHandler() {
-        props.softwareRepoComp.addMock();
-    }
-
-    function getMocksTable() {
-        let keyVal = 0;
-        return (
-            <div>
-                <p>Mocks</p>
-                <table>
-                    <thead>
-                        <tr key={keyVal++}>
-                            <td key={keyVal++}>Input</td>
-                            <td key={keyVal++}>Output</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {props.softwareRepoComp.getMocks().map(function(currMock, rowIndex) {
-                            return (
-                            <tr key={keyVal++}>
-                                <td key={keyVal++}><input type="text" name="mockInput" defaultValue={currMock.getInput()} onChange={e => mockInputOnChangeHandler(e, rowIndex)}/></td>
-                                <td key={keyVal++}><input type="text" name="mockOutput" defaultValue={currMock.getOutput()} onChange={e => mockOutputOnChangeHandler(e, rowIndex)}/></td>
-                                <td key={keyVal++}><button onClick={() => deleteMockOnClickHandler(rowIndex)}>Delete Mock</button></td>
-                            </tr>);
-                        })}
-                    </tbody>
-                </table>
-                <button onClick={addMockOnClickHandler}>Add Mock</button>
-            </div>
-        )
+        let newMock: Mock = new Mock(props.softwareRepoComp, "", "");
+        props.softwareRepoComp.addMock(newMock);
+        setMocks([
+            ...mocks,
+            newMock
+        ])
     }
 
     return (
         <div>
-            <label>
-                <Toggle
-                    defaultChecked={displayInitNameTargetField}
-                    icons={false}
-                    onChange={switchDisplayedFields}
-                />
-                <span>Toggle Init Method</span>
-            </label>
+            <p>
+                Init Repo Name: <input type="text" name="initRepoName" defaultValue={props.softwareRepoComp.getInitRepoName()} onChange={initRepoNameOnChangeHandler}/>
+            </p>
 
-            <form id="SoftwareRepo">
-                {getFormFields()}
-            </form>
-
-            <form>
-                {getMocksTable()}
-            </form>                    
+            {
+                <div>
+                    <p>Mocks</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Input</td>
+                                <td>Output</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                mocks.map(function(currMock: Mock) {
+                                    return (
+                                        <tr key={currMock.getId()}>
+                                            <td><input type="text" name="mockInput" defaultValue={currMock.getInput()} onChange={e => mockInputOnChangeHandler(currMock, e.target.value)}/></td>
+                                            <td><input type="text" name="mockOutput" defaultValue={currMock.getOutput()} onChange={e => mockOutputOnChangeHandler(currMock, e.target.value)}/></td>
+                                            <td><button onClick={() => deleteMockOnClickHandler(currMock)}>Delete Mock</button></td>
+                                        </tr>
+                                    );
+                                })
+                            }
+                        </tbody>
+                    </table>
+                    <button onClick={addMockOnClickHandler}>Add Mock</button>
+                </div>
+            }                  
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef } from "react";
+import { ChangeEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import ProjectComponent from "../project/project_component/project_component";
 import TodoEditor from "./tiles/todo_editor";
 import DocumentationSectionEditor from "./tiles/documentation_section_editor";
@@ -12,12 +12,17 @@ import DocumentationSection from "../project/project_component/components/docume
 import ComponentDescription from "../project/project_component/components/component_description";
 import Roadmap from "../project/project_component/components/roadmap/roadmap";
 import SoftwareRepo from "../project/project_component/components/software_repo/software_repo";
-import UseCases from "../project/project_component/components/use_cases";
+import UseCases from "../project/project_component/components/uses_cases/use_cases";
 import Difficulties from "../project/project_component/components/difficulties/difficulties";
-import Draggable from "react-draggable";
 import Visualizer from "../visualizer/visualizer";
+import { useXarrow } from "react-xarrows";
+import { Rnd } from "react-rnd";
 
 const ComponentEditor = (props: {componentToEdit: ProjectComponent}) => {
+    const updateXarrow = useXarrow();
+    
+    const [renderViews, setRenderViews] = useState<boolean>(false);
+
     const nodeRef: MutableRefObject<null> = useRef(null);
 
     function renderComponentEditor() {
@@ -41,10 +46,36 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent}) => {
         }
     }
 
+    function componentNameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
+        let newName: string = event.target.value;
+        props.componentToEdit.setComponentName(newName);
+    }
+
     return (
         <div>
-            <Draggable nodeRef={nodeRef} cancel=".dont-move-draggable">
-                <div style={{ position: 'absolute', top: "0%", left: "50%", zIndex: 1000, background: "#f56c42" }} ref={nodeRef} id={`${props.componentToEdit.getComponentName()}_visualizer`}>
+            <p>Editing Component: <input type="text" value={props.componentToEdit.getComponentName()} onChange={componentNameOnChangeHandler}/></p>
+
+            <button onClick={e => (setRenderViews(!renderViews))}>Re-render Views</button>
+
+            <Rnd
+                style={{
+                    border: "solid 1px #ddd",
+                    background: "#f0f0f0",
+                    overflow: "hidden"
+                }}
+                default={{
+                    x: 0,
+                    y: 0,
+                    width: 275,
+                    height: 150
+                }}
+                onDrag={updateXarrow}
+                onDragStop={updateXarrow}
+                id={`${props.componentToEdit.getId()}_visualizer`}
+                minWidth={275}
+                minHeight={150}
+            >
+                <div>
                     <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
                         <p>Visualizer: {props.componentToEdit.getComponentName()}</p>
                     </div>
@@ -53,31 +84,65 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent}) => {
                         <Visualizer componentToVisualize={props.componentToEdit}></Visualizer>
                     </div>
                 </div>
-            </Draggable>
+            </Rnd>
 
-            <Draggable nodeRef={nodeRef} cancel=".dont-move-draggable">
-                <div style={{ position: 'absolute', top: "33%", left: "50%", zIndex: 1000, background: "#f56c42" }} ref={nodeRef} id={`${props.componentToEdit.getComponentName()}_setup_file`}>
+            <Rnd
+                style={{
+                    border: "solid 1px #ddd",
+                    background: "#f0f0f0",
+                    overflow: "hidden"
+                }}
+                default={{
+                    x: 0,
+                    y: 0,
+                    width: 275,
+                    height: 150
+                }}
+                onDrag={updateXarrow}
+                onDragStop={updateXarrow}
+                id={`${props.componentToEdit.getId()}_setup_file`}
+                minWidth={275}
+                minHeight={150}
+            >
+                <div>
                     <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
                         <p>Setup File: {props.componentToEdit.getComponentName()}</p>
                     </div>
 
                     <div className="dont-move-draggable">
-                        <textarea key="1" name="viewSetup" value={props.componentToEdit.getSetupFileContents()} readOnly={true}/>
+                        <textarea name="viewSetup" value={props.componentToEdit.getSetupFileContents()} readOnly={true}/>
                     </div>
                 </div>
-            </Draggable>
+            </Rnd>
             
-            <Draggable nodeRef={nodeRef} cancel=".dont-move-draggable">
-                <div style={{ position: 'absolute', top: "66%", left: "50%", zIndex: 1000, background: "#f56c42" }} ref={nodeRef} id={`${props.componentToEdit.getComponentName()}_deploy_file`}>
+            <Rnd
+                style={{
+                    border: "solid 1px #ddd",
+                    background: "#f0f0f0",
+                    overflow: "hidden"
+                }}
+                default={{
+                    x: 0,
+                    y: 0,
+                    width: 275,
+                    height: 150
+                }}
+                onDrag={updateXarrow}
+                onDragStop={updateXarrow}
+                id={`${props.componentToEdit.getId()}_deploy_file`}
+                minWidth={275}
+                minHeight={150}
+            >
+                <div>
                     <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
                         <p>Deploy File: {props.componentToEdit.getComponentName()}</p>
                     </div>
 
                     <div className="dont-move-draggable">
-                        <textarea key="2" name="viewDeploy" value={props.componentToEdit.getDeployFileContents()} readOnly={true}/>
+                        <textarea name="viewDeploy" value={props.componentToEdit.getDeployFileContents()} readOnly={true}/>
                     </div>
                 </div>
-            </Draggable>
+            </Rnd>
             
             {renderComponentEditor()}
         </div>

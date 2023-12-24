@@ -22,7 +22,7 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
     }
 
     function renderCurrEditor() {
-        let focusedComponent: ProjectComponent | null = props.projectToEdit.getComponentWithName(focus);
+        let focusedComponent: ProjectComponent | null = props.projectToEdit.getComponentWithId(focus);
         if (focusedComponent === null) {
             return <ProjectEditor projectToEdit={props.projectToEdit}/>
         } else {
@@ -55,7 +55,8 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
                     editorCanvasDropdownVisible && (
                         <form onSubmit={changeFocusOnSubmitHandler}>
                             <select name="newFocus" defaultValue={focus}>
-                                {[props.projectToEdit.getProjectName(), ...props.projectToEdit.getComponentNames()].map((compName: string, index: number) => <option value={compName} key={index}>{compName}</option>)}
+                                <option value={props.projectToEdit.getId()} key={props.projectToEdit.getId()}>{props.projectToEdit.getProjectName()}</option>
+                                {props.projectToEdit.getComponents().map((component: ProjectComponent) => <option value={component.getId()} key={component.getId()}>{component.getComponentName()}</option>)}
                             </select>
                             <button type="submit">Change Focus</button>
                         </form>

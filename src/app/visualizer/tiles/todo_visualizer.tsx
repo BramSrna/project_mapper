@@ -1,17 +1,16 @@
 import Todo from "@/app/project/project_component/components/todo/todo";
-import { ChangeEvent } from "react";
+import TodoItem from "@/app/project/project_component/components/todo/todo_item";
 
 const TodoVisualizer = (props: {todoComp: Todo}) => {
-    let keyVal: number = 0;
     return (
         <div>
             <table>
                 <tbody>
-                    {props.todoComp.getItems().map(function(currItem) {
+                    {props.todoComp.getItems().map(function(currItem: TodoItem) {
                         return (
-                            <tr key={keyVal++}>
-                                <td key={keyVal++}><input type="checkbox" checked={currItem.getIsComplete()} readOnly={true}></input></td>
-                                <td key={keyVal++}>{currItem.getItemDescription()}</td>
+                            <tr key={currItem.getId()}>
+                                <td><input type="checkbox" checked={currItem.getIsComplete()} readOnly={true}></input></td>
+                                <td>{currItem.getItemDescription()}</td>
                             </tr>
                         )
                     })}

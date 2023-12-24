@@ -1,51 +1,56 @@
 import Todo from "@/app/project/project_component/components/todo/todo";
-import { ChangeEvent } from "react";
+import TodoItem from "@/app/project/project_component/components/todo/todo_item";
+import { ChangeEvent, useEffect, useState } from "react";
 
 const TodoEditor = (props: {todoComp: Todo}) => {
-    function checkboxOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.todoComp.setIsComplete(rowIndex, event.target.checked)
+    const [items, setItems] = useState<TodoItem[]>([]);
+
+    useEffect(() => {
+        setItems([...props.todoComp.getItems()]);
+    }, [props.todoComp]);
+
+    function isCompleteOnChangeHandler(item: TodoItem, checked: boolean) {
+        item.setIsComplete(checked);
     }
 
-    function itemDescriptionOnChangeHandler(event: ChangeEvent<HTMLInputElement>, rowIndex: number) {
-        props.todoComp.setItemDescription(rowIndex, event.target.value);
+    function itemDescriptionOnChangeHandler(item: TodoItem, newDescription: string) {
+        item.setItemDescription(newDescription);
     }
 
-    function deleteItemOnClickHandler(rowIndex: number) {
-        props.todoComp.deleteItem(rowIndex);
+    function deleteItemOnClickHandler(itemToDelete: TodoItem) {
+        props.todoComp.deleteItem(itemToDelete);
+        setItems(items.filter(function(currItem: TodoItem) {
+            return currItem !== itemToDelete;
+        }));
     }
 
     function addItemOnClickHandler() {
-        props.todoComp.addItem();
-    }
-
-    function getFormFields() {
-        let keyVal = 0;
-        const itemRows = props.todoComp.getItems().map(function(currItem, rowIndex) {
-            return (
-                <tr key={keyVal++}>
-                    <td key={keyVal++}><input type="checkbox" defaultChecked={currItem.getIsComplete()} onChange={e => checkboxOnChangeHandler(e, rowIndex)}></input></td>
-                    <td key={keyVal++}><input type="text" defaultValue={currItem.getItemDescription()} onChange={e => itemDescriptionOnChangeHandler(e, rowIndex)}/></td>
-                    <td key={keyVal++}><button onClick={() => deleteItemOnClickHandler(rowIndex)}>Delete Item</button></td>
-                </tr>
-            )
-        });
-        return (
-            <div>
-                <table>
-                    <tbody>
-                        {itemRows}
-                    </tbody>
-                </table>
-                <button onClick={addItemOnClickHandler}>Add Item</button>
-            </div>
-        )
+        let newItem: TodoItem = new TodoItem(props.todoComp, "", false);
+        props.todoComp.addItem(newItem);
+        setItems([
+            ...items,
+            newItem
+        ]);
     }
 
     return (
         <div>
-            <form id="Todo">
-                {getFormFields()}
-            </form>
+            <table>
+                <tbody>
+                    {
+                        items.map(function(currItem: TodoItem) {
+                            return (
+                                <tr key={currItem.getId()}>
+                                    <td><input type="checkbox" defaultChecked={currItem.getIsComplete()} onChange={e => isCompleteOnChangeHandler(currItem, e.target.checked)}></input></td>
+                                    <td><input type="text" defaultValue={currItem.getItemDescription()} onChange={e => itemDescriptionOnChangeHandler(currItem, e.target.value)}/></td>
+                                    <td><button onClick={() => deleteItemOnClickHandler(currItem)}>Delete Item</button></td>
+                                </tr>
+                            )
+                        })
+                    }
+                </tbody>
+            </table>
+            <button onClick={addItemOnClickHandler}>Add Item</button>
         </div>
     );
 }

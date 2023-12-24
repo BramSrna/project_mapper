@@ -1,20 +1,23 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import { ControlPosition } from "react-draggable";
 import DifficultyEntry from "./difficulty_entry";
-import Connection from "../../connection";
 
 class Difficulties extends ProjectComponent {
-    type = "Difficulties";
+    type: string = "Difficulties";
 
-    difficulties: DifficultyEntry[] = [];
+    difficulties: DifficultyEntry[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Connection[], position: ControlPosition, difficulties: object[]) {
-        super(id, parentProject, componentName, connections, position);
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[], difficulties: object[]) {
+        super(id, parentProject, componentName, connections);
 
         this.difficulties = [];
         for (const currDifficulty of difficulties) {
-            this.difficulties.push(new DifficultyEntry(currDifficulty["description" as keyof typeof currDifficulty], currDifficulty["possibleSolutions" as keyof typeof currDifficulty]));
+            let newEntry: DifficultyEntry = new DifficultyEntry(
+                this,
+                currDifficulty["description" as keyof typeof currDifficulty],
+                currDifficulty["possibleSolutions" as keyof typeof currDifficulty]
+            );
+            this.difficulties.push(newEntry);
         }
 
         parentProject.addComponent(this);
@@ -37,42 +40,17 @@ class Difficulties extends ProjectComponent {
         return this.difficulties;
     }
 
-    deletePossibleSolution(difficultyIndex: number, possibleSolutionIndex: number) {
-        if ((difficultyIndex >= 0) || (difficultyIndex < this.difficulties.length)) {
-            this.difficulties[difficultyIndex].deletePossibleSolution(possibleSolutionIndex);
+    addDifficulty(newDifficulty: DifficultyEntry) {
+        if (this.difficulties.indexOf(newDifficulty) === -1) {
+            this.difficulties.push(newDifficulty);
             this.saveToBrowser();
         }
     }
 
-    setDifficultyDescription(index: number, newDescription: string) {
-        if ((index >= 0) || (index < this.difficulties.length)) {
-            this.difficulties[index].setDescription(newDescription);
-            this.saveToBrowser();
-        }
-    }
-
-    setPossibleSolution(difficultyIndex: number, possibleSolutionIndex: number, newPossibleSolution: string) {
-        if ((difficultyIndex >= 0) || (difficultyIndex < this.difficulties.length)) {
-            this.difficulties[difficultyIndex].setPossibleSolution(possibleSolutionIndex, newPossibleSolution);
-            this.saveToBrowser();
-        }
-    }
-
-    addDifficulty() {
-        this.difficulties.push(new DifficultyEntry("", []));
-        this.saveToBrowser();
-    }
-
-    deleteDifficulty(index: number) {
-        if ((index >= 0) || (index < this.difficulties.length)) {
-            this.difficulties.splice(index, 1);
-            this.saveToBrowser();
-        }
-    }
-
-    addPossibleSolution(index: number) {
-        if ((index >= 0) || (index < this.difficulties.length)) {
-            this.difficulties[index].addPossibleSolution("");
+    deleteDifficulty(difficultyToDelete: DifficultyEntry) {
+        let indexToDelete: number = this.difficulties.indexOf(difficultyToDelete);
+        if (indexToDelete !== -1) {
+            this.difficulties.splice(indexToDelete, 1);
             this.saveToBrowser();
         }
     }
