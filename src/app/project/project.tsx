@@ -42,8 +42,6 @@ class Project {
                             this,
                             currCompInfo["componentName"],
                             currCompInfo["connections"],
-                            currCompInfo["name"],
-                            currCompInfo["componentType"],
                             currCompInfo["endGoal"],
                             currCompInfo["missionStatement"]
                         );

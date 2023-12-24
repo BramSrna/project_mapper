@@ -104,7 +104,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                         x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
                         y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
                     };
-                    console.log(initialPosition)
+                    
                     return (
                         <Rnd
                             style={{

@@ -4,14 +4,6 @@ import { ChangeEvent, MutableRefObject, useRef } from "react";
 const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentDescription}) => {    
     const nodeRef: MutableRefObject<null> = useRef(null);
 
-    function nameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
-        props.componentDescriptionComp.setName(event.target.value);
-    }
-
-    function componentTypeOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
-        props.componentDescriptionComp.setComponentType(event.target.value);
-    }
-
     function endGoalOnChangeHandler(event: ChangeEvent<HTMLTextAreaElement>) {
         props.componentDescriptionComp.setEndGoal(event.target.value);
     }
@@ -22,8 +14,6 @@ const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentD
 
     return (
         <form ref={nodeRef} id="ComponentDescriptionTile">
-            <p>Component Name: <input type="text" name="componentName" defaultValue={props.componentDescriptionComp.getName()} onChange={nameOnChangeHandler}/></p>
-            <p>Component Type: <input type="text" name="componentType" defaultValue={props.componentDescriptionComp.getComponentType()} onChange={componentTypeOnChangeHandler}/></p>
             <p>End Goal:
                 <textarea
                     name="endGoal"

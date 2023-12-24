@@ -44,7 +44,7 @@ const ProjectEditor = (props: {projectToEdit: Project}) => {
             const tileType = formData.get("tileType");
             switch (tileType) {
                 case "Component Description":
-                    newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", "", "", "");
+                    newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", "");
                     break;
                 case "Documentation Box":
                     newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "");

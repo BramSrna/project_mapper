@@ -4,16 +4,12 @@ import Project from "../../project";
 class ComponentDescription extends ProjectComponent {
     type: string = "ComponentDescription";
 
-    name: string;
-    componentType: string;
     endGoal: string;
     missionStatement: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], name: string, componentType: string, endGoal: string, missionStatement: string) {
+    constructor(id: string, parentProject: Project, componentName: string, connections: string[], endGoal: string, missionStatement: string) {
         super(id, parentProject, componentName, connections);
 
-        this.name = name;
-        this.componentType = componentType;
         this.endGoal = endGoal;
         this.missionStatement = missionStatement;
 
@@ -31,31 +27,11 @@ class ComponentDescription extends ProjectComponent {
 
     getDisplayableContentsJson() {
         const setupContents = {
-            "name": this.name,
-            "componentType": this.componentType,
             "endGoal": this.endGoal,
             "missionStatement": this.missionStatement
         };
 
         return setupContents;
-    }
-
-    getName() {
-        return this.name;
-    }
-
-    getComponentType() {
-        return this.componentType;
-    }
-
-    setName(newname: string) {
-        this.name = newname;
-        this.saveToBrowser()
-    }
-
-    setComponentType(newcomponentType: string) {
-        this.componentType = newcomponentType;
-        this.saveToBrowser()
     }
 
     getSetupFileContents() {

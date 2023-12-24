@@ -39,6 +39,7 @@ const RoadmapEntryTile = (props: {roadmapEntry: RoadmapEntry, initialPosition: o
             id={props.roadmapEntry.getId()}
             minWidth={ROADMAP_ENTRY_TILE_MIN_WIDTH}
             minHeight={ROADMAP_ENTRY_TILE_MIN_HEIGHT}
+            dragHandleClassName={"handle"}
         >
             <div>
                 <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}/>
