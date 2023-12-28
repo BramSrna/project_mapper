@@ -1,0 +1,91 @@
+{
+    "Initial Outline": {
+        "componentName": "Initial Outline",
+        "connections": [
+            "Expanded Idea",
+            "Todo"
+        ],
+        "position": {
+            "x": 74,
+            "y": 19
+        },
+        "type": "DocumentationSection",
+        "content": "- Platform for open source hardware development\n  - Platform is fundamentally a project planner from start to finish\n    - Aggregates the various design documents as well as implementation details\n  - Operating walls:\n    - Start: Setting up a project\n    - End: Aggregating the design documents\n  - Question: How many implementation tools should the platform have? How much should the platform help with implementation?\n    - Ex. Should it have a code editor? Should it have component simulators? etc\n  - Tools for mapping out hardware and software stack\n  - Integrate tools for designing\n    - 3d printing designs\n    - CAD drawings\n    - Git repos\n    - Simulation tools\n  - AI assistant for APIs between layers in the stack\n  - The tool is meant for e2e open source development - includes both hardware and software stack\n    - Maps out architecture\n    - Solicit open source contributions\n    - Output of the tool should be a recipe that someone with the needed materials and skills could follow to put together the whole project\n      - The way to think about it is a factory serviced by robots should be able to use the output to create the project to spec"
+    },
+    "Todo": {
+        "componentName": "Todo",
+        "connections": [],
+        "position": {
+            "x": 67,
+            "y": 347
+        },
+        "type": "Todo",
+        "items": [
+            {
+                "description": "Text boxes are too small",
+                "isComplete": false
+            },
+            {
+                "description": "Screen flashes when a lot of buttons are pressed",
+                "isComplete": false
+            },
+            {
+                "description": "No screen scrolling, so components overlap",
+                "isComplete": false
+            },
+            {
+                "description": "Switching between projects is still pretty awkward",
+                "isComplete": false
+            },
+            {
+                "description": "Cannot select all text in component name using click and drag",
+                "isComplete": false
+            },
+            {
+                "description": "Making roadmaps is annoying",
+                "isComplete": false
+            },
+            {
+                "description": "Load and save projects as groups",
+                "isComplete": false
+            },
+            {
+                "description": "Find out if ctrl+s can be used to save projects",
+                "isComplete": false
+            }
+        ]
+    },
+    "Short Term Action Items": {
+        "componentName": "Short Term Action Items",
+        "connections": [],
+        "position": {
+            "x": 708,
+            "y": 0
+        },
+        "type": "DocumentationSection",
+        "content": "For tomorrow (06/12/23):\n- I really want the Project Mapper website to be the perfect tool for creating large scale, long timeline projects\n- The project needs to balance between abstract planning tools and rapid prototyping tools\n- Use AI for UI to match user's needs\n- I think the best way forward would be to just start using the tool lmao. Tomorrow, I'll start porting the garbage collection / vertical farming project into the project mapper and start working on it with the tool.\n"
+    },
+    "Random Ideas": {
+        "componentName": "Random Ideas",
+        "connections": [],
+        "position": {
+            "x": 1153,
+            "y": 299
+        },
+        "type": "DocumentationSection",
+        "content": "A terminal that you can use to make the project outline programatically\n- ex. There would be a terminal text box that you could enter \"create documentation box\" into and a documentation box would be added\n\nImplement this: https://twitter.com/_nonfigurativ_/status/1727657155409363120\n\nTerminals as a component\n\nreact cad\n\nCool landing pages to show off projects\n\nWarning of project scope creep\n\nThrow ideas into the project planner and it outputs a development plan. The project planner is an end-to-end tool for developing and engineering a project including:\n- Planning\n- Developing\n- Deploying\n- Maintaining\n- Socializing\n- Growing\nThe way to think about it is to provide a tool that can be used by a single person to make a simple Python package over a few days and for millions of people to build a dyson sphere over hundreds of years.\n\nMake internall defined / external link a global tile feature"
+    },
+    "Expanded Idea": {
+        "componentName": "Expanded Idea",
+        "connections": [
+            "Random Ideas",
+            "Short Term Action Items"
+        ],
+        "position": {
+            "x": 616,
+            "y": 361
+        },
+        "type": "DocumentationSection",
+        "content": "An important aspect of the project is about owning the domain between the operating walls. The project planner should help the user build a project that fully envelops the domain. "
+    }
+}

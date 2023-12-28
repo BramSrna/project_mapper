@@ -1,0 +1,197 @@
+{
+    "Food Delivery + Recycling": {
+        "componentName": "Food Delivery + Recycling",
+        "connections": [],
+        "position": {
+            "x": 53,
+            "y": 29
+        },
+        "type": "ComponentDescription",
+        "name": "",
+        "componentType": "",
+        "endGoal": "Circular economy",
+        "missionStatement": "Develop the capability to turn every object back into its base components with 100% efficiency"
+    },
+    "Use Cases": {
+        "componentName": "Use Cases",
+        "connections": [],
+        "position": {
+            "x": 619,
+            "y": 0
+        },
+        "type": "UseCases",
+        "startOperatingWall": "Collecting trash",
+        "endOperatingWall": "Selling recycled trash as commodities",
+        "useCases": []
+    },
+    "Difficulties": {
+        "componentName": "Difficulties",
+        "connections": [],
+        "position": {
+            "x": 131,
+            "y": 319
+        },
+        "type": "Difficulties",
+        "difficulties": [
+            {
+                "description": "Ensuring 100% of garbage is collected",
+                "possibleSolutions": [
+                    "Automated drone swarm collection system that users can interface with to highlight trash for collection",
+                    "Standardized collection bins",
+                    "Accessible disposal sites"
+                ]
+            },
+            {
+                "description": "Technological development required for 100% recycling rate",
+                "possibleSolutions": [
+                    "Sensor technology for better sorting",
+                    "Robotics for breaking down larger garbage pieces",
+                    "Iterating on existing technology"
+                ]
+            },
+            {
+                "description": "Selling recycled commodities at a profit",
+                "possibleSolutions": [
+                    "Get running costs of recycling plants as low as possible by relying on automation",
+                    "Use recycled materials for in-house purposes where possible (3d printing for robot parts, clothing for advertising)",
+                    "Explore use cases for undesired recycled commodities"
+                ]
+            },
+            {
+                "description": "Reaching recycling flow required for 100% rate (if it's too slow, there will be landfill buildup)",
+                "possibleSolutions": [
+                    "Automation for sorting and running factories consistently",
+                    "Modular factories that can scale to meet changing demands (i.e. If there are higher rates of electronic devices, local factors will need more units for recycling electronic devices)"
+                ]
+            }
+        ]
+    },
+    "Business Development Steps": {
+        "componentName": "Business Development Steps",
+        "connections": [],
+        "position": {
+            "x": 1057,
+            "y": -142
+        },
+        "type": "Roadmap",
+        "internallyDefined": true,
+        "linkToRoadmap": "",
+        "roadmapHeaders": [
+            "Phase 1: Sell technology to existing recycling plants and dumps",
+            "",
+            ""
+        ],
+        "entries": [
+            [
+                "",
+                "Phase 1.1: Software aspects",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Sorting technology (computer vision model, arm controller, etc)"
+            ],
+            [
+                "",
+                "",
+                "Dump layout software to help minimize environmental harm due to leachate"
+            ],
+            [
+                "",
+                "Phase 1.2: Hardware aspects",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Robotics for breaking down larger garbage pieces"
+            ],
+            [
+                "",
+                "",
+                "Sensor technology for better sorting"
+            ],
+            [
+                "Phase 2: Develop recycling technology and run dump + recycling plant",
+                "",
+                ""
+            ],
+            [
+                "",
+                "Phase 2.1: Modular factories that can scale as needed",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Iterating on existing technology"
+            ],
+            [
+                "",
+                "",
+                "Get running costs of recycling plants as low as possible by relying on automation"
+            ],
+            [
+                "",
+                "",
+                "Automation for sorting and running factories consistently"
+            ],
+            [
+                "",
+                "Phase 2.2: Explore use cases for undesired recycled commodities",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Use recycled materials for in-house purposes where possible (3d printing for robot parts, clothing for advertising)"
+            ],
+            [
+                "Phase 3: Collecting trash",
+                "",
+                ""
+            ],
+            [
+                "",
+                "Phase 3.1: Simplifying collection",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Standardized collection bins"
+            ],
+            [
+                "",
+                "",
+                "Accessible disposal sites"
+            ],
+            [
+                "",
+                "Phase 3.2: Obsoleting collection",
+                ""
+            ],
+            [
+                "",
+                "",
+                "Automated drone swarm collection system that users can interface with to highlight trash for collection"
+            ],
+            [
+                "Phase 4 and beyond: Transform into general commodities company (once reusability threshold passes 100%)",
+                "",
+                ""
+            ],
+            [
+                "",
+                "Mine asteroids",
+                ""
+            ],
+            [
+                "",
+                "Move basic raw material processing to space",
+                ""
+            ]
+        ]
+    }
+}

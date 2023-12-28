@@ -1,0 +1,41 @@
+.projectEditorMenu {
+    border-bottom: solid;
+}
+
+.projectEditorContainer {
+    display: "flex";
+    height: 100vh;
+    flex-direction: column;
+}
+
+.projectEditorWindow {
+    height: 93vh;
+}
+
+.connectionAdder {
+    width: 10px;
+    height: 10px;
+    background-color: #2196F3;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+}
+
+.handle {
+    cursor: move;
+    padding: 10px;
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+.previewTileContainer {
+    border: solid 1px #ddd;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+
+.handleContainer {
+    display: "flex"
+}
