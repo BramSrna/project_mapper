@@ -33,7 +33,7 @@ class DocumentationSection extends ProjectComponent {
 
     getSetupFileContents() {
         let content: string = "";
-        let lines: string[] = this.content.split("\n");
+        const lines: string[] = this.content.split("\n");
         for (let i: number = 0; i < lines.length; i++) {
             if (i === 0) {
                 content += `echo "${lines[i]}" > "${this.componentName}.md"`;

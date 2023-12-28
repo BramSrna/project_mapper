@@ -48,7 +48,7 @@ class SoftwareRepo extends ProjectComponent {
     }
 
     deleteMock(mockToDelete: Mock) {
-        let indexToDelete: number = this.mocks.indexOf(mockToDelete);
+        const indexToDelete: number = this.mocks.indexOf(mockToDelete);
         if (indexToDelete !== -1) {
             this.mocks.splice(indexToDelete, 1);
             this.saveToBrowser();

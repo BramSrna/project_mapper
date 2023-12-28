@@ -1,0 +1,24 @@
+.projectInitializerContainer {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.projectEditorContainer {
+    height: 100vh;
+}
+
+.projectMapperContainer {
+    height: 100vh;
+}
+
+.editorContainer {
+    border-style: solid;
+}
+
+.containerWithSeperators {
+    background-color: #9e9e9e;
+    border-right: solid;
+}

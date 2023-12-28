@@ -1,9 +1,10 @@
 import Difficulties from "@/app/project/project_component/components/difficulties/difficulties";
 import DifficultyEntry from "@/app/project/project_component/components/difficulties/difficulty_entry";
 import PossibleSolution from "@/app/project/project_component/components/difficulties/possible_solution";
-import { ChangeEvent, LegacyRef, MutableRefObject, forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import { useXarrow } from "react-xarrows";
+import "./component_editor_tiles.css";
 
 const DIFFICULTY_ENTRY_MIN_WIDTH: number = 275;
 const DIFFICULTY_ENTRY_MIN_HEIGHT: number = 150;
@@ -15,10 +16,6 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
         setPossibleSolutions([...props.difficulty.getPossibleSolutions()]);
     }, [props.difficulty]);
 
-    function posssibleSolutionOnChangeHandler(possibleSolution: PossibleSolution, newDescription: string) {
-        possibleSolution.setDescription(newDescription);
-    }
-
     function deletePossibleSolutionOnClickHandler(possibleSolutionToDelete: PossibleSolution) {
         props.difficulty.deletePossibleSolution(possibleSolutionToDelete);
         setPossibleSolutions(possibleSolutions.filter(function(currPossibleSolution: PossibleSolution) {
@@ -27,7 +24,7 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
     }
 
     function addPossibleSolutionOnClickHandler() {
-        let newPossibleSolution: PossibleSolution = new PossibleSolution(props.difficulty, "");
+        const newPossibleSolution: PossibleSolution = new PossibleSolution(props.difficulty, "");
         props.difficulty.addPossibleSolution(newPossibleSolution);
         setPossibleSolutions([
             ...possibleSolutions,
@@ -46,7 +43,7 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
                                 rows={4}
                                 cols={40}
                                 defaultValue={currPossibleSolution.getDescription()}
-                                onChange={e => posssibleSolutionOnChangeHandler(currPossibleSolution, e.target.value)}
+                                onChange={e => currPossibleSolution.setDescription(e.target.value)}
                             />
                             <button onClick={() => deletePossibleSolutionOnClickHandler(currPossibleSolution)}>Delete Possible Solution</button>
                         </div>
@@ -62,23 +59,18 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
     const updateXarrow = useXarrow();
     const [difficulties, setDifficulties] = useState<DifficultyEntry[]>([]);
 
-    const nodeRef: MutableRefObject<null> = useRef(null);
-
     useEffect(() => {
         setDifficulties([...props.difficultiesComp.getDifficulties()]);
     }, [props.difficultiesComp]);
 
     function addDifficulty() {
-        let newDifficulty: DifficultyEntry = new DifficultyEntry(props.difficultiesComp, "", []);
+        console.log(difficulties.length)
+        const newDifficulty: DifficultyEntry = new DifficultyEntry(props.difficultiesComp, "", []);
         props.difficultiesComp.addDifficulty(newDifficulty);
         setDifficulties([
             ...difficulties,
             newDifficulty
         ]);
-    }
-
-    function difficultyDescriptionOnChangeHandler(difficultyEntry: DifficultyEntry, newDescription: string) {
-        difficultyEntry.setDescription(newDescription);
     }
 
     function deleteDifficultyOnClickHandler(difficultyToDelete: DifficultyEntry) {
@@ -94,13 +86,13 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
     }
 
     return (
-        <div>
+        <div className="difficultiesEditorWindow">
             {
                 difficulties.map(function(currDifficulty: DifficultyEntry, index: number) {
-                    let rowIndex: number = Math.floor(index / dispSquareDim);
-                    let colIndex: number = index % dispSquareDim;
+                    const rowIndex: number = Math.floor(index / dispSquareDim);
+                    const colIndex: number = index % dispSquareDim;
 
-                    let initialPosition: object = {
+                    const initialPosition: object = {
                         x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
                         y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
                     };
@@ -124,10 +116,12 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                             minWidth={DIFFICULTY_ENTRY_MIN_WIDTH}
                             minHeight={DIFFICULTY_ENTRY_MIN_HEIGHT}
                             key={currDifficulty.getId()}
+                            bounds=".difficultiesEditorWindow"
                         >
                             <div>
-                                <div className="handle" style={{ cursor: 'move', padding: '10px', background: '#ddd', border: '1px solid #999', borderRadius: '4px' }}>
-                                    <button onClick={() => deleteDifficultyOnClickHandler(currDifficulty)}>Delete Difficulty</button>
+                                <div className="sideBySideContainer handleContainer">
+                                    <div className="handle"/>
+                                    <button onClick={() => deleteDifficultyOnClickHandler(currDifficulty)}>X</button>
                                 </div>
                 
                                 <div className="dont-move-draggable">
@@ -136,7 +130,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                                         rows={4}
                                         cols={40}
                                         defaultValue={currDifficulty.getDescription()}
-                                        onChange={e => difficultyDescriptionOnChangeHandler(currDifficulty, e.target.value)}
+                                        onChange={e => currDifficulty.setDescription(e.target.value)}
                                     />
                 
                                     <PossibleSolutionBlock difficulty={currDifficulty}></PossibleSolutionBlock>

@@ -1,0 +1,16 @@
+.handleContainer {
+    display: "flex"
+}
+
+.handle {
+    cursor: move;
+    padding: 10px;
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+.difficultiesEditorWindow {
+    height: 93vh;
+}

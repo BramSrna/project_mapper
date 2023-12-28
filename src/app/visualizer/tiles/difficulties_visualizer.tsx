@@ -12,8 +12,8 @@ const DifficultiesVisualizer = (props: {difficultiesComp: Difficulties}) => {
             </thead>
             <tbody>
                 {
-                    props.difficultiesComp.getDifficulties().map(function(currDifficulty, difficultyIndex) {
-                        let numPossibleSolutions: number = currDifficulty.getPossibleSolutions().length;
+                    props.difficultiesComp.getDifficulties().map(function(currDifficulty) {
+                        const numPossibleSolutions: number = currDifficulty.getPossibleSolutions().length;
                         if (numPossibleSolutions <= 0) {
                             return (
                                 <tr key={currDifficulty.getId()}>

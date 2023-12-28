@@ -60,7 +60,7 @@ class UseCases extends ProjectComponent {
     }
 
     deleteUseCase(useCase: UseCaseItem) {
-        let indexToDelete: number = this.useCases.indexOf(useCase);
+        const indexToDelete: number = this.useCases.indexOf(useCase);
         if (indexToDelete !== -1) {
             this.useCases.splice(indexToDelete, 1);
             this.saveToBrowser();
@@ -93,7 +93,7 @@ class UseCases extends ProjectComponent {
             } else {
                 content += `echo "Use Cases:" > "${this.componentName}.md"`
             }
-            for (let currCase of this.useCases) {
+            for (const currCase of this.useCases) {
                 content += `echo "- ${currCase}" >> "${this.componentName}.md"`;
             }
         }

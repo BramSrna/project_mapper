@@ -12,7 +12,7 @@ class Difficulties extends ProjectComponent {
 
         this.difficulties = [];
         for (const currDifficulty of difficulties) {
-            let newEntry: DifficultyEntry = new DifficultyEntry(
+            const newEntry: DifficultyEntry = new DifficultyEntry(
                 this,
                 currDifficulty["description" as keyof typeof currDifficulty],
                 currDifficulty["possibleSolutions" as keyof typeof currDifficulty]
@@ -48,7 +48,7 @@ class Difficulties extends ProjectComponent {
     }
 
     deleteDifficulty(difficultyToDelete: DifficultyEntry) {
-        let indexToDelete: number = this.difficulties.indexOf(difficultyToDelete);
+        const indexToDelete: number = this.difficulties.indexOf(difficultyToDelete);
         if (indexToDelete !== -1) {
             this.difficulties.splice(indexToDelete, 1);
             this.saveToBrowser();
@@ -64,11 +64,11 @@ class Difficulties extends ProjectComponent {
         content += `echo "|:---|:---|" >> "${this.componentName}.md"\n`
 
         let currLineContent: string;
-        for (var currDifficulty of this.difficulties) {
+        for (const currDifficulty of this.difficulties) {
             currLineContent = "|";
             currLineContent += currDifficulty.getDescription();
             currLineContent += "|";
-            for (var currSolution of currDifficulty.getPossibleSolutions()) {
+            for (const currSolution of currDifficulty.getPossibleSolutions()) {
                 currLineContent += `- ${currSolution}`;
             }
             currLineContent += "|";

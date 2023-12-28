@@ -38,7 +38,7 @@ class DifficultyEntry {
     }
 
     deletePossibleSolution(possibleSolutionToDelete: PossibleSolution) {
-        let indexToDelete: number = this.possibleSolutions.indexOf(possibleSolutionToDelete);
+        const indexToDelete: number = this.possibleSolutions.indexOf(possibleSolutionToDelete);
         if (indexToDelete !== -1) {
             this.possibleSolutions.splice(indexToDelete, 1);
             this.saveToBrowser();

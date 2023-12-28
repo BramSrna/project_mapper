@@ -1,11 +1,6 @@
 import DocumentationSection from "@/app/project/project_component/components/documentation_section";
-import { ChangeEvent } from "react";
 
 const DocumentationSectionEditor = (props: {documentationSectionComp: DocumentationSection}) => {
-    function documentationOnChangeHandler (event: ChangeEvent<HTMLTextAreaElement>) {
-        props.documentationSectionComp.setContent(event.target.value);
-    }
-
     return (
         <div>
             <textarea
@@ -13,7 +8,7 @@ const DocumentationSectionEditor = (props: {documentationSectionComp: Documentat
                 rows={4}
                 cols={40}
                 defaultValue={props.documentationSectionComp.getContent()}
-                onChange={e => documentationOnChangeHandler(e)}
+                onChange={e => props.documentationSectionComp.setContent(e.target.value)}
             />
         </div>
     );

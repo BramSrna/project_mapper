@@ -1,7 +1,6 @@
 import Mock from "@/app/project/project_component/components/software_repo/mock";
 import SoftwareRepo from "@/app/project/project_component/components/software_repo/software_repo";
-import { ChangeEvent, useEffect, useState } from "react";
-import Toggle from 'react-toggle'
+import { useEffect, useState } from "react";
 
 const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     const [mocks, setMocks] = useState<Mock[]>([]);
@@ -9,18 +8,6 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     useEffect(() => {
         setMocks([...props.softwareRepoComp.getMocks()]);
     }, [props.softwareRepoComp]);
-
-    function initRepoNameOnChangeHandler(event: ChangeEvent<HTMLInputElement>) {
-        props.softwareRepoComp.setInitRepoName(event.target.value);
-    }
-
-    function mockInputOnChangeHandler(mock: Mock, newVal: string) {
-        mock.setInput(newVal);
-    }
-
-    function mockOutputOnChangeHandler(mock: Mock, newVal: string) {
-        mock.setOutput(newVal);
-    }
 
     function deleteMockOnClickHandler(mockToDelete: Mock) {
         props.softwareRepoComp.deleteMock(mockToDelete);
@@ -30,7 +17,7 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     }
 
     function addMockOnClickHandler() {
-        let newMock: Mock = new Mock(props.softwareRepoComp, "", "");
+        const newMock: Mock = new Mock(props.softwareRepoComp, "", "");
         props.softwareRepoComp.addMock(newMock);
         setMocks([
             ...mocks,
@@ -41,7 +28,7 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     return (
         <div>
             <p>
-                Init Repo Name: <input type="text" name="initRepoName" defaultValue={props.softwareRepoComp.getInitRepoName()} onChange={initRepoNameOnChangeHandler}/>
+                Init Repo Name: <input type="text" name="initRepoName" defaultValue={props.softwareRepoComp.getInitRepoName()} onChange={e => props.softwareRepoComp.setInitRepoName(e.target.value)}/>
             </p>
 
             {
@@ -59,8 +46,8 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                                 mocks.map(function(currMock: Mock) {
                                     return (
                                         <tr key={currMock.getId()}>
-                                            <td><input type="text" name="mockInput" defaultValue={currMock.getInput()} onChange={e => mockInputOnChangeHandler(currMock, e.target.value)}/></td>
-                                            <td><input type="text" name="mockOutput" defaultValue={currMock.getOutput()} onChange={e => mockOutputOnChangeHandler(currMock, e.target.value)}/></td>
+                                            <td><input type="text" name="mockInput" defaultValue={currMock.getInput()} onChange={e => currMock.setInput(e.target.value)}/></td>
+                                            <td><input type="text" name="mockOutput" defaultValue={currMock.getOutput()} onChange={e => currMock.setOutput(e.target.value)}/></td>
                                             <td><button onClick={() => deleteMockOnClickHandler(currMock)}>Delete Mock</button></td>
                                         </tr>
                                     );

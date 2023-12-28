@@ -1,16 +1,8 @@
 import ComponentDescription from "@/app/project/project_component/components/component_description";
-import { ChangeEvent, MutableRefObject, useRef } from "react";
+import { MutableRefObject, useRef } from "react";
 
 const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentDescription}) => {    
     const nodeRef: MutableRefObject<null> = useRef(null);
-
-    function endGoalOnChangeHandler(event: ChangeEvent<HTMLTextAreaElement>) {
-        props.componentDescriptionComp.setEndGoal(event.target.value);
-    }
-
-    function missionStatementOnChangeHandler(event: ChangeEvent<HTMLTextAreaElement>) {
-        props.componentDescriptionComp.setMissionStatement(event.target.value);
-    }
 
     return (
         <form ref={nodeRef} id="ComponentDescriptionTile">
@@ -20,7 +12,7 @@ const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentD
                     rows={4}
                     cols={40}
                     defaultValue={props.componentDescriptionComp.getEndGoal()}
-                    onChange={endGoalOnChangeHandler}
+                    onChange={(event) => props.componentDescriptionComp.setEndGoal(event.target.value)}
                 />
             </p>
             <p> Mission statement:
@@ -29,7 +21,7 @@ const ComponentDescriptionEditor = (props: {componentDescriptionComp: ComponentD
                     rows={4}
                     cols={40}
                     defaultValue={props.componentDescriptionComp.getMissionStatement()}
-                    onChange={missionStatementOnChangeHandler}
+                    onChange={(event) => props.componentDescriptionComp.setMissionStatement(event.target.value)}
                 />
             </p>
         </form>

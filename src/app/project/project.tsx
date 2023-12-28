@@ -2,7 +2,6 @@ import { saveAs } from 'file-saver';
 import ProjectComponent from "./project_component/project_component";
 import DocumentationSection from "./project_component/components/documentation_section";
 import SoftwareRepo from './project_component/components/software_repo/software_repo';
-import Roadmap from './project_component/components/roadmap/roadmap';
 import Todo from './project_component/components/todo/todo';
 import UseCases from './project_component/components/uses_cases/use_cases';
 import Difficulties from './project_component/components/difficulties/difficulties';
@@ -65,16 +64,6 @@ class Project {
                             currCompInfo["connections"],
                             currCompInfo["initRepoName"],
                             currCompInfo["mocks"]
-                        );
-                        break;
-                    }
-                    case "Roadmap": {
-                        new Roadmap(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["entries"]
                         );
                         break;
                     }
@@ -170,9 +159,7 @@ class Project {
             localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
         }
 
-        let projJson: object = this.toJSON();
-
-        localStorage.setItem(this.id, JSON.stringify(projJson));
+        localStorage.setItem(this.id, JSON.stringify(this.toJSON()));
     }
 
     getId() {

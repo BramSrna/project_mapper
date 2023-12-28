@@ -70,7 +70,6 @@ abstract class ProjectComponent {
     }
 
     setComponentName(newComponentName: string) {
-        const originalName: string = this.componentName;
         this.componentName = newComponentName;
         this.saveToBrowser();
     }
@@ -92,6 +91,10 @@ abstract class ProjectComponent {
             this.connections.splice(index, 1);
             this.saveToBrowser();
         }
+    }
+
+    getParentProject() {
+        return this.parentProject;
     }
 }
 

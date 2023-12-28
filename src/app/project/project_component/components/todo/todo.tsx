@@ -22,7 +22,7 @@ class Todo extends ProjectComponent {
     }
 
     deleteItem(itemToDelete: TodoItem) {
-        let indexToDelete: number = this.items.indexOf(itemToDelete);
+        const indexToDelete: number = this.items.indexOf(itemToDelete);
         if (indexToDelete !== -1) {
             this.items.splice(indexToDelete, 1);
             this.saveToBrowser();
@@ -52,7 +52,7 @@ class Todo extends ProjectComponent {
     getSetupFileContents() {
         let content: string = "";
         for (let i: number = 0; i < this.items.length; i++) {
-            let item = this.items[i];
+            const item = this.items[i];
             if (item.getIsComplete()) {
                 content += `- ${item.getItemDescription()}`;
             } else {

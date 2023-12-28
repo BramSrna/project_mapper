@@ -1,18 +1,13 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Project from "./project/project";
-import Modal from 'react-modal';
-import ComponentDescription from './project/project_component/components/component_description';
 import EditorCanvas from './editor_canvas';
-import IdGenerator from './id_generator';
-
-// Modal.setAppElement(".root");
+import "./page.css"
+import "./globals.css"
 
 const Page = () => {
-    const [mainMenuDropdownVisible, setMainMenuDropdownVisible] = useState(false);
-    const [initProjWizardIsOpen, setInitProjWizardIsOpen] = useState(false);
-    const [projectToEdit, setProjectToEdit] = useState<Project>(new Project());
+    const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
     const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
 
     useEffect(() => {
@@ -21,11 +16,11 @@ const Page = () => {
 
     function reloadLocalStorage() {
         const storedProjIds = localStorage.getItem("loadedProjectIds");
-        let projects: Project[] = [];
+        const projects: Project[] = [];
         if (storedProjIds !== null) {
-            let projIds: string[] = JSON.parse(storedProjIds);
+            const projIds: string[] = JSON.parse(storedProjIds);
 
-            for (var currId of projIds) {
+            for (const currId of projIds) {
                 const project = localStorage.getItem(currId);
         
                 if (project !== null) {
@@ -39,6 +34,8 @@ const Page = () => {
         const projectToEditId = localStorage.getItem("projectToEditId");
         if ((projectToEditId === null) && (storedProjIds !== null) && (storedProjIds.length > 0)) {
             projectToEditId === storedProjIds[0];
+        } else {
+            setProjectToEdit(null);
         }
 
         if (projectToEditId !== null) {
@@ -48,32 +45,12 @@ const Page = () => {
                 setProjectToEdit(newProj);
             }
         } else {
-            projectToEdit.setProjectName("New Project");
-            localStorage.setItem("projectToEditId", projectToEdit.getId())
+            setProjectToEdit(null);
         }
     }
 
-    function closeInitProjWizard() {
-        setInitProjWizardIsOpen(false);
-    }
-
-    function toggleMainMenuDropdown() {
-        let newVal: boolean = !mainMenuDropdownVisible;
-        if (newVal) {
-            reloadLocalStorage();
-        }
-        setMainMenuDropdownVisible(newVal);
-    }
-
-    function initWizardOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
-        const formData: FormData = new FormData(event.currentTarget);
+    function initProjectOnClickHandler() {
         const newProj: Project = new Project();
-        if (formData.has("projectType")) {
-            const projectType = formData.get("projectType");
-            if ((projectType !== null) && (projectType !== "None")) {
-                new ComponentDescription(IdGenerator.generateId(), newProj, "Component Description", [], {x: 0, y: 0}, "", projectType.toString(), "", "");
-            }
-        }
         newProj.saveToBrowser();
         newProj.setProjectName("New Project");
         localStorage.setItem("projectToEditId", newProj.getId());
@@ -82,11 +59,6 @@ const Page = () => {
             ...loadedProjects,
             newProj
         ]);
-        closeInitProjWizard();
-    }
-
-    function initProjectOnClickHandler() {
-        setInitProjWizardIsOpen(true);
     }
 
     function handleProjectImport(event: React.ChangeEvent<HTMLInputElement>) {
@@ -111,167 +83,97 @@ const Page = () => {
         };
         fileReader.readAsText(file);
     }
+
+    function switchToProject(projectId: string | null) {
+        if (projectId === null) {
+            localStorage.removeItem("projectToEditId")
+            setProjectToEdit(null);
+        } else {
+            const project = localStorage.getItem(projectId);
     
-    function saveProjectOnClickHandler() {
-        projectToEdit.downloadProjectAsJson();
-    }
-
-    function saveSetupFileOnClickHandler() {
-        projectToEdit.downloadSetupFile();
-    }
-
-    function saveDeployFileOnClickHandler() {
-        projectToEdit.downloadDeployFile();
-    }
-
-    function changeLoadedProjectMenuOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
-        const formData: FormData = new FormData(event.currentTarget);
-        if (formData.has("action")) {
-            const action = formData.get("action");
-            switch (action) {
-                case "Load Project": {
-                    let newProj: Project = new Project(undefined, "{}");
-                    if (formData.has("projectId")) {
-                        const projId = formData.get("projectId");
-            
-                        if (projId !== null){
-                            const project = localStorage.getItem(projId.toString());
-                    
-                            if (project !== null) {
-                                newProj = new Project(projId.toString(), project);
-                            }
-                        }
-                    }
-                    localStorage.setItem("projectToEditId", newProj.getId());
-                    setProjectToEdit(newProj)
-                    break;
-                }
-                case "Close Project": {
-                    if (formData.has("projectId")) {
-                        const projId = formData.get("projectId");
-            
-                        if (projId !== null) {
-                            let storedProjIds = localStorage.getItem("loadedProjectIds");
-                            let parsedIds = [];
-                            if (storedProjIds !== null) {
-                                parsedIds = JSON.parse(storedProjIds);
-                                let index = parsedIds.indexOf(projId.toString());
-                                if (index > -1) {
-                                    parsedIds.splice(index, 1);
-                                    localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
-                                }
-                            }
-                            localStorage.removeItem(projId.toString());
-                            setLoadedProjects(loadedProjects.filter(function(project) {
-                                return (project.getId() !== projId);
-                            }));
-
-                            if (projectToEdit.getId() === projId) {
-                                let newProj: Project = new Project(undefined, "{}");
-
-                                if (parsedIds.length > 0) {
-                                    const project = localStorage.getItem(parsedIds[0].toString());
-                            
-                                    if (project !== null) {
-                                        newProj = new Project(parsedIds[0].toString(), project);
-                                    }
-                                } else {
-                                    newProj.setProjectName("New Project");
-                                    setLoadedProjects([
-                                        ...loadedProjects,
-                                        newProj
-                                    ]);
-                                }
-
-                                localStorage.setItem("projectToEditId", newProj.getId());
-                                setProjectToEdit(newProj)
-                            }
-                        }
-                    }
-                    break;
-                }
-                default: {
-                    throw (`unknown action ${action}`);
-                }
+            if (project !== null) {
+                const newProj: Project = new Project(projectId, project);
+                localStorage.setItem("projectToEditId", newProj.getId());
+                setProjectToEdit(newProj);
             }
         }
-        event.preventDefault();
+    }
+
+    function closeProject(projectId: string) {
+        const storedProjIds = localStorage.getItem("loadedProjectIds");
+        let parsedIds = [];
+        if (storedProjIds !== null) {
+            parsedIds = JSON.parse(storedProjIds);
+            const index = parsedIds.indexOf(projectId.toString());
+            if (index > -1) {
+                parsedIds.splice(index, 1);
+                localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
+            }
+        }
+        localStorage.removeItem(projectId.toString());
+        setLoadedProjects(loadedProjects.filter(function(project) {
+            return (project.getId() !== projectId);
+        }));
+
+        if ((projectToEdit !== null) && (projectToEdit.getId() === projectId)) {
+            let newProj: Project = new Project(undefined, "{}");
+
+            if (parsedIds.length > 0) {
+                const project = localStorage.getItem(parsedIds[0].toString());
+        
+                if (project !== null) {
+                    newProj = new Project(parsedIds[0].toString(), project);
+                }
+            } else {
+                newProj.setProjectName("New Project");
+                setLoadedProjects([
+                    ...loadedProjects,
+                    newProj
+                ]);
+            }
+
+            localStorage.setItem("projectToEditId", newProj.getId());
+            setProjectToEdit(newProj)
+        }
+    }
+
+    function renderEditor(projectToRender: Project | null) {
+        if (projectToRender === null) {
+            return (
+                <div className="projectInitializerContainer">
+                    <p>New Project: <button onClick={initProjectOnClickHandler}>Initialize new project...</button></p>
+                    <p>Load Project: <input type="file" accept=".json" onChange={handleProjectImport}/></p>
+                </div>
+            );
+        } else {
+            return (
+                <div className="projectEditorContainer">
+                    <EditorCanvas projectToEdit={projectToRender}></EditorCanvas>
+                </div>
+            );
+        }
     }
 
     return (
-        <div
-            className="project-mapper-container"
-            style={{
-                height: "100vh"
-            }}
-        >
-            <div className="dropdown-menu">
-                <button onClick={toggleMainMenuDropdown}>Main Menu</button>
+        <div className="projectMapperContainer root">
+            <div className="sideBySideContainer">
                 {
-                    mainMenuDropdownVisible && (
-                        <div className="dropdown-content">
-                            <div className="loaded-projects-menu">
-                                <form onSubmit={changeLoadedProjectMenuOnSubmitHandler}>
-                                    <select name="projectId" defaultValue={projectToEdit.getId()}>
-                                        {
-                                            loadedProjects.map(function(currProject: Project) {
-                                                return(
-                                                    <option
-                                                        key={currProject.getId()}
-                                                        value={currProject.getId()}
-                                                    >
-                                                        {currProject.getProjectName()}
-                                                    </option>
-                                                );
-                                            })
-                                        }
-                                    </select>
-                                    <select name="action">
-                                        <option value="Load Project">Load Project</option>
-                                        <option value="Close Project">Close Project</option>
-                                    </select>
-                                    <button type="submit">Execute Action</button>
-                                </form>
+                    loadedProjects.map(function(currProject: Project) {
+                        return(
+                            <div key={currProject.getId()} className="containerWithSeperators">
+                                <button onClick={() => switchToProject(currProject.getId())}>{currProject.getProjectName()}</button>
+                                <button onClick={() => closeProject(currProject.getId())}>X</button>
                             </div>
-
-                            <div className="dropdown-content">
-                                <button onClick={initProjectOnClickHandler}>Initialize new project...</button>
-                                <input type="file" accept=".json" onChange={handleProjectImport}/>
-                                <button onClick={saveProjectOnClickHandler}>Save Project</button>
-                                <button onClick={saveSetupFileOnClickHandler}>Save Setup File</button>
-                                <button onClick={saveDeployFileOnClickHandler}>Save Deploy File</button>
-                            </div>
-                        </div>
-                    )
+                        );
+                    })
                 }
+                <div className="containerWithSeperators">
+                    <button onClick={() => switchToProject(null)}>+</button>
+                </div>                
             </div>
-
-            <div
-                className="project-editor-container"
-                style={{
-                    height: "80vh"
-                }}
-                onClick={e => setMainMenuDropdownVisible(false)}
-            >
-                <EditorCanvas projectToEdit={projectToEdit}></EditorCanvas>
-            </div>
-
-            <div className="init-proj-wizard" onClick={e => setMainMenuDropdownVisible(false)}>
-                <Modal
-                    style={{overlay: {zIndex: 1000}}}
-                    isOpen={initProjWizardIsOpen}
-                    onRequestClose={closeInitProjWizard}
-                >
-                    <div>Project Initialization Wizard</div>
-                    <form onSubmit={initWizardOnSubmitHandler}>
-                        <select name="projectType" id="template">
-                            <option value="None">None</option>
-                            <option value="Website">Website</option>
-                            <option value="Robotics">Robotics</option>
-                        </select>
-                        <button type="submit">Close Wizard And Go To Editor</button>
-                    </form>
-                </Modal>
+            
+            <div className="editorContainer">
+                {renderEditor(projectToEdit)}
             </div>
         </div>
     );

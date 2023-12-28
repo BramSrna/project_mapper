@@ -1,7 +1,6 @@
 import Difficulties from "../project/project_component/components/difficulties/difficulties";
 import DocumentationSection from "../project/project_component/components/documentation_section";
 import ProjectComponent from "../project/project_component/project_component";
-import Roadmap from "../project/project_component/components/roadmap/roadmap";
 import SoftwareRepo from "../project/project_component/components/software_repo/software_repo";
 import Todo from "../project/project_component/components/todo/todo";
 import UseCases from "../project/project_component/components/uses_cases/use_cases";
@@ -9,7 +8,6 @@ import ComponentDescription from "../project/project_component/components/compon
 import TodoVisualizer from "./tiles/todo_visualizer";
 import DocumentationSectionVisualizer from "./tiles/documentation_box_visualizer";
 import ComponentDescriptionVisualizer from "./tiles/component_description_visualizer";
-import RoadmapVisualizer from "./tiles/roadmap_visualizer";
 import SoftwareRepoVisualizer from "./tiles/software_repo_visualizer";
 import UseCasesVisualizer from "./tiles/use_cases_visualizer";
 import DifficultiesVisualizer from "./tiles/difficulties_visualizer";
@@ -26,9 +24,6 @@ const Visualizer = (props: {componentToVisualize: ProjectComponent}) => {
                 break;
             case "ComponentDescription":
                 element = <ComponentDescriptionVisualizer componentDescriptionComp={component as ComponentDescription}/>
-                break;
-            case "Roadmap":
-                element = <RoadmapVisualizer roadmapComp={component as Roadmap}/>
                 break;
             case "SoftwareRepo":
                 element = <SoftwareRepoVisualizer softwareRepoComp={component as SoftwareRepo}/>
