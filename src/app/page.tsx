@@ -51,7 +51,7 @@ const Page = () => {
     }
 
     function initProjectOnClickHandler() {
-        const newProj: Project = new Project(IdGenerator.generateId(), "New Project", []);
+        const newProj: Project = new Project(IdGenerator.generateId(), "New Project");
         newProj.saveToBrowser();
         localStorage.setItem("projectToEditId", newProj.getId());
         setProjectToEdit(newProj);
@@ -101,22 +101,22 @@ const Page = () => {
 
     function closeProject(projectId: string) {
         const storedProjIds = localStorage.getItem("loadedProjectIds");
-        let parsedIds = [];
+        let parsedIds: string[] = [];
         if (storedProjIds !== null) {
             parsedIds = JSON.parse(storedProjIds);
             const index = parsedIds.indexOf(projectId.toString());
             if (index > -1) {
                 parsedIds.splice(index, 1);
-                localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
             }
         }
+        localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
         localStorage.removeItem(projectId.toString());
         setLoadedProjects(loadedProjects.filter(function(project) {
             return (project.getId() !== projectId);
         }));
 
         if ((projectToEdit !== null) && (projectToEdit.getId() === projectId)) {
-            let newProj: Project = new Project(IdGenerator.generateId(), "New Project", []);
+            let newProj: Project = new Project(IdGenerator.generateId(), "New Project");
 
             if (parsedIds.length > 0) {
                 const project = localStorage.getItem(parsedIds[0].toString());

@@ -8,12 +8,12 @@ export interface MockJsonInterface {
 }
 
 class Mock {
-    parentComponent: SoftwareRepo | null;
+    parentComponent: SoftwareRepo;
     input: string;
     output: string;
     id: string;
 
-    constructor(parentComponent: SoftwareRepo | null, input: string, output: string) {
+    constructor(parentComponent: SoftwareRepo, input: string, output: string) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.input = input;
@@ -29,9 +29,7 @@ class Mock {
     }
 
     saveToBrowser() {
-        if (this.parentComponent !== null) {
-            this.parentComponent.saveToBrowser();
-        }
+        this.parentComponent.saveToBrowser();
     }
 
     getInput() {

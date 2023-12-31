@@ -28,7 +28,7 @@ abstract class ProjectComponent {
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
 
-    setParent(newParent: Project) {
+    setParent(newParent: Project | NestedComponent) {
         this.parent = newParent;
     }
 

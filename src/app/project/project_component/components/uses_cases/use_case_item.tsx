@@ -6,11 +6,11 @@ export interface UseCaseItemJsonInterface {
 }
 
 class UseCaseItem {
-    parentComponet: UseCases | null;
+    parentComponet: UseCases;
     description: string;
     id: string;
 
-    constructor(parentComponet: UseCases | null, description: string) {
+    constructor(parentComponet: UseCases, description: string) {
         this.id = IdGenerator.generateId();
         this.parentComponet = parentComponet;
         this.description = description;
@@ -21,9 +21,7 @@ class UseCaseItem {
     }
 
     saveToBrowser() {
-        if (this.parentComponet !== null) {
-            this.parentComponet.saveToBrowser();
-        }
+        this.parentComponet.saveToBrowser();
     }
 
     toJSON() {

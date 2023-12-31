@@ -12,8 +12,8 @@ class Todo extends ProjectComponent {
     type: string = "Todo";
     items: TodoItem[];
 
-    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
+        super(id, parent, componentName, connections);
 
         this.items = items;
         for (const currItem of this.items) {

@@ -21,28 +21,21 @@ export interface ProjectJsonInterface {
 }
 
 class Project {
-    projectName: string = "";
-    components: Array<ProjectComponent> = [];
     id: string;
+    projectName: string;
+    rootComponent: NestedComponent;
 
-    constructor(id: string, projectName: string, components: ProjectComponent[]) {
+    constructor(id: string, projectName: string) {
         this.id = id;
         this.projectName = projectName;
-        this.components = components;
 
-        for (const currComponent of this.components) {
-            currComponent.setParent(this);
-        }
+        this.rootComponent = new NestedComponent(IdGenerator.generateId(), this, "Root", [], []);
     }
 
     toJSON() {
-        const components = [];
-        for (const currComponent of this.components) {
-            components.push(currComponent.toJSON());
-        }
         return {
-            "components": components,
-            "projectName": this.projectName
+            "projectName": this.projectName,
+            "components": this.rootComponent.toJSON()
         };
     }
 
@@ -52,25 +45,13 @@ class Project {
     }
 
     downloadSetupFile() {
-        let setupFileContents: string = "";
-        for (const component of this.components) {
-            const newContents = component.getSetupFileContents();
-            if (newContents !== "") {
-                setupFileContents += newContents + "\n";
-            }
-        }
+        let setupFileContents: string = this.rootComponent.getSetupFileContents()
         const file = new Blob([setupFileContents], { type: "application/json" });
         saveAs(file, this.projectName + "_setup_file.ps1");
     }
 
     downloadDeployFile() {
-        let deployFileContents: string = "";
-        for (const component of this.components) {
-            const newContents = component.getDeployFileContents();
-            if (newContents !== "") {
-                deployFileContents += newContents + "\n";
-            }
-        }
+        let deployFileContents: string = this.rootComponent.getDeployFileContents()
         const file = new Blob([deployFileContents], { type: "application/json" });
         saveAs(file, this.projectName + "_deploy_file.ps1");
     }
@@ -80,13 +61,11 @@ class Project {
         let parsedIds: string[] = [];
         if (storedProjIds !== null) {
             parsedIds = JSON.parse(storedProjIds);
+            if (parsedIds.indexOf(this.id) === -1) {
+                parsedIds.push(this.id);
+            }
         }
-
-        if (parsedIds.indexOf(this.id) === -1) {
-            parsedIds.push(this.id);
-            localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
-        }
-
+        localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
         localStorage.setItem(this.id, JSON.stringify(this.toJSON()));
     }
 
@@ -101,79 +80,6 @@ class Project {
 
     getProjectName() {
         return this.projectName;
-    }
-
-    getComponents() {
-        return this.components;
-    }
-
-    addComponent(newComponent: ProjectComponent) {
-        if (this.components.indexOf(newComponent, 0) === -1) {
-            this.components.push(newComponent);
-            this.saveToBrowser()
-            return true;
-        }
-        return false;
-    }
-
-    removeComponent(componentToRemove: ProjectComponent, notifyOtherComponents: boolean) {
-        const index = this.components.indexOf(componentToRemove, 0);
-        if (index > -1) {
-            this.components.splice(index, 1);
-        }
-        if (notifyOtherComponents) {
-            for (const component of this.components) {
-                component.notifyComponentRemoval(componentToRemove);
-            }
-        }
-        this.saveToBrowser();
-    }
-
-    switchComponent(componentToSwitch: ProjectComponent, newType: string) {
-        if (componentToSwitch.getType() === newType) {
-            return componentToSwitch;
-        }
-
-        let newComponent: ProjectComponent;
-        switch (newType) {
-            case "NestedComponent":
-                newComponent = new NestedComponent(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            case "ComponentDescription":
-                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
-                break;
-            case "DocumentationSection":
-                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
-                break;
-            case "SoftwareRepo":
-                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
-                break;
-            case "Todo":
-                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            case "UseCases":
-                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
-                break;
-            case "Difficulties":
-                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            default:
-                throw new Error("Unknown tile type: " + newType);
-        }
-
-        this.removeComponent(componentToSwitch, false);
-        this.addComponent(newComponent);
-
-        return newComponent;
-    }
-
-    getComponentWithId(componentId: string) {
-        for (const currComponent of this.components) {
-            if (currComponent.getId() === componentId) {
-                return currComponent;
-            }
-        }
-        return null;
     }
 }
 

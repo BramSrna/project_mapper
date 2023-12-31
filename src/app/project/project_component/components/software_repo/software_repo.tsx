@@ -15,8 +15,8 @@ class SoftwareRepo extends ProjectComponent {
     initRepoName: string;
     mocks: Mock[];
 
-    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
+        super(id, parent, componentName, connections);
 
         this.initRepoName = initRepoName;
         this.mocks = mocks;

@@ -7,10 +7,10 @@ export interface PossibleSolutionsJsonInterface {
 
 class PossibleSolution {
     id: string;
-    parentComponent: DifficultyEntry | null;
+    parentComponent: DifficultyEntry;
     description: string;
 
-    constructor(parentComponent: DifficultyEntry | null, description: string) {
+    constructor(parentComponent: DifficultyEntry, description: string) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.description = description;
@@ -25,9 +25,7 @@ class PossibleSolution {
     }
 
     saveToBrowser() {
-        if (this.parentComponent !== null) {
-            this.parentComponent.saveToBrowser();
-        }
+        this.parentComponent.saveToBrowser();
     }
 
     toJSON() {

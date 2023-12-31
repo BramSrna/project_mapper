@@ -16,10 +16,61 @@ class NestedComponent extends ProjectComponent {
     type: string = "NestedComponent";
     childComponents: ProjectComponent[];
 
-    constructor(id: string, parent: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], childComponents: ProjectComponent[]) {
+    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], childComponents: ProjectComponent[]) {
         super(id, parent, componentName, connections);
 
         this.childComponents = childComponents;
+        for (var currComponent of this.childComponents) {
+            currComponent.setParent(this);
+        }
+    }
+
+    getChildComponents() {
+        return this.childComponents;
+    }
+
+    toJSON() {
+        const components = [];
+        for (const currComponent of this.childComponents) {
+            components.push(currComponent.toJSON());
+        }
+        const initialJson: ProjectComponentToJsonInterface = super.toJSON();
+        const finalJson = {
+            ...initialJson,
+            "components": components
+        }
+        return finalJson;
+    }
+
+    getSetupFileContents() {
+        let setupFileContents: string = "";
+        for (const component of this.getChildComponents()) {
+            const newContents = component.getSetupFileContents();
+            if (newContents !== "") {
+                setupFileContents += newContents + "\n";
+            }
+        }
+        return setupFileContents;
+    }
+
+    getDeployFileContents() {
+        let deployFileContents: string = "";
+        for (const component of this.getChildComponents()) {
+            const newContents = component.getDeployFileContents();
+            if (newContents !== "") {
+                deployFileContents += newContents + "\n";
+            }
+        }
+        return deployFileContents;
+    }
+
+    getComponentWithId(componentId: string) {
+        for (const currComponent of this.childComponents) {
+            if (currComponent.getId() === componentId) {
+                return currComponent;
+            }
+        }
+        return null;
     }
 
     addComponent(newComponent: ProjectComponent) {
@@ -84,49 +135,6 @@ class NestedComponent extends ProjectComponent {
         this.addComponent(newComponent);
 
         return newComponent;
-    }
-
-    getChildComponents() {
-        return this.childComponents;
-    }
-
-    toJSON() {
-        const initialJson: ProjectComponentToJsonInterface = super.toJSON();
-        const finalJson = {
-            ...initialJson
-        }
-        return finalJson;
-    }
-
-    getSetupFileContents() {
-        let setupFileContents: string = "";
-        for (const component of this.getChildComponents()) {
-            const newContents = component.getSetupFileContents();
-            if (newContents !== "") {
-                setupFileContents += newContents + "\n";
-            }
-        }
-        return setupFileContents;
-    }
-
-    getDeployFileContents() {
-        let deployFileContents: string = "";
-        for (const component of this.getChildComponents()) {
-            const newContents = component.getDeployFileContents();
-            if (newContents !== "") {
-                deployFileContents += newContents + "\n";
-            }
-        }
-        return deployFileContents;
-    }
-
-    getComponentWithId(componentId: string) {
-        for (const currComponent of this.childComponents) {
-            if (currComponent.getId() === componentId) {
-                return currComponent;
-            }
-        }
-        return null;
     }
 }
 

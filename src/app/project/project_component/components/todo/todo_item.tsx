@@ -8,12 +8,12 @@ export interface TodoItemJsonInterface {
 }
 
 class TodoItem {
-    parentComponent: Todo | null;
+    parentComponent: Todo;
     itemDescription: string;
     isComplete: boolean;
     id: string;
 
-    constructor(parentComponent: Todo | null, itemDescription: string, isComplete: boolean) {
+    constructor(parentComponent: Todo, itemDescription: string, isComplete: boolean) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.itemDescription = itemDescription;
@@ -29,9 +29,7 @@ class TodoItem {
     }
 
     saveToBrowser() {
-        if (this.parentComponent !== null) {
-            this.parentComponent.saveToBrowser();
-        }
+        this.parentComponent.saveToBrowser();
     }
 
     toJSON() {

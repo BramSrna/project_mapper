@@ -16,13 +16,13 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_com
 import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "./project_component_connection";
 
 export function jsonToProject(idToUse: string, jsonObject: ProjectJsonInterface) {
+    let newProj: Project = new Project(idToUse, "", []);
+
     console.log(jsonObject);
-    let projectName: string = "";
     if ("projectName" in jsonObject) {
-        projectName = jsonObject["projectName"];
+        newProj.setProjectName(jsonObject["projectName"]);
     }
 
-    let components: ProjectComponent[] = [];
     if ("components" in jsonObject) {
         const componentsBlock = jsonObject["components"];
 
@@ -58,7 +58,7 @@ export function jsonToProject(idToUse: string, jsonObject: ProjectJsonInterface)
                     let compDescInfo: ComponentDescriptionJsonInterface = currComponentInfo as ComponentDescriptionJsonInterface;
                     newComp = new ComponentDescription(
                         compDescInfo["id"],
-                        null,
+                        newProj,
                         compDescInfo["componentName"],
                         connections,
                         compDescInfo["endGoal"],
@@ -70,7 +70,7 @@ export function jsonToProject(idToUse: string, jsonObject: ProjectJsonInterface)
                     let docSectionInfo: DocumentationSectionJsonInterface = currComponentInfo as DocumentationSectionJsonInterface;
                     newComp = new DocumentationSection(
                         docSectionInfo["id"],
-                        null,
+                        newProj,
                         docSectionInfo["componentName"],
                         connections,
                         docSectionInfo["content"]
@@ -79,115 +79,121 @@ export function jsonToProject(idToUse: string, jsonObject: ProjectJsonInterface)
                 }
                 case "SoftwareRepo": {
                     let softwareRepoInfo: SoftwareRepoJsonInterface = currComponentInfo as SoftwareRepoJsonInterface;
+                    
+                    let newSoftwareRepo: SoftwareRepo = new SoftwareRepo(
+                        softwareRepoInfo["id"],
+                        newProj,
+                        softwareRepoInfo["componentName"],
+                        connections,
+                        softwareRepoInfo["initRepoName"],
+                        []
+                    );
 
-                    let mocks: Mock[] = [];
                     let currMockInfo: MockJsonInterface;
                     for (let mockIndex: number = 0; mockIndex < softwareRepoInfo["mocks"].length; mockIndex++) {
                         currMockInfo = softwareRepoInfo["mocks"][mockIndex];
-                        mocks.push(new Mock(
-                            null,
+                        newSoftwareRepo.addMock(new Mock(
+                            newSoftwareRepo,
                             currMockInfo["input"],
                             currMockInfo["output"]
                         ));
                     }
 
-                    newComp = new SoftwareRepo(
-                        softwareRepoInfo["id"],
-                        null,
-                        softwareRepoInfo["componentName"],
-                        connections,
-                        softwareRepoInfo["initRepoName"],
-                        mocks
-                    );
+                    newComp = newSoftwareRepo;
+
                     break;
                 }
                 case "Todo": {
                     let todoInfo: TodoJsonInterface = currComponentInfo as TodoJsonInterface;
+                    
+                    let newTodo: Todo = new Todo(
+                        todoInfo["id"],
+                        newProj,
+                        todoInfo["componentName"],
+                        connections,
+                        []
+                    );
 
-                    let items: TodoItem[] = [];
                     let currTodoItemInfo: TodoItemJsonInterface;
                     for (let todoItemIndex: number = 0; todoItemIndex < todoInfo["items"].length; todoItemIndex++) {
                         currTodoItemInfo = todoInfo["items"][todoItemIndex];
-                        items.push(new TodoItem(
-                            null,
+                        newTodo.addItem(new TodoItem(
+                            newTodo,
                             currTodoItemInfo["description"],
                             currTodoItemInfo["isComplete"]
                         ));
                     }
 
-                    newComp = new Todo(
-                        todoInfo["id"],
-                        null,
-                        todoInfo["componentName"],
-                        connections,
-                        items
-                    );
+                    newComp = newTodo;
+
                     break;
                 }
                 case "UseCases":
                     let useCaseInfo: UseCaseJsonInterface = currComponentInfo as UseCaseJsonInterface;
-
-                    let useCases: UseCaseItem[] = [];
-                    let currUseCaseItemInfo: UseCaseItemJsonInterface;
-                    for (let useCaseItemIndex: number = 0; useCaseItemIndex < useCaseInfo["useCases"].length; useCaseItemIndex++) {
-                        currUseCaseItemInfo = useCaseInfo["useCases"][useCaseItemIndex];
-                        useCases.push(new UseCaseItem(
-                            null,
-                            currUseCaseItemInfo["description"]
-                        ));
-                    }
-
-                    newComp = new UseCases(
+                    
+                    let newUseCases: UseCases = new UseCases(
                         useCaseInfo["id"],
-                        null,
+                        newProj,
                         useCaseInfo["componentName"],
                         connections,
                         useCaseInfo["startOperatingWall"],
                         useCaseInfo["endOperatingWall"],
-                        useCases
+                        []
                     );
+
+                    let currUseCaseItemInfo: UseCaseItemJsonInterface;
+                    for (let useCaseItemIndex: number = 0; useCaseItemIndex < useCaseInfo["useCases"].length; useCaseItemIndex++) {
+                        currUseCaseItemInfo = useCaseInfo["useCases"][useCaseItemIndex];
+                        newUseCases.addUseCase(new UseCaseItem(
+                            newUseCases,
+                            currUseCaseItemInfo["description"]
+                        ));
+                    }
+
+                    newComp = newUseCases;
+
                     break;
                 case "Difficulties":
                     let difficultyInfo: DifficultiesJsonInterface = currComponentInfo as DifficultiesJsonInterface;
+                    
+                    let newDifficulties: Difficulties = new Difficulties(
+                        difficultyInfo["id"],
+                        newProj,
+                        difficultyInfo["componentName"],
+                        connections,
+                        []
+                    );
 
-                    let difficulties: DifficultyEntry[] = [];
                     let currDifficultyEntryInfo: DifficultyEntryJsonInterface;
                     for (let difficultyEntryIndex: number = 0; difficultyEntryIndex < difficultyInfo["difficulties"].length; difficultyEntryIndex++) {
                         currDifficultyEntryInfo = difficultyInfo["difficulties"][difficultyEntryIndex];
 
-                        let possibleSolutions: PossibleSolution[] = []
+                        let newEntry: DifficultyEntry = new DifficultyEntry(
+                            newDifficulties,
+                            currDifficultyEntryInfo["description"],
+                            []
+                        )
 
                         let currPossibleSolutionInfo: PossibleSolutionsJsonInterface;
                         for (let possibleSolutionIndex: number = 0; possibleSolutionIndex < currDifficultyEntryInfo["possibleSolutions"].length; possibleSolutionIndex++) {
                             currPossibleSolutionInfo = currDifficultyEntryInfo["possibleSolutions"][possibleSolutionIndex];
-                            possibleSolutions.push(new PossibleSolution(null, currPossibleSolutionInfo["description"]));
-                        }
-                        
-                        let newEntry: DifficultyEntry = new DifficultyEntry(
-                            null,
-                            currDifficultyEntryInfo["description"],
-                            possibleSolutions
-                        )
+                            newEntry.addPossibleSolution(new PossibleSolution(newEntry, currPossibleSolutionInfo["description"]));
+                        }                        
 
-                        difficulties.push(newEntry);
+                        newDifficulties.addDifficulty(newEntry);
                     }
 
-                    newComp = new Difficulties(
-                        difficultyInfo["id"],
-                        null,
-                        difficultyInfo["componentName"],
-                        connections,
-                        difficulties
-                    );
+                    newComp = newDifficulties;
+
                     break;
                 default: {
                     throw("Unknown component type: " + compType);
                 }
             }
             IdGenerator.addGeneratedId(currComponentInfo["id"]);
-            components.push(newComp);
+            newProj.addComponent(newComp);
         }
     }
 
-    return new Project(idToUse, projectName, components);
+    return newProj;
 }

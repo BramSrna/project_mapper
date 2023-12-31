@@ -13,8 +13,8 @@ class Difficulties extends ProjectComponent {
 
     difficulties: DifficultyEntry[];
 
-    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
+        super(id, parent, componentName, connections);
 
         this.difficulties = difficulties;
         for (const currDifficulty of this.difficulties) {

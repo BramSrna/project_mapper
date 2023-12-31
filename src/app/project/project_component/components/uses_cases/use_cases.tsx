@@ -17,8 +17,8 @@ class UseCases extends ProjectComponent {
     endOperatingWall: string;
     useCases: UseCaseItem[];
 
-    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], startOperatingWall: string, endOperatingWall: string, useCases: UseCaseItem[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], startOperatingWall: string, endOperatingWall: string, useCases: UseCaseItem[]) {
+        super(id, parent, componentName, connections);
 
         this.startOperatingWall = startOperatingWall;
         this.endOperatingWall = endOperatingWall;

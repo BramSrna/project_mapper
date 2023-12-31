@@ -10,11 +10,11 @@ export interface DifficultyEntryJsonInterface {
 
 class DifficultyEntry {
     id: string;
-    parentComponent: Difficulties | null;
+    parentComponent: Difficulties;
     description: string;
     possibleSolutions: PossibleSolution[];
 
-    constructor(parentComponent: Difficulties | null, description: string, possibleSolutions: PossibleSolution[]) {
+    constructor(parentComponent: Difficulties, description: string, possibleSolutions: PossibleSolution[]) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.description = description;
@@ -33,9 +33,7 @@ class DifficultyEntry {
     }
 
     saveToBrowser() {
-        if (this.parentComponent !== null) {
-            this.parentComponent.saveToBrowser();
-        }
+        this.parentComponent.saveToBrowser();
     }
 
     toJSON() {

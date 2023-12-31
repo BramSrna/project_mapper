@@ -24,15 +24,20 @@ class IdGenerator {
         const charactersLength = characters.length;
         const length = 12;
 
-        let newId: string | null = null;
-
-        while ((newId === null) || (this.ids.indexOf(newId) !== -1)) {
+        let newId: string = "";
+        let loopCounter: number = 0;
+        let threshold: number = 100;
+        while ((newId === "") || (this.ids.indexOf(newId) !== -1) && (loopCounter < threshold)) {
             newId = "";
             let counter: number = 0;
             while (counter < length) {
                 newId += characters.charAt(Math.floor(Math.random() * charactersLength));
               counter += 1;
             }
+            loopCounter += 1;
+        }
+        if (loopCounter >= threshold) {
+            throw("Could not generate new ID.")
         }
         this.ids.push(newId);
 

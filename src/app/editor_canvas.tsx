@@ -17,11 +17,12 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
 
     function reloadLocalStorage() {
         const editorContext = localStorage.getItem("editorContext");
-        let focusInfo: EditorContextInterface;
+        let currFocus: string = props.projectToEdit.getProjectName();
         if (editorContext !== null) {
-            focusInfo = JSON.parse(editorContext);
-            setFocus(focusInfo["focus"]);
+            let focusInfo: EditorContextInterface = JSON.parse(editorContext);
+            currFocus = focusInfo["focus"];
         }
+        setFocus(currFocus);
     }
 
     function renderCurrEditor() {
