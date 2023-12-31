@@ -2,7 +2,7 @@ import Difficulties from "@/app/project/project_component/components/difficultie
 import DifficultyEntry from "@/app/project/project_component/components/difficulties/difficulty_entry";
 import PossibleSolution from "@/app/project/project_component/components/difficulties/possible_solution";
 import { useEffect, useState } from "react";
-import { Rnd } from "react-rnd";
+import { Position, Rnd } from "react-rnd";
 import { useXarrow } from "react-xarrows";
 import "./component_editor_tiles.css";
 
@@ -92,7 +92,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                     const rowIndex: number = Math.floor(index / dispSquareDim);
                     const colIndex: number = index % dispSquareDim;
 
-                    const initialPosition: object = {
+                    const initialPosition: Position = {
                         x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
                         y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
                     };
@@ -105,8 +105,8 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                                 overflow: "hidden"
                             }}
                             default={{
-                              x: initialPosition["x" as keyof typeof initialPosition],
-                              y: initialPosition["y" as keyof typeof initialPosition],
+                              x: initialPosition["x"],
+                              y: initialPosition["y"],
                               width: DIFFICULTY_ENTRY_MIN_WIDTH,
                               height: DIFFICULTY_ENTRY_MIN_HEIGHT
                             }}

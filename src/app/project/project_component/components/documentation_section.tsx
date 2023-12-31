@@ -1,16 +1,19 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
+import ProjectComponentConnection from "../../project_component_connection";
+
+export interface DocumentationSectionJsonInterface extends ProjectComponentToJsonInterface {
+    "content": string
+}
 
 class DocumentationSection extends ProjectComponent {
     content: string = "";
     type: string = "DocumentationSection";
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, content: string) {
+    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], content: string) {
         super(id, parentProject, componentName, connections);
 
         this.content = content;
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {

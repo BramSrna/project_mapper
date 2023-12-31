@@ -1,5 +1,11 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
+import ProjectComponentConnection from "../../project_component_connection";
+
+export interface ComponentDescriptionJsonInterface extends ProjectComponentToJsonInterface {
+    "endGoal": string,
+    "missionStatement": string
+}
 
 class ComponentDescription extends ProjectComponent {
     type: string = "ComponentDescription";
@@ -7,13 +13,11 @@ class ComponentDescription extends ProjectComponent {
     endGoal: string;
     missionStatement: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], endGoal: string, missionStatement: string) {
+    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], endGoal: string, missionStatement: string) {
         super(id, parentProject, componentName, connections);
 
         this.endGoal = endGoal;
         this.missionStatement = missionStatement;
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {

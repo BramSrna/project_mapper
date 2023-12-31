@@ -1,30 +1,28 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import DifficultyEntry from "./difficulty_entry";
+import DifficultyEntry, { DifficultyEntryJsonInterface } from "./difficulty_entry";
+import ProjectComponentConnection from "@/app/project/project_component_connection";
+
+export interface DifficultiesJsonInterface extends ProjectComponentToJsonInterface {
+    "difficulties": DifficultyEntryJsonInterface[]
+}
 
 class Difficulties extends ProjectComponent {
     type: string = "Difficulties";
 
     difficulties: DifficultyEntry[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], difficulties: object[]) {
+    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
         super(id, parentProject, componentName, connections);
 
-        this.difficulties = [];
-        for (const currDifficulty of difficulties) {
-            const newEntry: DifficultyEntry = new DifficultyEntry(
-                this,
-                currDifficulty["description" as keyof typeof currDifficulty],
-                currDifficulty["possibleSolutions" as keyof typeof currDifficulty]
-            );
-            this.difficulties.push(newEntry);
+        this.difficulties = difficulties;
+        for (const currDifficulty of this.difficulties) {
+            currDifficulty.setParentComponent(this);
         }
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {
-        const difficultiesAsJson: object[] = [];
+        const difficultiesAsJson: DifficultyEntryJsonInterface[] = [];
         for (const currDifficulty of this.difficulties) {
             difficultiesAsJson.push(currDifficulty.toJSON());
         }

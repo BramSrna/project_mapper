@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import ProjectComponent from "./project_component/project_component";
+import ProjectComponent, { ProjectComponentToJsonInterface } from "./project_component/project_component";
 import DocumentationSection from "./project_component/components/documentation_section";
 import SoftwareRepo from './project_component/components/software_repo/software_repo';
 import Todo from './project_component/components/todo/todo';
@@ -7,107 +7,34 @@ import UseCases from './project_component/components/uses_cases/use_cases';
 import Difficulties from './project_component/components/difficulties/difficulties';
 import ComponentDescription from './project_component/components/component_description';
 import IdGenerator from '../id_generator';
+import ProjectComponentConnection from './project_component_connection';
+import UseCaseItem from './project_component/components/uses_cases/use_case_item';
+import TodoItem from './project_component/components/todo/todo_item';
+import Mock from './project_component/components/software_repo/mock';
+import DifficultyEntry from './project_component/components/difficulties/difficulty_entry';
+import PossibleSolution from './project_component/components/difficulties/possible_solution';
+
+export interface ProjectJsonInterface {
+    "projectName": string,
+    "components": ProjectComponentToJsonInterface[]
+}
 
 class Project {
     projectName: string = "";
     components: Array<ProjectComponent> = [];
     id: string;
 
-    constructor(id?: string, jsonStr?: string) {
-        if (typeof(id) === "undefined") {
-            id = IdGenerator.generateId();
-        } else {
-            IdGenerator.addGeneratedId(id);
-        }
+    constructor(id: string, projectName: string, components: ProjectComponent[]) {
         this.id = id;
+        this.projectName = projectName;
+        this.components = components;
 
-        if (typeof(jsonStr) === "undefined") {
-            jsonStr = "{}";
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const parsedJson: any = JSON.parse(jsonStr);
-        if ("projectName" in parsedJson) {
-            this.projectName = parsedJson["projectName"];
-            this.saveToBrowser();
-        }
-        if ("components" in parsedJson) {
-            const componentsBlock = parsedJson["components"];
-            for (const currCompInfo of componentsBlock) {
-                const compType = currCompInfo["type"];
-                switch(compType) {
-                    case "ComponentDescription": {
-                        new ComponentDescription(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["endGoal"],
-                            currCompInfo["missionStatement"]
-                        );
-                        break;
-                    }
-                    case "DocumentationSection": {
-                        new DocumentationSection(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["content"]
-                        );
-                        break;
-                    }
-                    case "SoftwareRepo": {
-                        new SoftwareRepo(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["initRepoName"],
-                            currCompInfo["mocks"]
-                        );
-                        break;
-                    }
-                    case "Todo": {
-                        new Todo(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["items"]
-                        );
-                        break;
-                    }
-                    case "UseCases":
-                        new UseCases(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["startOperatingWall"],
-                            currCompInfo["endOperatingWall"],
-                            currCompInfo["useCases"]
-                        );
-                        break;
-                    case "Difficulties":
-                        new Difficulties(
-                            currCompInfo["id"],
-                            this,
-                            currCompInfo["componentName"],
-                            currCompInfo["connections"],
-                            currCompInfo["difficulties"]
-                        );
-                        break;
-                    default: {
-                        throw("Unknown component type: " + compType);
-                    }
-                }
-                IdGenerator.addGeneratedId(currCompInfo["id"]);
-            }
+        for (const currComponent of this.components) {
+            currComponent.setParentProject(this);
         }
     }
 
     toJSON() {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const components = [];
         for (const currComponent of this.components) {
             components.push(currComponent.toJSON());
@@ -188,15 +115,52 @@ class Project {
         return false;
     }
 
-    removeComponent(componentToRemove: ProjectComponent) {
+    removeComponent(componentToRemove: ProjectComponent, notifyOtherComponents: boolean) {
         const index = this.components.indexOf(componentToRemove, 0);
         if (index > -1) {
             this.components.splice(index, 1);
         }
-        for (const component of this.components) {
-            component.notifyComponentRemoval(componentToRemove);
+        if (notifyOtherComponents) {
+            for (const component of this.components) {
+                component.notifyComponentRemoval(componentToRemove);
+            }
         }
         this.saveToBrowser();
+    }
+
+    switchComponent(componentToSwitch: ProjectComponent, newType: string) {
+        if (componentToSwitch.getType() === newType) {
+            return componentToSwitch;
+        }
+
+        let newComponent: ProjectComponent;
+        switch (newType) {
+            case "ComponentDescription":
+                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
+                break;
+            case "DocumentationSection":
+                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
+                break;
+            case "SoftwareRepo":
+                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
+                break;
+            case "Todo":
+                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                break;
+            case "UseCases":
+                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
+                break;
+            case "Difficulties":
+                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                break;
+            default:
+                throw new Error("Unknown tile type: " + newType);
+        }
+
+        this.removeComponent(componentToSwitch, false);
+        this.addComponent(newComponent);
+
+        return newComponent;
     }
 
     getComponentWithId(componentId: string) {

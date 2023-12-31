@@ -1,6 +1,12 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import Mock from "./mock";
+import Mock, { MockJsonInterface } from "./mock";
+import ProjectComponentConnection from "@/app/project/project_component_connection";
+
+export interface SoftwareRepoJsonInterface extends ProjectComponentToJsonInterface {
+    "initRepoName": string,
+    "mocks": MockJsonInterface[]
+}
 
 class SoftwareRepo extends ProjectComponent {
     type: string = "SoftwareRepo";
@@ -8,20 +14,18 @@ class SoftwareRepo extends ProjectComponent {
     initRepoName: string;
     mocks: Mock[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], initRepoName: string, mocks: object[]) {
+    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
         super(id, parentProject, componentName, connections);
 
         this.initRepoName = initRepoName;
-        this.mocks = [];
+        this.mocks = mocks;
         for (const currMock of mocks) {
-            this.mocks.push(new Mock(this, currMock["input" as keyof typeof currMock], currMock["output" as keyof typeof currMock]));
+            currMock.setParentComponent(this);
         }
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {
-        const mocksAsJson: object[] = [];
+        const mocksAsJson: MockJsonInterface[] = [];
         for (const currItem of this.mocks) {
             mocksAsJson.push(currItem.toJSON());
         }

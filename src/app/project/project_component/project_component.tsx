@@ -1,22 +1,23 @@
 import Project from "../project";
 import saveAs from "file-saver";
+import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "../project_component_connection";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
     "componentName": string,
-    "connections": string[],
+    "connections": ProjectComponentConnection[],
     "type": string
 }
 
 abstract class ProjectComponent {
     id: string;
-    parentProject: Project;
+    parentProject: Project | null;
     componentName: string = "";
-    connections: string[] = [];
+    connections: ProjectComponentConnection[] = [];
 
     abstract readonly type: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[]) {
+    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[]) {
         this.id = id;
         this.parentProject = parentProject;
         this.componentName = componentName;
@@ -25,6 +26,20 @@ abstract class ProjectComponent {
 
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
+
+    setParentProject(newParentProject: Project) {
+        this.parentProject = newParentProject;
+    }
+
+    setType(newType: string) {
+        if (newType === this.type) {
+            return this;
+        }
+        
+        if (this.parentProject !== null) {
+            return this.parentProject.switchComponent(this, newType);
+        }
+    }
 
     getId() {
         return this.id;
@@ -35,6 +50,10 @@ abstract class ProjectComponent {
     }
 
     toJSON() : ProjectComponentToJsonInterface {
+        const connectionsAsJson: ProjectComponentConnectionJsonInterface[] = [];
+        for (const currConnection of this.connections) {
+            connectionsAsJson.push(currConnection.toJSON());
+        }
         return {
             "id": this.id,
             "componentName": this.componentName,
@@ -62,11 +81,15 @@ abstract class ProjectComponent {
     }
 
     saveToBrowser() {
-        this.parentProject.saveToBrowser();
+        if (this.parentProject !== null) {
+            this.parentProject.saveToBrowser();
+        }
     }
 
     removeFromProject() {
-        this.parentProject.removeComponent(this);
+        if (this.parentProject !== null) {
+            this.parentProject.removeComponent(this, true);
+        }
     }
 
     setComponentName(newComponentName: string) {
@@ -74,19 +97,27 @@ abstract class ProjectComponent {
         this.saveToBrowser();
     }
 
-    addConnection(newId: string) {
-        if (this.connections.indexOf(newId) === -1) {
-            this.connections.push(newId);
+    addConnection(newConnection: ProjectComponentConnection) {
+        if (this.connections.indexOf(newConnection) === -1) {
+            this.connections.push(newConnection);
             this.saveToBrowser();
         }
     }
 
     notifyComponentRemoval(removedComponent: ProjectComponent) {
-        this.deleteConnection(removedComponent.getId());
+        let connectionsToDelete: ProjectComponentConnection[] = [];
+        for (let currConnection of this.connections) {
+            if ((currConnection.getStartId() === removedComponent.getId()) || (currConnection.getEndId() === removedComponent.getId())) {
+                connectionsToDelete.push(currConnection);
+            }
+        }
+        for (let currConnection of connectionsToDelete) {
+            this.deleteConnection(currConnection);
+        }
     }
 
-    deleteConnection(idToDelete: string) {
-        const index: number = this.connections.indexOf(idToDelete);
+    deleteConnection(connectionToDelete: ProjectComponentConnection) {
+        const index: number = this.connections.indexOf(connectionToDelete);
         if (index !== -1) {
             this.connections.splice(index, 1);
             this.saveToBrowser();

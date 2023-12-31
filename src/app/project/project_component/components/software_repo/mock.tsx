@@ -1,17 +1,27 @@
 import IdGenerator from "@/app/id_generator";
 import ProjectComponent from "../../project_component";
+import SoftwareRepo from "./software_repo";
+
+export interface MockJsonInterface {
+    "input": string,
+    "output": string
+}
 
 class Mock {
-    parentComponent: ProjectComponent;
+    parentComponent: SoftwareRepo | null;
     input: string;
     output: string;
     id: string;
 
-    constructor(parentComponent: ProjectComponent, input: string, output: string) {
+    constructor(parentComponent: SoftwareRepo | null, input: string, output: string) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.input = input;
         this.output = output;
+    }
+
+    setParentComponent(newParentComponent: SoftwareRepo) {
+        this.parentComponent = newParentComponent;
     }
 
     getId() {
@@ -19,7 +29,9 @@ class Mock {
     }
 
     saveToBrowser() {
-        this.parentComponent.saveToBrowser();
+        if (this.parentComponent !== null) {
+            this.parentComponent.saveToBrowser();
+        }
     }
 
     getInput() {

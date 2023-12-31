@@ -16,14 +16,23 @@ import 'react-contexify/ReactContexify.css';
 import Modal from 'react-modal';
 import "../globals.css";
 import "./project_editor.css";
+import ProjectComponentConnection from "../project/project_component_connection";
+import { Position } from "react-rnd";
+
+export interface ComponentPositionInterface {
+    "component": ProjectComponent,
+    "position": Position
+}
 
 Modal.setAppElement(".root");
 
 const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId: string) => void}) => {
     const [components, setComponents] = useState<ProjectComponent[]>([]);
-    const [connections, setConnections] = useState<string[][]>([]);
-    const { show } = useContextMenu();
+    const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
     const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
+    const [view, setView] = useState<string>("Roadmap");
+    
+    const { show } = useContextMenu();
 
     let prevClickedComponent: ProjectComponent | null = null;
 
@@ -31,10 +40,12 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
         const componentsData = [...props.projectToEdit.getComponents()];
         setComponents(componentsData);
 
-        const connectionsData: string[][] = [];
+        const connectionsData: ProjectComponentConnection[] = [];
         for (const currComponent of props.projectToEdit.getComponents()) {
-            for (const endComponentId of currComponent.getConnections()) {
-                connectionsData.push([currComponent.getId(), endComponentId]);
+            for (const currConnection of currComponent.getConnections()) {
+                if (currConnection.getType() === view) {
+                    connectionsData.push(currConnection);
+                }
             }
         }
         setConnections(connectionsData);
@@ -46,13 +57,13 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
         switch (componentType) {
             case "Add Component":
                 return false;
-            case "Component Description":
+            case "ComponentDescription":
                 newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", "");
                 break;
-            case "Documentation Box":
+            case "DocumentationSection":
                 newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "");
                 break;
-            case "Software Repo":
+            case "SoftwareRepo":
                 newComponent = new SoftwareRepo(IdGenerator.generateId(), props.projectToEdit, "Software Repo", [], "", []);
                 break;
             case "Todo":
@@ -68,20 +79,22 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                 throw new Error("Unknown tile type: " + componentType);
         }
 
+        props.projectToEdit.addComponent(newComponent);
+
         setComponents([
             ...components,
             newComponent
         ]);
     }
 
-    function connectionOnClickHandler(startId: string, endId: string) {
-        const ownerComp: ProjectComponent | null = props.projectToEdit.getComponentWithId(startId);
+    function deleteConnectionOnClickHandler(connectionToDelete: ProjectComponentConnection) {
+        const ownerComp: ProjectComponent | null = props.projectToEdit.getComponentWithId(connectionToDelete.getStartId());
         if (ownerComp !== null) {
-            ownerComp.deleteConnection(endId);
+            ownerComp.deleteConnection(connectionToDelete);
         }
 
         setConnections(connections.filter(function(connection) {
-            return !((connection[0] === startId) && (connection[1] === endId));
+            return connection !== connectionToDelete;
         }));
     }
 
@@ -95,14 +108,16 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
             for (const currEntry of entriesToSort) {
                 let allConnectionsAdded: boolean = true;
 
-                for (const connectionId of currEntry.getConnections()) {
-                    let connectionsPresent: boolean = true;
-                    for (const checkEntry of entriesToSort) {
-                        if (connectionId === checkEntry.getId()) {
-                            connectionsPresent = false;
+                for (const currConnection of currEntry.getConnections()) {
+                    if (currConnection.getType() == view) {
+                        let connectionsPresent: boolean = true;
+                        for (const checkEntry of entriesToSort) {
+                            if (currConnection.getEndId() === checkEntry.getId()) {
+                                connectionsPresent = false;
+                            }
                         }
+                        allConnectionsAdded = allConnectionsAdded && connectionsPresent;
                     }
-                    allConnectionsAdded = allConnectionsAdded && connectionsPresent;
                 }
 
                 if (allConnectionsAdded) {
@@ -123,7 +138,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
 
         columns = columns.reverse();
 
-        const finalObjArray: object[] = [];
+        const finalObjArray: ComponentPositionInterface[] = [];
         for (let columnIndex: number = 0; columnIndex < columns.length; columnIndex++) {
             for (let componentIndex: number = 0; componentIndex < columns[columnIndex].length; componentIndex++) {
                 finalObjArray.push({
@@ -143,12 +158,23 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
             prevClickedComponent = clickedComponent;
         } else {
             if (prevClickedComponent !== clickedComponent) {
-                prevClickedComponent.addConnection(clickedComponent.getId());
-        
+                let newConnection: ProjectComponentConnection = new ProjectComponentConnection(prevClickedComponent.getId(), clickedComponent.getId(), view);
+
+                for (var currConnection of connections) {
+                    if ((currConnection.getStartId() == newConnection.getStartId()) && (currConnection.getEndId() == newConnection.getEndId())) {
+                        return false;
+                    }
+                    if ((currConnection.getStartId() == newConnection.getEndId()) && (currConnection.getEndId() == newConnection.getStartId())) {
+                        return false;
+                    }
+                }
+
+                prevClickedComponent.addConnection(newConnection);
+
                 setConnections([
                     ...connections,
-                    [prevClickedComponent.getId(), clickedComponent.getId()]
-                ]);
+                    newConnection
+                ]);       
             }
         }
     }
@@ -168,6 +194,20 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
         event.preventDefault();
     }
 
+    function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
+        const newView: string = event.target.value;
+        const connectionsData: ProjectComponentConnection[] = [];
+        for (const currComponent of props.projectToEdit.getComponents()) {
+            for (const currConnection of currComponent.getConnections()) {
+                if (currConnection.getType() === newView) {
+                    connectionsData.push(currConnection);
+                }
+            }
+        }
+        setConnections(connectionsData);
+        setView(newView);
+    }
+
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">
@@ -175,17 +215,17 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                 
                 <select onChange={addTileOnChangeHandler} value={"Add Component"}>
                     <option value="Add Component">Add Component</option>
-                    <option value="Component Description">Component Description</option>
-                    <option value="Documentation Box">Documentation Section</option>
-                    <option value="Software Repo">Software Repo</option>
+                    <option value="ComponentDescription">Component Description</option>
+                    <option value="DocumentationSection">Documentation Section</option>
+                    <option value="SoftwareRepo">Software Repo</option>
                     <option value="Todo">Todo</option>
                     <option value="UseCases">Use Cases</option>
                     <option value="Difficulties">Difficulties</option>
                 </select>
 
-                <select value={"Change Planner View"}>
-                    <option value="Change Planner View">Change Planner View</option>
-                    <option value="Roadmap View">Roadmap View</option>
+                <select onChange={viewOnChangeHandler}>
+                    <option value="Roadmap">Roadmap</option>
+                    <option value="Use Case Flow">Use Case Flow</option>
                 </select>
                 
                 <button onClick={() => setSaveModalVisible(true)}>Save</button>
@@ -194,9 +234,9 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
             <div className="projectEditorWindow">
                 <Xwrapper>
                     {
-                        getProjectComponentsWithStartPosition().map(function(currObj: object) {
-                            const currComponent: ProjectComponent = currObj["component" as keyof typeof currObj] as ProjectComponent;
-                            const currPos: object = currObj["position" as keyof typeof currObj] as object;
+                        getProjectComponentsWithStartPosition().map(function(currObj: ComponentPositionInterface) {
+                            const currComponent: ProjectComponent = currObj["component"];
+                            const currPos: Position = currObj["position"];
                             return (
                                 <PreviewTileContainer parentComponent={currComponent} initialPosition={currPos} key={currComponent.getId()} changeFocus={props.changeFocus} connectionAdderOnClickHandler={connectionAdderOnClickHandler}/>
                             );
@@ -204,15 +244,15 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                     }
 
                     {
-                        connections.map(function(currConnection) {
+                        connections.map(function(currConnection: ProjectComponentConnection) {
                             return (
-                                <div key={currConnection[0] + currConnection[1]}>
-                                    <div onContextMenu={(event) => show({ id: currConnection[0] + currConnection[1], event: event })}>
-                                        <Xarrow start={currConnection[0]} end={currConnection[1]}/>
+                                <div key={currConnection.getId()}>
+                                    <div onContextMenu={(event) => show({ id: currConnection.getId(), event: event })}>
+                                        <Xarrow key={currConnection.getId()} start={currConnection.getStartId()} end={currConnection.getEndId()}/>
                                     </div>
 
-                                    <Menu id={currConnection[0] + currConnection[1]}>
-                                        <Item id="delete" onClick={() => connectionOnClickHandler(currConnection[0], currConnection[1])}>Delete</Item>
+                                    <Menu id={currConnection.getId()}>
+                                        <Item id="delete" onClick={() => deleteConnectionOnClickHandler(currConnection)}>Delete</Item>
                                     </Menu>
                                 </div>
                             );
