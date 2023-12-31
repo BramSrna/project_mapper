@@ -13,6 +13,8 @@ import UseCases from "../project/project_component/components/uses_cases/use_cas
 import Difficulties from "../project/project_component/components/difficulties/difficulties";
 import "./component_editor.css";
 import { ChangeEvent, useEffect, useState } from "react";
+import NestedComponent from "../project/project_component/components/nested_component";
+import NestedComponentEditor from "./tiles/nested_component_editor";
 
 const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus: (componentId: string) => void}) => {
     const [component, setComponent] = useState<ProjectComponent>(props.componentToEdit);
@@ -23,6 +25,8 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
 
     function renderComponentEditor() {
         switch (component.getType()) {
+            case "NestedComponent":
+                return (<NestedComponentEditor nestedComponentComp={component as NestedComponent} changeFocus={props.changeFocus}/>)
             case "Todo":
                 return(<TodoEditor todoComp={component as Todo}/>);
             case "DocumentationSection":
@@ -54,11 +58,11 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
     return (
         <div>
             <div className="sideBySideContainer componentEditorMenu">
-                <button onClick={() => props.changeFocus(component.getParentProject().getId())}>Back To Project</button>
+                <button onClick={() => props.changeFocus(component.getParent().getId())}>Back To Project</button>
                 <p>Editing Component: <input type="text" defaultValue={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
                 <select value="Change Component Type" onChange={(event: ChangeEvent<HTMLSelectElement>) => componentTypeOnChangeHandler(event.target.value)}>
                     <option value="Change Component Type">Change Component Type</option>
-                    <option value="Nested Component">Nested Component</option>
+                    <option value="NestedComponent">Nested Component</option>
                     <option value="Todo">Todo</option>
                     <option value="DocumentationSection">Documentation Section</option>
                     <option value="ComponentDescription">Component Description</option>

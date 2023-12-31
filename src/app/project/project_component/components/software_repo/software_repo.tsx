@@ -2,6 +2,7 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project
 import Project from "../../../project";
 import Mock, { MockJsonInterface } from "./mock";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
+import NestedComponent from "../nested_component";
 
 export interface SoftwareRepoJsonInterface extends ProjectComponentToJsonInterface {
     "initRepoName": string,
@@ -14,7 +15,7 @@ class SoftwareRepo extends ProjectComponent {
     initRepoName: string;
     mocks: Mock[];
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
+    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
         super(id, parentProject, componentName, connections);
 
         this.initRepoName = initRepoName;

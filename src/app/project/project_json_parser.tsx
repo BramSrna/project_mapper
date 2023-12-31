@@ -5,6 +5,7 @@ import Difficulties, { DifficultiesJsonInterface } from "./project_component/com
 import DifficultyEntry, { DifficultyEntryJsonInterface } from "./project_component/components/difficulties/difficulty_entry";
 import PossibleSolution, { PossibleSolutionsJsonInterface } from "./project_component/components/difficulties/possible_solution";
 import DocumentationSection, { DocumentationSectionJsonInterface } from "./project_component/components/documentation_section";
+import NestedComponent, { NestedComponentJsonInterface } from "./project_component/components/nested_component";
 import Mock, { MockJsonInterface } from "./project_component/components/software_repo/mock";
 import SoftwareRepo, { SoftwareRepoJsonInterface } from "./project_component/components/software_repo/software_repo";
 import Todo, { TodoJsonInterface } from "./project_component/components/todo/todo";
@@ -43,6 +44,16 @@ export function jsonToProject(idToUse: string, jsonObject: ProjectJsonInterface)
             let newComp: ProjectComponent;
             const compType = currComponentInfo["type"];
             switch(compType) {
+                case "NestedComponent": {
+                    let nestedCompInfo: NestedComponentJsonInterface = currComponentInfo as NestedComponentJsonInterface;
+                    newComp = new NestedComponent(
+                        nestedCompInfo["id"],
+                        null,
+                        nestedCompInfo["componentName"],
+                        connections
+                    );
+                    break;
+                }
                 case "ComponentDescription": {
                     let compDescInfo: ComponentDescriptionJsonInterface = currComponentInfo as ComponentDescriptionJsonInterface;
                     newComp = new ComponentDescription(

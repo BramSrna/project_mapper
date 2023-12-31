@@ -2,6 +2,7 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project
 import Project from "../../../project";
 import TodoItem, { TodoItemJsonInterface } from "./todo_item";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
+import NestedComponent from "../nested_component";
 
 export interface TodoJsonInterface extends ProjectComponentToJsonInterface {
     "items": TodoItemJsonInterface[]
@@ -11,7 +12,7 @@ class Todo extends ProjectComponent {
     type: string = "Todo";
     items: TodoItem[];
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
+    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
         super(id, parentProject, componentName, connections);
 
         this.items = items;

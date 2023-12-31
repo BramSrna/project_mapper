@@ -13,6 +13,7 @@ import TodoItem from './project_component/components/todo/todo_item';
 import Mock from './project_component/components/software_repo/mock';
 import DifficultyEntry from './project_component/components/difficulties/difficulty_entry';
 import PossibleSolution from './project_component/components/difficulties/possible_solution';
+import NestedComponent from './project_component/components/nested_component';
 
 export interface ProjectJsonInterface {
     "projectName": string,
@@ -30,7 +31,7 @@ class Project {
         this.components = components;
 
         for (const currComponent of this.components) {
-            currComponent.setParentProject(this);
+            currComponent.setParent(this);
         }
     }
 
@@ -45,7 +46,7 @@ class Project {
         };
     }
 
-    downloadProjectAsJson() {
+    downloadJsonFile() {
         const file = new Blob([JSON.stringify(this.toJSON())], { type: "application/json" });
         saveAs(file, this.projectName + ".json");
     }
@@ -135,23 +136,26 @@ class Project {
 
         let newComponent: ProjectComponent;
         switch (newType) {
+            case "NestedComponent":
+                newComponent = new NestedComponent(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                break;
             case "ComponentDescription":
-                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
+                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
                 break;
             case "DocumentationSection":
-                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
+                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
                 break;
             case "SoftwareRepo":
-                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
+                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
                 break;
             case "Todo":
-                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
                 break;
             case "UseCases":
-                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
+                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
                 break;
             case "Difficulties":
-                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParentProject(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
                 break;
             default:
                 throw new Error("Unknown tile type: " + newType);

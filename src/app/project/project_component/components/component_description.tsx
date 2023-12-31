@@ -1,6 +1,7 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
 import ProjectComponentConnection from "../../project_component_connection";
+import NestedComponent from "./nested_component";
 
 export interface ComponentDescriptionJsonInterface extends ProjectComponentToJsonInterface {
     "endGoal": string,
@@ -13,7 +14,7 @@ class ComponentDescription extends ProjectComponent {
     endGoal: string;
     missionStatement: string;
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], endGoal: string, missionStatement: string) {
+    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], endGoal: string, missionStatement: string) {
         super(id, parentProject, componentName, connections);
 
         this.endGoal = endGoal;

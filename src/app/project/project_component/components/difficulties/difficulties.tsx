@@ -2,6 +2,7 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project
 import Project from "../../../project";
 import DifficultyEntry, { DifficultyEntryJsonInterface } from "./difficulty_entry";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
+import NestedComponent from "../nested_component";
 
 export interface DifficultiesJsonInterface extends ProjectComponentToJsonInterface {
     "difficulties": DifficultyEntryJsonInterface[]
@@ -12,7 +13,7 @@ class Difficulties extends ProjectComponent {
 
     difficulties: DifficultyEntry[];
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
+    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
         super(id, parentProject, componentName, connections);
 
         this.difficulties = difficulties;

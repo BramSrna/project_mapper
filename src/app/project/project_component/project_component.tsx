@@ -1,6 +1,7 @@
 import Project from "../project";
 import saveAs from "file-saver";
 import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "../project_component_connection";
+import NestedComponent from "./components/nested_component";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
@@ -11,15 +12,15 @@ export interface ProjectComponentToJsonInterface {
 
 abstract class ProjectComponent {
     id: string;
-    parentProject: Project | null;
+    parent: Project | NestedComponent;
     componentName: string = "";
     connections: ProjectComponentConnection[] = [];
 
     abstract readonly type: string;
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[]) {
+    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[]) {
         this.id = id;
-        this.parentProject = parentProject;
+        this.parent = parent;
         this.componentName = componentName;
         this.connections = connections;
     }
@@ -27,18 +28,8 @@ abstract class ProjectComponent {
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
 
-    setParentProject(newParentProject: Project) {
-        this.parentProject = newParentProject;
-    }
-
-    setType(newType: string) {
-        if (newType === this.type) {
-            return this;
-        }
-        
-        if (this.parentProject !== null) {
-            return this.parentProject.switchComponent(this, newType);
-        }
+    setParent(newParent: Project) {
+        this.parent = newParent;
     }
 
     getId() {
@@ -62,6 +53,11 @@ abstract class ProjectComponent {
         }
     }
 
+    downloadJsonFile() {
+        const file = new Blob([JSON.stringify(this.toJSON())], { type: "application/json" });
+        saveAs(file, this.componentName + ".json");
+    }
+
     downloadSetupFile() {
         const file = new Blob([this.getSetupFileContents()], { type: "application/json" });
         saveAs(file, this.componentName + "_setup_file.ps1");
@@ -81,15 +77,11 @@ abstract class ProjectComponent {
     }
 
     saveToBrowser() {
-        if (this.parentProject !== null) {
-            this.parentProject.saveToBrowser();
-        }
+        this.parent.saveToBrowser();
     }
 
     removeFromProject() {
-        if (this.parentProject !== null) {
-            this.parentProject.removeComponent(this, true);
-        }
+        this.parent.removeComponent(this, true);
     }
 
     setComponentName(newComponentName: string) {
@@ -124,8 +116,8 @@ abstract class ProjectComponent {
         }
     }
 
-    getParentProject() {
-        return this.parentProject;
+    getParent() {
+        return this.parent;
     }
 }
 

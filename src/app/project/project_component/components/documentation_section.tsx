@@ -1,6 +1,7 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
 import ProjectComponentConnection from "../../project_component_connection";
+import NestedComponent from "./nested_component";
 
 export interface DocumentationSectionJsonInterface extends ProjectComponentToJsonInterface {
     "content": string
@@ -10,7 +11,7 @@ class DocumentationSection extends ProjectComponent {
     content: string = "";
     type: string = "DocumentationSection";
 
-    constructor(id: string, parentProject: Project | null, componentName: string, connections: ProjectComponentConnection[], content: string) {
+    constructor(id: string, parentProject: Project | NestedComponent | null, componentName: string, connections: ProjectComponentConnection[], content: string) {
         super(id, parentProject, componentName, connections);
 
         this.content = content;

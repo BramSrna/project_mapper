@@ -1,33 +1,23 @@
+import IdGenerator from "@/app/id_generator";
+import ComponentDescription from "@/app/project/project_component/components/component_description";
+import Difficulties from "@/app/project/project_component/components/difficulties/difficulties";
+import DocumentationSection from "@/app/project/project_component/components/documentation_section";
+import NestedComponent from "@/app/project/project_component/components/nested_component";
+import SoftwareRepo from "@/app/project/project_component/components/software_repo/software_repo";
+import Todo from "@/app/project/project_component/components/todo/todo";
+import UseCases from "@/app/project/project_component/components/uses_cases/use_cases";
+import ProjectComponent from "@/app/project/project_component/project_component";
+import ProjectComponentConnection from "@/app/project/project_component_connection";
+import PreviewTileContainer from "@/app/project_editor/preview_tile_container";
+import { ComponentPositionInterface } from "@/app/project_editor/project_editor";
+import { ProjectEditorConstants } from "@/app/project_editor/project_editor_constants";
 import { FormEvent, useEffect, useState } from "react";
-import Project from "../project/project";
-import PreviewTileContainer from "./preview_tile_container";
-import Xarrow, { Xwrapper } from "react-xarrows";
-import ComponentDescription from "../project/project_component/components/component_description";
-import DocumentationSection from "../project/project_component/components/documentation_section";
-import SoftwareRepo from "../project/project_component/components/software_repo/software_repo";
-import Todo from "../project/project_component/components/todo/todo";
-import UseCases from "../project/project_component/components/uses_cases/use_cases";
-import Difficulties from "../project/project_component/components/difficulties/difficulties";
-import ProjectComponent from "../project/project_component/project_component";
-import IdGenerator from "../id_generator";
-import { ProjectEditorConstants } from "./project_editor_constants";
-import { Menu, Item, useContextMenu } from 'react-contexify';
-import 'react-contexify/ReactContexify.css';
-import Modal from 'react-modal';
-import "../globals.css";
-import "./project_editor.css";
-import ProjectComponentConnection from "../project/project_component_connection";
+import { Item, Menu, useContextMenu } from "react-contexify";
 import { Position } from "react-rnd";
-import NestedComponent from "../project/project_component/components/nested_component";
+import Xarrow, { Xwrapper } from "react-xarrows";
+import Modal from 'react-modal';
 
-export interface ComponentPositionInterface {
-    "component": ProjectComponent,
-    "position": Position
-}
-
-Modal.setAppElement(".root");
-
-const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId: string) => void}) => {
+const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, changeFocus: (componentId: string) => void}) => {
     const [components, setComponents] = useState<ProjectComponent[]>([]);
     const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
     const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
@@ -38,11 +28,11 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     let prevClickedComponent: ProjectComponent | null = null;
 
     useEffect(() => {
-        const componentsData = [...props.projectToEdit.getComponents()];
+        const componentsData = [...props.nestedComponentComp.getChildComponents()];
         setComponents(componentsData);
 
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getComponents()) {
+        for (const currComponent of props.nestedComponentComp.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === view) {
                     connectionsData.push(currConnection);
@@ -50,7 +40,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
             }
         }
         setConnections(connectionsData);
-    }, [props.projectToEdit]);
+    }, [props.nestedComponentComp]);
 
     function addTileOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const componentType: string = event.target.value;
@@ -59,31 +49,31 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
             case "Add Component":
                 return false;
             case "NestedComponent":
-                newComponent = new NestedComponent(IdGenerator.generateId(), props.projectToEdit, "Nested Component", [], []);
+                newComponent = new NestedComponent(IdGenerator.generateId(), props.nestedComponentComp, "Nested Component", [], []);
                 break;
             case "ComponentDescription":
-                newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", "");
+                newComponent = new ComponentDescription(IdGenerator.generateId(), props.nestedComponentComp, "Component Description", [], "", "");
                 break;
             case "DocumentationSection":
-                newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "");
+                newComponent = new DocumentationSection(IdGenerator.generateId(), props.nestedComponentComp, "Documentation Section", [], "");
                 break;
             case "SoftwareRepo":
-                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.projectToEdit, "Software Repo", [], "", []);
+                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.nestedComponentComp, "Software Repo", [], "", []);
                 break;
             case "Todo":
-                newComponent = new Todo(IdGenerator.generateId(), props.projectToEdit, "Todo", [], []);
+                newComponent = new Todo(IdGenerator.generateId(), props.nestedComponentComp, "Todo", [], []);
                 break;
             case "UseCases":
-                newComponent = new UseCases(IdGenerator.generateId(), props.projectToEdit, "Use Cases", [], "", "", []);
+                newComponent = new UseCases(IdGenerator.generateId(), props.nestedComponentComp, "Use Cases", [], "", "", []);
                 break;
             case "Difficulties":
-                newComponent = new Difficulties(IdGenerator.generateId(), props.projectToEdit, "Difficulties", [], []);
+                newComponent = new Difficulties(IdGenerator.generateId(), props.nestedComponentComp, "Difficulties", [], []);
                 break;
             default:
                 throw new Error("Unknown tile type: " + componentType);
         }
 
-        props.projectToEdit.addComponent(newComponent);
+        props.nestedComponentComp.addComponent(newComponent);
 
         setComponents([
             ...components,
@@ -92,7 +82,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     }
 
     function deleteConnectionOnClickHandler(connectionToDelete: ProjectComponentConnection) {
-        const ownerComp: ProjectComponent | null = props.projectToEdit.getComponentWithId(connectionToDelete.getStartId());
+        const ownerComp: ProjectComponent | null = props.nestedComponentComp.getComponentWithId(connectionToDelete.getStartId());
         if (ownerComp !== null) {
             ownerComp.deleteConnection(connectionToDelete);
         }
@@ -186,13 +176,13 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     function saveProjectOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
         const formData: FormData = new FormData(event.currentTarget);
         if ((formData.has("Save Project")) && (formData.get("Save Project"))) {
-            props.projectToEdit.downloadJsonFile();
+            props.nestedComponentComp.downloadJsonFile();
         }
         if ((formData.has("Save Setup File")) && (formData.get("Save Setup File"))) {
-            props.projectToEdit.downloadSetupFile();
+            props.nestedComponentComp.downloadSetupFile();
         }
         if ((formData.has("Save Deploy File")) && (formData.get("Save Deploy File"))) {
-            props.projectToEdit.downloadDeployFile();
+            props.nestedComponentComp.downloadDeployFile();
         }
         setSaveModalVisible(false);
         event.preventDefault();
@@ -201,7 +191,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const newView: string = event.target.value;
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getComponents()) {
+        for (const currComponent of props.nestedComponentComp.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === newView) {
                     connectionsData.push(currConnection);
@@ -215,7 +205,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">
-                <p>Editing Project: <input type="text" defaultValue={props.projectToEdit.getProjectName()} onChange={(e)=> props.projectToEdit.setProjectName(e.target.value)} key={props.projectToEdit.getId()}/></p>
+                <p>Editing Project: <input type="text" defaultValue={props.nestedComponentComp.getComponentName()} onChange={(e)=> props.nestedComponentComp.setComponentName(e.target.value)} key={props.nestedComponentComp.getId()}/></p>
                 
                 <select onChange={addTileOnChangeHandler} value={"Add Component"}>
                     <option value="Add Component">Add Component</option>
@@ -285,4 +275,4 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     );
 }
 
-export default ProjectEditor;
+export default NestedComponentEditor;
