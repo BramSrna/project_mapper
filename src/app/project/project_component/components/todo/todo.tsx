@@ -12,7 +12,7 @@ class Todo extends ProjectComponent {
     type: string = "Todo";
     items: TodoItem[];
 
-    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], items: TodoItem[]) {
         super(id, parent, componentName, connections);
 
         this.items = items;

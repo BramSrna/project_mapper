@@ -1,40 +1,40 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import Mock, { MockJsonInterface } from "./mock";
+import CodeSample, { CodeSamplesJsonInterface } from "./code_sample";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
 import NestedComponent from "../nested_component";
 
 export interface SoftwareRepoJsonInterface extends ProjectComponentToJsonInterface {
     "initRepoName": string,
-    "mocks": MockJsonInterface[]
+    "codeSamples": CodeSamplesJsonInterface[]
 }
 
 class SoftwareRepo extends ProjectComponent {
     type: string = "SoftwareRepo";
 
     initRepoName: string;
-    mocks: Mock[];
+    codeSamples: CodeSample[];
 
-    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, mocks: Mock[]) {
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, codeSamples: CodeSample[]) {
         super(id, parent, componentName, connections);
 
         this.initRepoName = initRepoName;
-        this.mocks = mocks;
-        for (const currMock of mocks) {
-            currMock.setParentComponent(this);
+        this.codeSamples = codeSamples;
+        for (const currCodeSample of codeSamples) {
+            currCodeSample.setParentComponent(this);
         }
     }
 
     toJSON() {
-        const mocksAsJson: MockJsonInterface[] = [];
-        for (const currItem of this.mocks) {
-            mocksAsJson.push(currItem.toJSON());
+        const codeSamplesAsJson: CodeSamplesJsonInterface[] = [];
+        for (const currSample of this.codeSamples) {
+            codeSamplesAsJson.push(currSample.toJSON());
         }
         const initialJson: ProjectComponentToJsonInterface = super.toJSON();
         const finalJson = {
             ...initialJson,
             "initRepoName": this.initRepoName,
-            "mocks": mocksAsJson
+            "codeSamples": codeSamplesAsJson
         }
         return finalJson;
     }
@@ -48,21 +48,21 @@ class SoftwareRepo extends ProjectComponent {
         this.saveToBrowser();
     }
 
-    getMocks() {
-        return this.mocks;
+    getCodeSamples() {
+        return this.codeSamples;
     }
 
-    deleteMock(mockToDelete: Mock) {
-        const indexToDelete: number = this.mocks.indexOf(mockToDelete);
+    deleteCodeSample(codeSampleToDelete: CodeSample) {
+        const indexToDelete: number = this.codeSamples.indexOf(codeSampleToDelete);
         if (indexToDelete !== -1) {
-            this.mocks.splice(indexToDelete, 1);
+            this.codeSamples.splice(indexToDelete, 1);
             this.saveToBrowser();
         }
     }
 
-    addMock(newMock: Mock) {
-        if (this.mocks.indexOf(newMock) === -1) {
-            this.mocks.push(newMock);
+    addCodeSample(newCodeSample: CodeSample) {
+        if (this.codeSamples.indexOf(newCodeSample) === -1) {
+            this.codeSamples.push(newCodeSample);
             this.saveToBrowser();
         }
     }

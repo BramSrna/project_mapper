@@ -12,9 +12,10 @@ import SoftwareRepo from "../project/project_component/components/software_repo/
 import UseCases from "../project/project_component/components/uses_cases/use_cases";
 import Difficulties from "../project/project_component/components/difficulties/difficulties";
 import "./component_editor.css";
-import { ChangeEvent, useEffect, useState } from "react";
-import NestedComponent from "../project/project_component/components/nested_component";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import NestedComponent, { ChildLayerJsonInterface } from "../project/project_component/components/nested_component";
 import NestedComponentEditor from "./tiles/nested_component_editor";
+import Project from "../project/project";
 
 const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus: (componentId: string) => void}) => {
     const [component, setComponent] = useState<ProjectComponent>(props.componentToEdit);
@@ -49,17 +50,40 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
             return false;
         }
 
-        console.log(newComponentType);
-
-        let newComp: ProjectComponent = component.setType(newComponentType);
+        let newComp: ProjectComponent = props.componentToEdit.getParent().switchComponent(props.componentToEdit, newComponentType);
         setComponent(newComp);
+    }
+
+    function renderComponentTreeSelect() {
+        let rootElement: Project | ProjectComponent = props.componentToEdit;
+        while (!(rootElement instanceof Project)) {
+            rootElement = rootElement.getParent();
+        }
+
+        let orderedComponents: ChildLayerJsonInterface[] = rootElement.getOrderedChildComponents();
+        console.log(orderedComponents);
+
+        return (
+            <select onChange={(event: ChangeEvent<HTMLSelectElement>) => props.changeFocus(event.target.value)} value={props.componentToEdit.getId()}>
+                <option value={rootElement.getId()}>{rootElement.getProjectName()}</option>
+                {
+                    orderedComponents.map(function(currChildLayerInfo: ChildLayerJsonInterface) {
+                        let currComponent: ProjectComponent = currChildLayerInfo["component"];
+                        let layer: number = currChildLayerInfo["layer"];
+                        return <option key={currComponent.getId()} value={currComponent.getId()}>{currComponent.getComponentName()}</option>
+                    })
+                }
+            </select>
+        );
     }
 
     return (
         <div>
             <div className="sideBySideContainer componentEditorMenu">
-                <button onClick={() => props.changeFocus(component.getParent().getId())}>Back To Project</button>
+                {renderComponentTreeSelect()}
+
                 <p>Editing Component: <input type="text" defaultValue={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
+
                 <select value="Change Component Type" onChange={(event: ChangeEvent<HTMLSelectElement>) => componentTypeOnChangeHandler(event.target.value)}>
                     <option value="Change Component Type">Change Component Type</option>
                     <option value="NestedComponent">Nested Component</option>

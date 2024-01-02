@@ -38,11 +38,11 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     let prevClickedComponent: ProjectComponent | null = null;
 
     useEffect(() => {
-        const componentsData = [...props.projectToEdit.getComponents()];
+        const componentsData = [...props.projectToEdit.getChildComponents()];
         setComponents(componentsData);
 
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getComponents()) {
+        for (const currComponent of props.projectToEdit.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === view) {
                     connectionsData.push(currConnection);
@@ -201,7 +201,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const newView: string = event.target.value;
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getComponents()) {
+        for (const currComponent of props.projectToEdit.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === newView) {
                     connectionsData.push(currConnection);

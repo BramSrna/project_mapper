@@ -11,7 +11,7 @@ class DocumentationSection extends ProjectComponent {
     content: string = "";
     type: string = "DocumentationSection";
 
-    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], content: string) {
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], content: string) {
         super(id, parent, componentName, connections);
 
         this.content = content;

@@ -20,7 +20,6 @@ import Modal from 'react-modal';
 const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, changeFocus: (componentId: string) => void}) => {
     const [components, setComponents] = useState<ProjectComponent[]>([]);
     const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
-    const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
     const [view, setView] = useState<string>("Roadmap");
     
     const { show } = useContextMenu();
@@ -173,21 +172,6 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
         }
     }
 
-    function saveProjectOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
-        const formData: FormData = new FormData(event.currentTarget);
-        if ((formData.has("Save Project")) && (formData.get("Save Project"))) {
-            props.nestedComponentComp.downloadJsonFile();
-        }
-        if ((formData.has("Save Setup File")) && (formData.get("Save Setup File"))) {
-            props.nestedComponentComp.downloadSetupFile();
-        }
-        if ((formData.has("Save Deploy File")) && (formData.get("Save Deploy File"))) {
-            props.nestedComponentComp.downloadDeployFile();
-        }
-        setSaveModalVisible(false);
-        event.preventDefault();
-    }
-
     function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const newView: string = event.target.value;
         const connectionsData: ProjectComponentConnection[] = [];
@@ -205,8 +189,6 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">
-                <p>Editing Project: <input type="text" defaultValue={props.nestedComponentComp.getComponentName()} onChange={(e)=> props.nestedComponentComp.setComponentName(e.target.value)} key={props.nestedComponentComp.getId()}/></p>
-                
                 <select onChange={addTileOnChangeHandler} value={"Add Component"}>
                     <option value="Add Component">Add Component</option>
                     <option value="NestedComponent">Nested Component</option>
@@ -222,8 +204,6 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
                     <option value="Roadmap">Roadmap</option>
                     <option value="Use Case Flow">Use Case Flow</option>
                 </select>
-                
-                <button onClick={() => setSaveModalVisible(true)}>Save</button>
             </div>
 
             <div className="projectEditorWindow">
@@ -255,22 +235,6 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
                     }
                 </Xwrapper>
             </div>
-
-            <Modal
-                isOpen={saveModalVisible}
-                onRequestClose={() => setSaveModalVisible(false)}
-            >
-                <div className="sideBySideContainer">
-                    <p>Save Project Wizard</p>
-                    <button onClick={() => setSaveModalVisible(false)}>Close Without Saving</button>
-                </div>                    
-                <form onSubmit={saveProjectOnSubmitHandler}>
-                    <p><input value="Save Project" type="checkbox" defaultChecked={true} name="Save Project"/>Project</p>
-                    <p><input value="Save Setup File" type="checkbox" name="Save Setup File"/>Setup File</p>
-                    <p><input value="Save Deploy File" type="checkbox" name="Save Deploy File"/>Deploy File</p>
-                    <button type="submit">Save</button>
-                </form>
-            </Modal>
         </div>
     );
 }

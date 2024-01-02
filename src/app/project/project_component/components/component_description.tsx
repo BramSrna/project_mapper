@@ -14,7 +14,7 @@ class ComponentDescription extends ProjectComponent {
     endGoal: string;
     missionStatement: string;
 
-    constructor(id: string, parent: NestedComponent, componentName: string, connections: ProjectComponentConnection[], endGoal: string, missionStatement: string) {
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], endGoal: string, missionStatement: string) {
         super(id, parent, componentName, connections);
 
         this.endGoal = endGoal;

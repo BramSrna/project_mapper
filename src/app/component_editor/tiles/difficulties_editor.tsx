@@ -64,7 +64,6 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
     }, [props.difficultiesComp]);
 
     function addDifficulty() {
-        console.log(difficulties.length)
         const newDifficulty: DifficultyEntry = new DifficultyEntry(props.difficultiesComp, "", []);
         props.difficultiesComp.addDifficulty(newDifficulty);
         setDifficulties([
@@ -86,61 +85,66 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
     }
 
     return (
-        <div className="difficultiesEditorWindow">
-            {
-                difficulties.map(function(currDifficulty: DifficultyEntry, index: number) {
-                    const rowIndex: number = Math.floor(index / dispSquareDim);
-                    const colIndex: number = index % dispSquareDim;
+        <div className="projectEditorContainer">
+            <div className="sideBySideContainer projectEditorMenu">
+                <button onClick={addDifficulty}>Add Difficulty</button>
+            </div>
+            
+            <div className="difficultiesEditorWindow">
+                {
+                    difficulties.map(function(currDifficulty: DifficultyEntry, index: number) {
+                        const rowIndex: number = Math.floor(index / dispSquareDim);
+                        const colIndex: number = index % dispSquareDim;
 
-                    const initialPosition: Position = {
-                        x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
-                        y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
-                    };
+                        const initialPosition: Position = {
+                            x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
+                            y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
+                        };
+                        
+                        return (
+                            <Rnd
+                                style={{
+                                    border: "solid 1px #ddd",
+                                    background: "#f0f0f0",
+                                    overflow: "hidden"
+                                }}
+                                default={{
+                                    x: initialPosition["x"],
+                                    y: initialPosition["y"],
+                                    width: DIFFICULTY_ENTRY_MIN_WIDTH,
+                                    height: DIFFICULTY_ENTRY_MIN_HEIGHT
+                                }}
+                                onDrag={updateXarrow}
+                                onDragStop={updateXarrow}
+                                id={currDifficulty.getDescription() + index}
+                                minWidth={DIFFICULTY_ENTRY_MIN_WIDTH}
+                                minHeight={DIFFICULTY_ENTRY_MIN_HEIGHT}
+                                key={currDifficulty.getId()}
+                                bounds=".difficultiesEditorWindow"
+                            >
+                                <div>
+                                    <div className="sideBySideContainer handleContainer">
+                                        <div className="handle"/>
+                                        <button onClick={() => deleteDifficultyOnClickHandler(currDifficulty)}>X</button>
+                                    </div>
                     
-                    return (
-                        <Rnd
-                            style={{
-                                border: "solid 1px #ddd",
-                                background: "#f0f0f0",
-                                overflow: "hidden"
-                            }}
-                            default={{
-                              x: initialPosition["x"],
-                              y: initialPosition["y"],
-                              width: DIFFICULTY_ENTRY_MIN_WIDTH,
-                              height: DIFFICULTY_ENTRY_MIN_HEIGHT
-                            }}
-                            onDrag={updateXarrow}
-                            onDragStop={updateXarrow}
-                            id={currDifficulty.getDescription() + index}
-                            minWidth={DIFFICULTY_ENTRY_MIN_WIDTH}
-                            minHeight={DIFFICULTY_ENTRY_MIN_HEIGHT}
-                            key={currDifficulty.getId()}
-                            bounds=".difficultiesEditorWindow"
-                        >
-                            <div>
-                                <div className="sideBySideContainer handleContainer">
-                                    <div className="handle"/>
-                                    <button onClick={() => deleteDifficultyOnClickHandler(currDifficulty)}>X</button>
+                                    <div className="dont-move-draggable">
+                                        <textarea
+                                            name="documentation"
+                                            rows={4}
+                                            cols={40}
+                                            defaultValue={currDifficulty.getDescription()}
+                                            onChange={e => currDifficulty.setDescription(e.target.value)}
+                                        />
+                    
+                                        <PossibleSolutionBlock difficulty={currDifficulty}></PossibleSolutionBlock>
+                                    </div>
                                 </div>
-                
-                                <div className="dont-move-draggable">
-                                    <textarea
-                                        name="documentation"
-                                        rows={4}
-                                        cols={40}
-                                        defaultValue={currDifficulty.getDescription()}
-                                        onChange={e => currDifficulty.setDescription(e.target.value)}
-                                    />
-                
-                                    <PossibleSolutionBlock difficulty={currDifficulty}></PossibleSolutionBlock>
-                                </div>
-                            </div>
-                        </Rnd>
-                    )
-                })
-            }
-            <button onClick={addDifficulty}>Add Difficulty</button>
+                            </Rnd>
+                        )
+                    })
+                }
+            </div>
         </div>
     );
 }

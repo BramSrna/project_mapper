@@ -8,8 +8,13 @@ import Todo from "./todo/todo";
 import UseCases from "./uses_cases/use_cases";
 import Difficulties from "./difficulties/difficulties";
 
+export interface ChildLayerJsonInterface {
+    "component": ProjectComponent,
+    "layer": number
+}
+
 export interface NestedComponentJsonInterface extends ProjectComponentToJsonInterface {
-    "childComponents": ProjectComponentToJsonInterface[]
+    "components": ProjectComponentToJsonInterface[]
 }
 
 class NestedComponent extends ProjectComponent {
@@ -135,6 +140,21 @@ class NestedComponent extends ProjectComponent {
         this.addComponent(newComponent);
 
         return newComponent;
+    }
+
+    getOrderedChildComponents() {
+        return this.getOrderedChildComponentsFromRoot(this, 0);
+    }
+
+    getOrderedChildComponentsFromRoot(rootElement: NestedComponent, layer: number) {
+        let orderedComponents: ChildLayerJsonInterface[] = [];
+        for (var currComponent of rootElement.getChildComponents()) {
+            orderedComponents.push({"component": currComponent, "layer": layer});
+            if (currComponent instanceof NestedComponent) {
+                orderedComponents.push(...this.getOrderedChildComponentsFromRoot(currComponent, layer + 1));
+            }
+        }
+        return orderedComponents;
     }
 }
 

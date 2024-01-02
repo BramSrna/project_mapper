@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ProjectEditor from "./project_editor/project_editor";
 import ProjectComponent from "./project/project_component/project_component";
 import ComponentEditor from "./component_editor/component_editor";
+import NestedComponent from "./project/project_component/components/nested_component";
 
 export interface EditorContextInterface {
     "focus": string
@@ -25,8 +26,26 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
         setFocus(currFocus);
     }
 
+    function getOrderedChildComponents(rootElement: Project | NestedComponent) {
+        let orderedComponents: ProjectComponent[] = [];
+        for (var currComponent of rootElement.getChildComponents()) {
+            orderedComponents.push(currComponent);
+            if (currComponent instanceof NestedComponent) {
+                orderedComponents.push(...getOrderedChildComponents(currComponent));
+            }
+        }
+        return orderedComponents;
+    }
+
     function renderCurrEditor() {
-        const focusedComponent: ProjectComponent | null = props.projectToEdit.getComponentWithId(focus);
+        let allComponents: ProjectComponent[] = getOrderedChildComponents(props.projectToEdit);
+        let focusedComponent: ProjectComponent | null = null;
+        for (var currComponent of allComponents) {
+            if (currComponent.getId() === focus) {
+                focusedComponent = currComponent
+            }
+        }
+        
         if (focusedComponent === null) {
             return (
                 <ProjectEditor projectToEdit={props.projectToEdit} changeFocus={(componentId: string) => changeFocus(componentId)}/>

@@ -41,7 +41,6 @@ const Page = () => {
         if (projectToEditId !== null) {
             for (const currProj of projects) {
                 if (currProj.getId() === projectToEditId) {
-                    console.log(currProj);
                     setProjectToEdit(currProj);
                 }
             }

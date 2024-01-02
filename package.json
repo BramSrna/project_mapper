@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "@typescript-eslint/parser": "^6.16.0",
     "file-saver": "^2.0.5",
     "next": "^14.0.1",
