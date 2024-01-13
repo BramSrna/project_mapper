@@ -1,6 +1,10 @@
 import IdGenerator from "@/app/id_generator";
 import DifficultyEntry from "./difficulty_entry";
 
+export interface PossibleSolutionsJsonInterface {
+    "description": string
+}
+
 class PossibleSolution {
     id: string;
     parentComponent: DifficultyEntry;
@@ -10,6 +14,10 @@ class PossibleSolution {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.description = description;
+    }
+
+    setParentComponent(newParentComponent: DifficultyEntry) {
+        this.parentComponent = newParentComponent;
     }
 
     getId() {

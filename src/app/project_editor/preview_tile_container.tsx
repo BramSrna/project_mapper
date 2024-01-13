@@ -3,11 +3,11 @@ import {useXarrow} from 'react-xarrows';
 import ProjectComponent from "../project/project_component/project_component";
 import Modal from 'react-modal';
 import Visualizer from "../visualizer/visualizer";
-import { Rnd } from "react-rnd";
+import { Position, Rnd } from "react-rnd";
 import { ProjectEditorConstants } from "./project_editor_constants";
 import "./project_editor.css"
 
-const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initialPosition: object, changeFocus: (componentId: string) => void, connectionAdderOnClickHandler: (clickedComponent: ProjectComponent) => void}) => {
+const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initialPosition: Position, changeFocus: (componentId: string) => void, connectionAdderOnClickHandler: (clickedComponent: ProjectComponent) => void}) => {
     const updateXarrow = useXarrow();
 
     const [stillExists, setStillExists] = useState(true);
@@ -20,13 +20,13 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initial
         let renderedElement: ReactElement;
         switch (view) {
             case "Setup File":
-                renderedElement = (<textarea name="viewSetup" value={props.parentComponent.getSetupFileContents()} readOnly={true}/>);
+                renderedElement = (<div><textarea name="viewSetup" value={props.parentComponent.getSetupFileContents()} readOnly={true}/></div>);
                 break;
             case "Deploy File":
-                renderedElement = (<textarea name="viewDeploy" value={props.parentComponent.getDeployFileContents()} readOnly={true}/>);
+                renderedElement = (<div><textarea name="viewDeploy" value={props.parentComponent.getDeployFileContents()} readOnly={true}/></div>);
                 break;
             case "Json":
-                renderedElement = (<textarea name="viewJson" value={JSON.stringify(props.parentComponent.toJSON(), null, 2)} readOnly={true}/>);
+                renderedElement = (<div><textarea name="viewJson" value={JSON.stringify(props.parentComponent.toJSON(), null, 2)} readOnly={true}/></div>);
                 break;
             default:
                 renderedElement = (<Visualizer componentToVisualize={props.parentComponent}></Visualizer>);
@@ -52,13 +52,19 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initial
         setStillExists(false);
     }
 
+    function rndOnClickHandler(event: React.MouseEvent<HTMLElement>) {
+        if (event.detail === 2) {
+            props.changeFocus(props.parentComponent.getId())
+        }
+    }
+
     return (
         stillExists &&
         <Rnd
             className="previewTileContainer"
             default={{
-                x: props.initialPosition["x" as keyof typeof props.initialPosition],
-                y: props.initialPosition["y" as keyof typeof props.initialPosition],
+                x: props.initialPosition["x"],
+                y: props.initialPosition["y"],
                 width: size.width,
                 height: size.height
             }}
@@ -67,7 +73,7 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initial
             id={props.parentComponent.getId()}
             minWidth={ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH}
             minHeight={ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT}
-            onClick={(e: React.MouseEvent<HTMLElement>) => e.detail === 2 ? props.changeFocus(props.parentComponent.getId()) : null}
+            onClick={rndOnClickHandler}
             onMouseEnter={() => setConnectionAdderVisible(true)}
             onMouseLeave={() => setConnectionAdderVisible(false)}
             dragHandleClassName={"handle"}

@@ -1,5 +1,13 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
+import ProjectComponentConnection from "../../project_component_connection";
+import NestedComponent from "./nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
+
+export interface ComponentDescriptionJsonInterface extends ProjectComponentToJsonInterface {
+    "endGoal": string,
+    "missionStatement": string
+}
 
 class ComponentDescription extends ProjectComponent {
     type: string = "ComponentDescription";
@@ -7,13 +15,11 @@ class ComponentDescription extends ProjectComponent {
     endGoal: string;
     missionStatement: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], endGoal: string, missionStatement: string) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, endGoal: string, missionStatement: string) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.endGoal = endGoal;
         this.missionStatement = missionStatement;
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {

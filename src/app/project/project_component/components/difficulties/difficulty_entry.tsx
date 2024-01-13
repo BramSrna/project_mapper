@@ -1,21 +1,31 @@
 import IdGenerator from "@/app/id_generator";
 import ProjectComponent from "../../project_component";
-import PossibleSolution from "./possible_solution";
+import PossibleSolution, { PossibleSolutionsJsonInterface } from "./possible_solution";
+import Difficulties from "./difficulties";
+
+export interface DifficultyEntryJsonInterface {
+    "description": string,
+    "possibleSolutions": PossibleSolutionsJsonInterface[]
+}
 
 class DifficultyEntry {
     id: string;
-    parentComponent: ProjectComponent;
+    parentComponent: Difficulties;
     description: string;
     possibleSolutions: PossibleSolution[];
 
-    constructor(parentComponent: ProjectComponent, description: string, possibleSolutions: object[]) {
+    constructor(parentComponent: Difficulties, description: string, possibleSolutions: PossibleSolution[]) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.description = description;
-        this.possibleSolutions = [];
-        for (const currPossibleSolution of possibleSolutions) {
-            this.possibleSolutions.push(new PossibleSolution(this, currPossibleSolution["description" as keyof typeof currPossibleSolution]));
+        this.possibleSolutions = possibleSolutions;
+        for (const currPossibleSolution of this.possibleSolutions) {
+            currPossibleSolution.setParentComponent(this);
         }
+    }
+
+    setParentComponent(newParentComponent: Difficulties) {
+        this.parentComponent = newParentComponent;
     }
 
     getId() {
@@ -27,7 +37,7 @@ class DifficultyEntry {
     }
 
     toJSON() {
-        const possibleSolutionsAsJson: object[] = [];
+        const possibleSolutionsAsJson: PossibleSolutionsJsonInterface[] = [];
         for (const currPossibleSolution of this.possibleSolutions) {
             possibleSolutionsAsJson.push(currPossibleSolution.toJSON());
         }

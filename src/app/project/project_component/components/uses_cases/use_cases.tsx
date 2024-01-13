@@ -1,6 +1,15 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import UseCaseItem from "./use_case_item";
+import UseCaseItem, { UseCaseItemJsonInterface } from "./use_case_item";
+import ProjectComponentConnection from "@/app/project/project_component_connection";
+import NestedComponent from "../nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
+
+export interface UseCaseJsonInterface extends ProjectComponentToJsonInterface {
+    "startOperatingWall": string,
+    "endOperatingWall": string,
+    "useCases": UseCaseItemJsonInterface[]
+}
 
 class UseCases extends ProjectComponent {
     type: string = "UseCases";
@@ -9,21 +18,19 @@ class UseCases extends ProjectComponent {
     endOperatingWall: string;
     useCases: UseCaseItem[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, startOperatingWall: string, endOperatingWall: string, useCases: object[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, startOperatingWall: string, endOperatingWall: string, useCases: UseCaseItem[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.startOperatingWall = startOperatingWall;
         this.endOperatingWall = endOperatingWall;
-        this.useCases = [];
-        for (const currUseCase of useCases) {
-            this.useCases.push(new UseCaseItem(this, currUseCase["description" as keyof typeof currUseCase]));
+        this.useCases = useCases;
+        for (let currUseCase of this.useCases) {
+            currUseCase.setParentComponent(this);
         }
-
-        parentProject.addComponent(this);
     }
 
     toJSON(): ProjectComponentToJsonInterface {
-        const useCasesAsJson: object[] = [];
+        const useCasesAsJson: UseCaseItemJsonInterface[] = [];
         for (const currUseCase of this.useCases) {
             useCasesAsJson.push(currUseCase.toJSON());
         }

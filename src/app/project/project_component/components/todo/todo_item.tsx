@@ -1,17 +1,27 @@
 import IdGenerator from "@/app/id_generator";
 import ProjectComponent from "../../project_component";
+import Todo from "./todo";
+
+export interface TodoItemJsonInterface {
+    "description": string,
+    "isComplete": boolean
+}
 
 class TodoItem {
-    parentComponent: ProjectComponent;
+    parentComponent: Todo;
     itemDescription: string;
     isComplete: boolean;
     id: string;
 
-    constructor(parentComponent: ProjectComponent, itemDescription: string, isComplete: boolean) {
+    constructor(parentComponent: Todo, itemDescription: string, isComplete: boolean) {
         this.id = IdGenerator.generateId();
         this.parentComponent = parentComponent;
         this.itemDescription = itemDescription;
         this.isComplete = isComplete;
+    }
+
+    setParentComponent(newParentComponent: Todo) {
+        this.parentComponent = newParentComponent;
     }
 
     getId() {

@@ -5,6 +5,8 @@ import Project from "./project/project";
 import EditorCanvas from './editor_canvas';
 import "./page.css"
 import "./globals.css"
+import { jsonToProject } from './project/project_json_parser';
+import IdGenerator from './id_generator';
 
 const Page = () => {
     const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
@@ -24,25 +26,23 @@ const Page = () => {
                 const project = localStorage.getItem(currId);
         
                 if (project !== null) {
-                    const newProj: Project = new Project(currId, project);
+                    const newProj: Project = jsonToProject(currId, JSON.parse(project));
                     projects.push(newProj);
                 }
             }
         }
         setLoadedProjects(projects);
 
-        const projectToEditId = localStorage.getItem("projectToEditId");
+        let projectToEditId = localStorage.getItem("projectToEditId");
         if ((projectToEditId === null) && (storedProjIds !== null) && (storedProjIds.length > 0)) {
             projectToEditId === storedProjIds[0];
-        } else {
-            setProjectToEdit(null);
         }
 
         if (projectToEditId !== null) {
-            const loadedProjectInfo = localStorage.getItem(projectToEditId);
-            if (loadedProjectInfo !== null) {
-                const newProj: Project = new Project(projectToEditId, loadedProjectInfo);
-                setProjectToEdit(newProj);
+            for (const currProj of projects) {
+                if (currProj.getId() === projectToEditId) {
+                    setProjectToEdit(currProj);
+                }
             }
         } else {
             setProjectToEdit(null);
@@ -50,9 +50,8 @@ const Page = () => {
     }
 
     function initProjectOnClickHandler() {
-        const newProj: Project = new Project();
+        const newProj: Project = new Project(IdGenerator.generateId(), "New Project");
         newProj.saveToBrowser();
-        newProj.setProjectName("New Project");
         localStorage.setItem("projectToEditId", newProj.getId());
         setProjectToEdit(newProj);
         setLoadedProjects([
@@ -71,7 +70,7 @@ const Page = () => {
         fileReader.onloadend = function(event) {
             const target = event.target;
             if ((target !== null) && (target.result !== null)) {
-                const newProject: Project = new Project(undefined, target.result.toString());
+                const newProject: Project = jsonToProject(IdGenerator.generateId(), JSON.parse(target.result.toString()));
                 newProject.saveToBrowser();
                 localStorage.setItem("projectToEditId", newProject.getId());
                 setProjectToEdit(newProject);
@@ -92,7 +91,7 @@ const Page = () => {
             const project = localStorage.getItem(projectId);
     
             if (project !== null) {
-                const newProj: Project = new Project(projectId, project);
+                const newProj: Project = jsonToProject(projectId, JSON.parse(project));
                 localStorage.setItem("projectToEditId", newProj.getId());
                 setProjectToEdit(newProj);
             }
@@ -101,38 +100,32 @@ const Page = () => {
 
     function closeProject(projectId: string) {
         const storedProjIds = localStorage.getItem("loadedProjectIds");
-        let parsedIds = [];
+        let parsedIds: string[] = [];
         if (storedProjIds !== null) {
             parsedIds = JSON.parse(storedProjIds);
             const index = parsedIds.indexOf(projectId.toString());
             if (index > -1) {
                 parsedIds.splice(index, 1);
-                localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
             }
         }
+        localStorage.setItem("loadedProjectIds", JSON.stringify(parsedIds));
         localStorage.removeItem(projectId.toString());
-        setLoadedProjects(loadedProjects.filter(function(project) {
+        let newLoadedProjects: Project[] = loadedProjects.filter(function(project) {
             return (project.getId() !== projectId);
-        }));
+        })
+        setLoadedProjects(newLoadedProjects);
 
         if ((projectToEdit !== null) && (projectToEdit.getId() === projectId)) {
-            let newProj: Project = new Project(undefined, "{}");
-
+            let newProj: Project | null = null;
             if (parsedIds.length > 0) {
                 const project = localStorage.getItem(parsedIds[0].toString());
         
                 if (project !== null) {
-                    newProj = new Project(parsedIds[0].toString(), project);
+                    newProj = jsonToProject(parsedIds[0].toString(), JSON.parse(project));
+                    localStorage.setItem("projectToEditId", newProj.getId());
                 }
-            } else {
-                newProj.setProjectName("New Project");
-                setLoadedProjects([
-                    ...loadedProjects,
-                    newProj
-                ]);
             }
 
-            localStorage.setItem("projectToEditId", newProj.getId());
             setProjectToEdit(newProj)
         }
     }
@@ -147,7 +140,7 @@ const Page = () => {
             );
         } else {
             return (
-                <div className="projectEditorContainer">
+                <div className="projectEditorContainer" key={projectToRender.getId()}>
                     <EditorCanvas projectToEdit={projectToRender}></EditorCanvas>
                 </div>
             );

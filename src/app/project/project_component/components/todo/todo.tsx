@@ -1,20 +1,25 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../../project_component";
 import Project from "../../../project";
-import TodoItem from "./todo_item";
+import TodoItem, { TodoItemJsonInterface } from "./todo_item";
+import ProjectComponentConnection from "@/app/project/project_component_connection";
+import NestedComponent from "../nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
+
+export interface TodoJsonInterface extends ProjectComponentToJsonInterface {
+    "items": TodoItemJsonInterface[]
+}
 
 class Todo extends ProjectComponent {
     type: string = "Todo";
     items: TodoItem[];
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[], items: object[]) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, items: TodoItem[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
-        this.items = [];
-        for (const currItem of items) {
-            this.items.push(new TodoItem(this, currItem["description" as keyof typeof currItem], currItem["isComplete" as keyof typeof currItem]));
+        this.items = items;
+        for (const currItem of this.items) {
+            currItem.setParentComponent(this);
         }
-
-        parentProject.addComponent(this);
     }
 
     getItems() {
@@ -37,7 +42,7 @@ class Todo extends ProjectComponent {
     }
 
     toJSON() {
-        const itemsAsJson: object[] = [];
+        const itemsAsJson: TodoItemJsonInterface[] = [];
         for (const currItem of this.items) {
             itemsAsJson.push(currItem.toJSON());
         }

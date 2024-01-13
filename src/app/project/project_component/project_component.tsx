@@ -1,30 +1,65 @@
 import Project from "../project";
 import saveAs from "file-saver";
+import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "../project_component_connection";
+import NestedComponent from "./components/nested_component";
+import SimulatorAppearance, { SimulatorAppearanceJsonInterface } from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
     "componentName": string,
-    "connections": string[],
-    "type": string
+    "connections": ProjectComponentConnection[],
+    "type": string,
+    "simulatorBehaviour": string,
+    "simulatorAppearance": SimulatorAppearanceJsonInterface
+
 }
 
 abstract class ProjectComponent {
     id: string;
-    parentProject: Project;
-    componentName: string = "";
-    connections: string[] = [];
+    parent: Project | NestedComponent;
+    componentName: string;
+    connections: ProjectComponentConnection[];
+    simulatorBehaviour: string;
+    simulatorAppearance: SimulatorAppearance;
 
     abstract readonly type: string;
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: string[]) {
+    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance) {
         this.id = id;
-        this.parentProject = parentProject;
+        this.parent = parent;
         this.componentName = componentName;
         this.connections = connections;
+
+        this.simulatorBehaviour = simulatorBehaviour;
+        this.simulatorAppearance = simulatorAppearance;
+
+        this.simulatorAppearance.setParentComponent(this);
     }
 
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
+
+    setParent(newParent: Project | NestedComponent) {
+        this.parent = newParent;
+    }
+
+    setSimulatorBehaviour(newSimulatorBehaviour: string) {
+        this.simulatorBehaviour = newSimulatorBehaviour;
+        this.saveToBrowser();
+    }
+
+    setSimulatorAppearance(newSimulatorAppearance: SimulatorAppearance) {
+        this.simulatorAppearance = newSimulatorAppearance;
+        this.saveToBrowser();
+    }
+
+    getSimulatorBehaviour() {
+        return this.simulatorBehaviour;
+    }
+
+    getSimulatorAppearance() {
+        return this.simulatorAppearance;
+    }
 
     getId() {
         return this.id;
@@ -35,12 +70,23 @@ abstract class ProjectComponent {
     }
 
     toJSON() : ProjectComponentToJsonInterface {
+        const connectionsAsJson: ProjectComponentConnectionJsonInterface[] = [];
+        for (const currConnection of this.connections) {
+            connectionsAsJson.push(currConnection.toJSON());
+        }
         return {
             "id": this.id,
             "componentName": this.componentName,
             "connections": this.connections,
-            "type": this.type
+            "type": this.type,
+            "simulatorBehaviour": this.simulatorBehaviour,
+            "simulatorAppearance": this.simulatorAppearance.toJSON()
         }
+    }
+
+    downloadJsonFile() {
+        const file = new Blob([JSON.stringify(this.toJSON())], { type: "application/json" });
+        saveAs(file, this.componentName + ".json");
     }
 
     downloadSetupFile() {
@@ -62,11 +108,11 @@ abstract class ProjectComponent {
     }
 
     saveToBrowser() {
-        this.parentProject.saveToBrowser();
+        this.parent.saveToBrowser();
     }
 
     removeFromProject() {
-        this.parentProject.removeComponent(this);
+        this.parent.removeComponent(this, true);
     }
 
     setComponentName(newComponentName: string) {
@@ -74,27 +120,35 @@ abstract class ProjectComponent {
         this.saveToBrowser();
     }
 
-    addConnection(newId: string) {
-        if (this.connections.indexOf(newId) === -1) {
-            this.connections.push(newId);
+    addConnection(newConnection: ProjectComponentConnection) {
+        if (this.connections.indexOf(newConnection) === -1) {
+            this.connections.push(newConnection);
             this.saveToBrowser();
         }
     }
 
     notifyComponentRemoval(removedComponent: ProjectComponent) {
-        this.deleteConnection(removedComponent.getId());
+        let connectionsToDelete: ProjectComponentConnection[] = [];
+        for (let currConnection of this.connections) {
+            if ((currConnection.getStartId() === removedComponent.getId()) || (currConnection.getEndId() === removedComponent.getId())) {
+                connectionsToDelete.push(currConnection);
+            }
+        }
+        for (let currConnection of connectionsToDelete) {
+            this.deleteConnection(currConnection);
+        }
     }
 
-    deleteConnection(idToDelete: string) {
-        const index: number = this.connections.indexOf(idToDelete);
+    deleteConnection(connectionToDelete: ProjectComponentConnection) {
+        const index: number = this.connections.indexOf(connectionToDelete);
         if (index !== -1) {
             this.connections.splice(index, 1);
             this.saveToBrowser();
         }
     }
 
-    getParentProject() {
-        return this.parentProject;
+    getParent() {
+        return this.parent;
     }
 }
 

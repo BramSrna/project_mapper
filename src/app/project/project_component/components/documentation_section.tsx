@@ -1,16 +1,21 @@
 import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_component";
 import Project from "../../project";
+import ProjectComponentConnection from "../../project_component_connection";
+import NestedComponent from "./nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
+
+export interface DocumentationSectionJsonInterface extends ProjectComponentToJsonInterface {
+    "content": string
+}
 
 class DocumentationSection extends ProjectComponent {
     content: string = "";
     type: string = "DocumentationSection";
 
-    constructor(id: string, parentProject: Project, componentName: string, connections: Array<string>, content: string) {
-        super(id, parentProject, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, content: string) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.content = content;
-
-        parentProject.addComponent(this);
     }
 
     toJSON() {

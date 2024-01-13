@@ -6,16 +6,21 @@ import Todo from "../project/project_component/components/todo/todo";
 import UseCases from "../project/project_component/components/uses_cases/use_cases";
 import ComponentDescription from "../project/project_component/components/component_description";
 import TodoVisualizer from "./tiles/todo_visualizer";
-import DocumentationSectionVisualizer from "./tiles/documentation_box_visualizer";
+import DocumentationSectionVisualizer from "./tiles/documentation_section_visualizer";
 import ComponentDescriptionVisualizer from "./tiles/component_description_visualizer";
 import SoftwareRepoVisualizer from "./tiles/software_repo_visualizer";
 import UseCasesVisualizer from "./tiles/use_cases_visualizer";
 import DifficultiesVisualizer from "./tiles/difficulties_visualizer";
+import NestedComponentVisualizer from "./tiles/nested_component_visualizer";
+import NestedComponent from "../project/project_component/components/nested_component";
 
 const Visualizer = (props: {componentToVisualize: ProjectComponent}) => {
     function renderComponent(component: ProjectComponent) {
         let element: JSX.Element;
         switch (component.getType()) {
+            case "NestedComponent":
+                element = <NestedComponentVisualizer nestedComponentComp={component as NestedComponent}/>
+                break;
             case "Todo":
                 element = <TodoVisualizer todoComp={component as Todo}/>
                 break;
