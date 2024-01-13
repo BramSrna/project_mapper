@@ -3,6 +3,7 @@ import Project from "../../../project";
 import DifficultyEntry, { DifficultyEntryJsonInterface } from "./difficulty_entry";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
 import NestedComponent from "../nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface DifficultiesJsonInterface extends ProjectComponentToJsonInterface {
     "difficulties": DifficultyEntryJsonInterface[]
@@ -13,8 +14,8 @@ class Difficulties extends ProjectComponent {
 
     difficulties: DifficultyEntry[];
 
-    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], difficulties: DifficultyEntry[]) {
-        super(id, parent, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, difficulties: DifficultyEntry[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.difficulties = difficulties;
         for (const currDifficulty of this.difficulties) {

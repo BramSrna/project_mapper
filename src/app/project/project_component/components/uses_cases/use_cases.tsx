@@ -3,6 +3,7 @@ import Project from "../../../project";
 import UseCaseItem, { UseCaseItemJsonInterface } from "./use_case_item";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
 import NestedComponent from "../nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface UseCaseJsonInterface extends ProjectComponentToJsonInterface {
     "startOperatingWall": string,
@@ -17,8 +18,8 @@ class UseCases extends ProjectComponent {
     endOperatingWall: string;
     useCases: UseCaseItem[];
 
-    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], startOperatingWall: string, endOperatingWall: string, useCases: UseCaseItem[]) {
-        super(id, parent, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, startOperatingWall: string, endOperatingWall: string, useCases: UseCaseItem[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.startOperatingWall = startOperatingWall;
         this.endOperatingWall = endOperatingWall;

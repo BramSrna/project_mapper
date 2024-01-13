@@ -70,7 +70,6 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     function codeBlockOnChangeHandler(codeSample: CodeSample, value: string | undefined) {
         if (value !== undefined) {
             codeSample.setCodeBlock(value);
-            console.log(value)
         }
     }
 
@@ -96,8 +95,6 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                             x: colIndex * (CODE_SAMPLE_MIN_WIDTH + 50),
                             y: rowIndex * (CODE_SAMPLE_MIN_HEIGHT + 50)
                         };
-
-                        console.log(currCodeSample.getCodeBlock())
                         
                         return (
                             <Rnd
@@ -129,13 +126,13 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                     
                                     <div className="dont-move-draggable">
                                         <p>Title: <input type="text" defaultValue={currCodeSample.getTitle()} onChange={e => currCodeSample.setTitle(e.target.value)}/></p>
-                                        <select defaultValue={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
+                                        <p>Language: <select defaultValue={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
                                             {
                                                 supportedLanguages.map(function(currLanguage: string) {
                                                     return <option value={currLanguage} key={currLanguage}>{currLanguage}</option>
                                                 })
                                             }
-                                        </select>
+                                        </select></p>
                                         <Editor
                                             height="90vh"
                                             language={currCodeSample.getLanguage()}

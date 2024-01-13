@@ -3,6 +3,7 @@ import Project from "../../../project";
 import CodeSample, { CodeSamplesJsonInterface } from "./code_sample";
 import ProjectComponentConnection from "@/app/project/project_component_connection";
 import NestedComponent from "../nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface SoftwareRepoJsonInterface extends ProjectComponentToJsonInterface {
     "initRepoName": string,
@@ -15,8 +16,8 @@ class SoftwareRepo extends ProjectComponent {
     initRepoName: string;
     codeSamples: CodeSample[];
 
-    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], initRepoName: string, codeSamples: CodeSample[]) {
-        super(id, parent, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, initRepoName: string, codeSamples: CodeSample[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.initRepoName = initRepoName;
         this.codeSamples = codeSamples;

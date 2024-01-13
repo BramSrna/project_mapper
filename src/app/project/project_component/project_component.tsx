@@ -2,27 +2,38 @@ import Project from "../project";
 import saveAs from "file-saver";
 import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "../project_component_connection";
 import NestedComponent from "./components/nested_component";
+import SimulatorAppearance, { SimulatorAppearanceJsonInterface } from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
     "componentName": string,
     "connections": ProjectComponentConnection[],
-    "type": string
+    "type": string,
+    "simulatorBehaviour": string,
+    "simulatorAppearance": SimulatorAppearanceJsonInterface
+
 }
 
 abstract class ProjectComponent {
     id: string;
     parent: Project | NestedComponent;
-    componentName: string = "";
-    connections: ProjectComponentConnection[] = [];
+    componentName: string;
+    connections: ProjectComponentConnection[];
+    simulatorBehaviour: string;
+    simulatorAppearance: SimulatorAppearance;
 
     abstract readonly type: string;
 
-    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[]) {
+    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance) {
         this.id = id;
         this.parent = parent;
         this.componentName = componentName;
         this.connections = connections;
+
+        this.simulatorBehaviour = simulatorBehaviour;
+        this.simulatorAppearance = simulatorAppearance;
+
+        this.simulatorAppearance.setParentComponent(this);
     }
 
     abstract getSetupFileContents() : string;
@@ -30,6 +41,24 @@ abstract class ProjectComponent {
 
     setParent(newParent: Project | NestedComponent) {
         this.parent = newParent;
+    }
+
+    setSimulatorBehaviour(newSimulatorBehaviour: string) {
+        this.simulatorBehaviour = newSimulatorBehaviour;
+        this.saveToBrowser();
+    }
+
+    setSimulatorAppearance(newSimulatorAppearance: SimulatorAppearance) {
+        this.simulatorAppearance = newSimulatorAppearance;
+        this.saveToBrowser();
+    }
+
+    getSimulatorBehaviour() {
+        return this.simulatorBehaviour;
+    }
+
+    getSimulatorAppearance() {
+        return this.simulatorAppearance;
     }
 
     getId() {
@@ -49,7 +78,9 @@ abstract class ProjectComponent {
             "id": this.id,
             "componentName": this.componentName,
             "connections": this.connections,
-            "type": this.type
+            "type": this.type,
+            "simulatorBehaviour": this.simulatorBehaviour,
+            "simulatorAppearance": this.simulatorAppearance.toJSON()
         }
     }
 

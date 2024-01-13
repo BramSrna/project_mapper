@@ -19,6 +19,8 @@ import "./project_editor.css";
 import ProjectComponentConnection from "../project/project_component_connection";
 import { Position } from "react-rnd";
 import NestedComponent from "../project/project_component/components/nested_component";
+import SimulatorAppearance from "../component_editor/simulator/simulator_appearance";
+import { Vector3 } from "three";
 
 export interface ComponentPositionInterface {
     "component": ProjectComponent,
@@ -55,29 +57,31 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     function addTileOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const componentType: string = event.target.value;
         let newComponent: ProjectComponent;
+
+        let appearance = new SimulatorAppearance(null, "Box", new Vector3(0, 0, 0), {"width": 1, "height": 1, "depth": 1});
         switch (componentType) {
             case "Add Component":
                 return false;
             case "NestedComponent":
-                newComponent = new NestedComponent(IdGenerator.generateId(), props.projectToEdit, "Nested Component", [], []);
+                newComponent = new NestedComponent(IdGenerator.generateId(), props.projectToEdit, "Nested Component", [], "", appearance, []);
                 break;
             case "ComponentDescription":
-                newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", "");
+                newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", appearance, "", "");
                 break;
             case "DocumentationSection":
-                newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "");
+                newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "", appearance, "");
                 break;
             case "SoftwareRepo":
-                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.projectToEdit, "Software Repo", [], "", []);
+                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.projectToEdit, "Software Repo", [], "", appearance, "", []);
                 break;
             case "Todo":
-                newComponent = new Todo(IdGenerator.generateId(), props.projectToEdit, "Todo", [], []);
+                newComponent = new Todo(IdGenerator.generateId(), props.projectToEdit, "Todo", [], "", appearance, []);
                 break;
             case "UseCases":
-                newComponent = new UseCases(IdGenerator.generateId(), props.projectToEdit, "Use Cases", [], "", "", []);
+                newComponent = new UseCases(IdGenerator.generateId(), props.projectToEdit, "Use Cases", [], "", appearance, "", "", []);
                 break;
             case "Difficulties":
-                newComponent = new Difficulties(IdGenerator.generateId(), props.projectToEdit, "Difficulties", [], []);
+                newComponent = new Difficulties(IdGenerator.generateId(), props.projectToEdit, "Difficulties", [], "", appearance, []);
                 break;
             default:
                 throw new Error("Unknown tile type: " + componentType);

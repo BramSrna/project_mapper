@@ -3,8 +3,6 @@ A terminal that you can use to make the project outline programatically
 
 Implement this: https://twitter.com/_nonfigurativ_/status/1727657155409363120
 
-Terminals as a component
-
 react cad
 
 Cool landing pages to show off projects
@@ -22,3 +20,12 @@ Throw ideas into the project planner and it outputs a development plan. The proj
 The way to think about it is to provide a tool that can be used by a single person to make a simple Python package over a few days and for millions of people to build a dyson sphere over hundreds of years.
 
 Make internall defined / external link a global tile feature
+
+- The project needs to balance between abstract planning tools and rapid prototyping tools
+- Use AI for UI to match user's needs
+
+
+
+- AI first development + language
+- ML in browser
+- User should be able to type everything in plain english and it gets mapped to objects

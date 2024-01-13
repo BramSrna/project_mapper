@@ -7,6 +7,7 @@ import SoftwareRepo from "./software_repo/software_repo";
 import Todo from "./todo/todo";
 import UseCases from "./uses_cases/use_cases";
 import Difficulties from "./difficulties/difficulties";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface ChildLayerJsonInterface {
     "component": ProjectComponent,
@@ -21,8 +22,8 @@ class NestedComponent extends ProjectComponent {
     type: string = "NestedComponent";
     childComponents: ProjectComponent[];
 
-    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], childComponents: ProjectComponent[]) {
-        super(id, parent, componentName, connections);
+    constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, childComponents: ProjectComponent[]) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.childComponents = childComponents;
         for (var currComponent of this.childComponents) {
@@ -112,25 +113,25 @@ class NestedComponent extends ProjectComponent {
         let newComponent: ProjectComponent;
         switch (newType) {
             case "NestedComponent":
-                newComponent = new NestedComponent(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                newComponent = new NestedComponent(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), []);
                 break;
             case "ComponentDescription":
-                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
+                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), "", "");
                 break;
             case "DocumentationSection":
-                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
+                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), "");
                 break;
             case "SoftwareRepo":
-                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
+                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), "", []);
                 break;
             case "Todo":
-                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), []);
                 break;
             case "UseCases":
-                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
+                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), "", "", []);
                 break;
             case "Difficulties":
-                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
+                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), componentToSwitch.getSimulatorBehaviour(), componentToSwitch.getSimulatorAppearance(), []);
                 break;
             default:
                 throw new Error("Unknown tile type: " + newType);

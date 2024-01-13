@@ -16,6 +16,8 @@ import { Item, Menu, useContextMenu } from "react-contexify";
 import { Position } from "react-rnd";
 import Xarrow, { Xwrapper } from "react-xarrows";
 import Modal from 'react-modal';
+import SimulatorAppearance from "../simulator/simulator_appearance";
+import { Vector3 } from "three";
 
 const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, changeFocus: (componentId: string) => void}) => {
     const [components, setComponents] = useState<ProjectComponent[]>([]);
@@ -44,29 +46,31 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     function addTileOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const componentType: string = event.target.value;
         let newComponent: ProjectComponent;
+
+        let appearance = new SimulatorAppearance(null, "Box", new Vector3(0, 0, 0), {"width": 1, "height": 1, "depth": 1});
         switch (componentType) {
             case "Add Component":
                 return false;
             case "NestedComponent":
-                newComponent = new NestedComponent(IdGenerator.generateId(), props.nestedComponentComp, "Nested Component", [], []);
+                newComponent = new NestedComponent(IdGenerator.generateId(), props.nestedComponentComp, "Nested Component", [], "", appearance, []);
                 break;
             case "ComponentDescription":
-                newComponent = new ComponentDescription(IdGenerator.generateId(), props.nestedComponentComp, "Component Description", [], "", "");
+                newComponent = new ComponentDescription(IdGenerator.generateId(), props.nestedComponentComp, "Component Description", [], "", appearance, "", "");
                 break;
             case "DocumentationSection":
-                newComponent = new DocumentationSection(IdGenerator.generateId(), props.nestedComponentComp, "Documentation Section", [], "");
+                newComponent = new DocumentationSection(IdGenerator.generateId(), props.nestedComponentComp, "Documentation Section", [], "", appearance, "");
                 break;
             case "SoftwareRepo":
-                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.nestedComponentComp, "Software Repo", [], "", []);
+                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.nestedComponentComp, "Software Repo", [], "", appearance, "", []);
                 break;
             case "Todo":
-                newComponent = new Todo(IdGenerator.generateId(), props.nestedComponentComp, "Todo", [], []);
+                newComponent = new Todo(IdGenerator.generateId(), props.nestedComponentComp, "Todo", [], "", appearance, []);
                 break;
             case "UseCases":
-                newComponent = new UseCases(IdGenerator.generateId(), props.nestedComponentComp, "Use Cases", [], "", "", []);
+                newComponent = new UseCases(IdGenerator.generateId(), props.nestedComponentComp, "Use Cases", [], "", appearance, "", "", []);
                 break;
             case "Difficulties":
-                newComponent = new Difficulties(IdGenerator.generateId(), props.nestedComponentComp, "Difficulties", [], []);
+                newComponent = new Difficulties(IdGenerator.generateId(), props.nestedComponentComp, "Difficulties", [], "", appearance, []);
                 break;
             default:
                 throw new Error("Unknown tile type: " + componentType);
@@ -202,7 +206,8 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
 
                 <select onChange={viewOnChangeHandler}>
                     <option value="Roadmap">Roadmap</option>
-                    <option value="Use Case Flow">Use Case Flow</option>
+                    <option value="UseCaseFlow">Use Case Flow</option>
+                    <option value="SimulatorFlow">Simulator Flow</option>
                 </select>
             </div>
 

@@ -2,6 +2,7 @@ import ProjectComponent, { ProjectComponentToJsonInterface } from "../project_co
 import Project from "../../project";
 import ProjectComponentConnection from "../../project_component_connection";
 import NestedComponent from "./nested_component";
+import SimulatorAppearance from "@/app/component_editor/simulator/simulator_appearance";
 
 export interface DocumentationSectionJsonInterface extends ProjectComponentToJsonInterface {
     "content": string
@@ -11,8 +12,8 @@ class DocumentationSection extends ProjectComponent {
     content: string = "";
     type: string = "DocumentationSection";
 
-    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], content: string) {
-        super(id, parent, componentName, connections);
+    constructor(id: string, parent: NestedComponent | Project, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance, content: string) {
+        super(id, parent, componentName, connections, simulatorBehaviour, simulatorAppearance);
 
         this.content = content;
     }

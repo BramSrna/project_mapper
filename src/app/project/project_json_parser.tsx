@@ -1,3 +1,4 @@
+import SimulatorAppearance, { SimulatorAppearanceJsonInterface } from "../component_editor/simulator/simulator_appearance";
 import IdGenerator from "../id_generator";
 import Project, { ProjectJsonInterface } from "./project";
 import ComponentDescription, { ComponentDescriptionJsonInterface } from "./project_component/components/component_description";
@@ -28,6 +29,9 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
         ));
     }
 
+    let appearanceInfo: SimulatorAppearanceJsonInterface = compJson["simulatorAppearance"];
+    let appearance: SimulatorAppearance = new SimulatorAppearance(null, appearanceInfo["shape"], appearanceInfo["position"], appearanceInfo["size"]);
+
     let newComp: ProjectComponent;
     const compType = compJson["type"];
     switch(compType) {
@@ -38,6 +42,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 nestedCompInfo["componentName"],
                 connections,
+                nestedCompInfo["simulatorBehaviour"],
+                appearance,
                 []
             );
 
@@ -55,6 +61,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 compDescInfo["componentName"],
                 connections,
+                compDescInfo["simulatorBehaviour"],
+                appearance,
                 compDescInfo["endGoal"],
                 compDescInfo["missionStatement"]
             );
@@ -67,6 +75,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 docSectionInfo["componentName"],
                 connections,
+                docSectionInfo["simulatorBehaviour"],
+                appearance,
                 docSectionInfo["content"]
             );
             break;
@@ -79,6 +89,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 softwareRepoInfo["componentName"],
                 connections,
+                softwareRepoInfo["simulatorBehaviour"],
+                appearance,
                 softwareRepoInfo["initRepoName"],
                 []
             );
@@ -106,6 +118,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 todoInfo["componentName"],
                 connections,
+                todoInfo["simulatorBehaviour"],
+                appearance,
                 []
             );
 
@@ -131,6 +145,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 useCaseInfo["componentName"],
                 connections,
+                useCaseInfo["simulatorBehaviour"],
+                appearance,
                 useCaseInfo["startOperatingWall"],
                 useCaseInfo["endOperatingWall"],
                 []
@@ -156,6 +172,8 @@ function compJsonToComponent(compJson: ProjectComponentToJsonInterface, parent: 
                 parent,
                 difficultyInfo["componentName"],
                 connections,
+                difficultyInfo["simulatorBehaviour"],
+                appearance,
                 []
             );
 
