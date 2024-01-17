@@ -1,88 +1,40 @@
 import Project from "./project/project";
-import { ReactElement, useEffect, useState } from "react";
+import { FormEvent, ReactElement, useEffect, useState } from "react";
 import ProjectEditor from "./project_editor/project_editor";
 import ProjectComponent from "./project/project_component/project_component";
 import ComponentEditor from "./component_editor/component_editor";
-import NestedComponent from "./project/project_component/components/nested_component";
-
-export interface EditorContextsInterface {
-    [key: string|number]: EditorContextInterface
-}
-
-export interface EditorContextInterface {
-    "focusedIndex": number,
-    "loadedFocusIds": string[]
-}
+import NestedComponent, { ChildLayerJsonInterface } from "./project/project_component/components/nested_component";
+import { mapRawTextToCommands } from "./terminal/command_mapper";
+import { executeCommandList } from "./terminal/command_executor";
+import { CommandJsonInterface } from "./terminal/command_json_interface";
+import { EditorContextInterface, getFocusedComponent, readEditorContext, writeEditorContext } from "./focus_helper_functions";
 
 const EditorCanvas = (props: {projectToEdit: Project}) => {
     const [focusedIndex, setFocusedIndex] = useState<number>(0);
     const [loadedFocusIds, setLoadedFocusIds] = useState<string[]>([props.projectToEdit.getId()]);
 
     useEffect(() => {
-        reloadLocalStorage();
+        reloadStorage();
     }, []);
 
-    function saveContext(focusedIndexToSave: number, loadedFocusIdsToSave: string[]) {
-        const editorContexts: string | null = localStorage.getItem("editorContexts");
-        let contexts: EditorContextsInterface = editorContexts !== null ? JSON.parse(editorContexts) : {};
+    function reloadStorage() {
+        let focusInfo: EditorContextInterface = readEditorContext(props.projectToEdit.getId());
 
-        contexts[props.projectToEdit.getId()] = {
-            "focusedIndex": focusedIndexToSave,
-            "loadedFocusIds": loadedFocusIdsToSave
-        }
-
-        localStorage.setItem("editorContexts", JSON.stringify(contexts));
-    }
-
-    function reloadLocalStorage() {
-        const editorContexts = localStorage.getItem("editorContexts");
-        
-        let savedFocusedIndex: number = 0;
-        let savedLoadedFocusIds: string[] = [props.projectToEdit.getId()];
-
-        if (editorContexts !== null) {
-            let parsedContexts: EditorContextsInterface = JSON.parse(editorContexts);
-
-            if (props.projectToEdit.getId() in parsedContexts) {
-                let focusInfo: EditorContextInterface = parsedContexts[props.projectToEdit.getId()];
-                savedFocusedIndex = focusInfo["focusedIndex"];
-                savedLoadedFocusIds = focusInfo["loadedFocusIds"];
-            }
-        }
-
-        setFocusedIndex(savedFocusedIndex);
-        setLoadedFocusIds(savedLoadedFocusIds);
-    }
-
-    function getOrderedChildComponents(rootElement: Project | NestedComponent) {
-        let orderedComponents: ProjectComponent[] = [];
-        for (var currComponent of rootElement.getChildComponents()) {
-            orderedComponents.push(currComponent);
-            if (currComponent instanceof NestedComponent) {
-                orderedComponents.push(...getOrderedChildComponents(currComponent));
-            }
-        }
-        return orderedComponents;
+        setFocusedIndex(focusInfo.focusedIndex);
+        setLoadedFocusIds(focusInfo.loadedFocusIds);
     }
 
     function renderCurrEditor() {
-        let allComponents: ProjectComponent[] = getOrderedChildComponents(props.projectToEdit);
-        let focusedComponent: ProjectComponent | null = null;
-        for (var currComponent of allComponents) {
-            if (currComponent.getId() === loadedFocusIds[focusedIndex]) {
-                focusedComponent = currComponent
-            }
-        }
+        let focusInfo: EditorContextInterface = readEditorContext(props.projectToEdit.getId());
+        let focusedComponent: ProjectComponent | Project = getFocusedComponent(props.projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex]);
         
-        if (focusedComponent === null) {
+        if (focusedComponent === props.projectToEdit) {
             return (
-                <ProjectEditor projectToEdit={props.projectToEdit} changeFocus={(componentId: string) => changeFocus(focusedIndex, componentId)}/>
+                <ProjectEditor key={props.projectToEdit.getId()} projectToEdit={props.projectToEdit} changeFocus={(componentId: string) => changeFocus(focusInfo.focusedIndex, componentId)}/>
             );
         } else {
             return (
-                <div>
-                    <ComponentEditor componentToEdit={focusedComponent} changeFocus={(projectId: string) => changeFocus(focusedIndex, projectId)}/>
-                </div>
+                <ComponentEditor componentToEdit={focusedComponent as ProjectComponent} changeFocus={(projectId: string) => changeFocus(focusInfo.focusedIndex, projectId)}/>
             )
         }
     }
@@ -99,7 +51,7 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
         setLoadedFocusIds(newLoadedFocusIds);
         setFocusedIndex(loadedFocusIndex);
 
-        saveContext(loadedFocusIndex, newLoadedFocusIds);
+        writeEditorContext(props.projectToEdit.getId(), loadedFocusIndex, newLoadedFocusIds);
     }
 
     function addFocusId(newFocusId: string) {
@@ -109,7 +61,7 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
         setLoadedFocusIds(newLoadedFocusIds);
         setFocusedIndex(newFocusedIndex);
 
-        saveContext(newFocusedIndex, newLoadedFocusIds);
+        writeEditorContext(props.projectToEdit.getId(), newFocusedIndex, newLoadedFocusIds);
     }
 
     function removeFocusId(indexToRemove: number) {
@@ -130,23 +82,18 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
         setLoadedFocusIds(newLoadedFocusIds);
         setFocusedIndex(newFocusedIndex);
 
-        saveContext(newFocusedIndex, newLoadedFocusIds);
+        writeEditorContext(props.projectToEdit.getId(), newFocusedIndex, newLoadedFocusIds);
     }
 
     return (
-        <div>
+        <div className="editorCanvasWindow">
             <div className="sideBySideContainer projectEditorMenu">
                 {
-                    loadedFocusIds.map(function(currFocusId: string, index: number) {
-                        let allComponents: ProjectComponent[] = getOrderedChildComponents(props.projectToEdit);
-                        let focusedComponent: ProjectComponent | null = null;
-                        for (var currComponent of allComponents) {
-                            if (currComponent.getId() === currFocusId) {
-                                focusedComponent = currComponent
-                            }
-                        }
+                    readEditorContext(props.projectToEdit.getId()).loadedFocusIds.map(function(currFocusId: string, index: number) {
+                        let focusedComponent: ProjectComponent | Project = getFocusedComponent(props.projectToEdit, currFocusId);
 
-                        if (focusedComponent !== null) {
+                        if (focusedComponent !== props.projectToEdit) {
+                            focusedComponent = focusedComponent as ProjectComponent;
                             return (
                                 <div className="containerWithSeperators" key={focusedComponent!.getId() + index}>
                                     <button onClick={() => changeFocus(index, focusedComponent!.getId())}>{focusedComponent.getComponentName()}</button>
@@ -167,7 +114,6 @@ const EditorCanvas = (props: {projectToEdit: Project}) => {
                     <button onClick={() => addFocusId(props.projectToEdit.getId())}>+</button>
                 </div>
             </div>
-
             {renderCurrEditor()}
         </div>
     );

@@ -3,13 +3,13 @@
 }
 
 .projectEditorContainer {
-    display: "flex";
-    height: 100vh;
+    display: flex;
+    flex: 1;
     flex-direction: column;
 }
 
 .projectEditorWindow {
-    height: 93vh;
+    height: 100%;
 }
 
 .connectionAdder {

@@ -1,16 +1,39 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import Project from "./project/project";
 import EditorCanvas from './editor_canvas';
 import "./page.css"
 import "./globals.css"
 import { jsonToProject } from './project/project_json_parser';
 import IdGenerator from './id_generator';
+import { DraggableData, Position, Rnd } from 'react-rnd';
+import { CommandJsonInterface } from './terminal/command_json_interface';
+import { mapRawTextToCommands } from './terminal/command_mapper';
+import { executeCommandList } from './terminal/command_executor';
+import { DraggableEvent } from 'react-draggable';
+import { parse } from 'path';
+import NestedComponent, { ChildLayerJsonInterface } from './project/project_component/components/nested_component';
+import ProjectComponent from './project/project_component/project_component';
+import { EditorContextInterface, getFocusedComponent, readEditorContext } from './focus_helper_functions';
+
+const TERMINAL_MIN_WIDTH: number = 300;
+const TERMINAL_MIN_HEIGHT: number = 200;
+
+interface SizeInterface {
+    "width": number,
+    "height": number
+}
 
 const Page = () => {
     const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
     const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
+
+    const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
+    const [terminalStatus, setTerminalStatus] = useState<string>("Click 'Submit' to execute the terminal actions.");
+    const [terminalPosition, setTerminalPosition] = useState<Position>({x: 0, y: 0});
+    const [terminalSize, setTerminalSize] = useState<SizeInterface>({"width": TERMINAL_MIN_WIDTH, "height": TERMINAL_MIN_HEIGHT});
+    const [terminalText, setTerminalText] = useState<string>("");
 
     useEffect(() => {
         reloadLocalStorage();
@@ -88,12 +111,11 @@ const Page = () => {
             localStorage.removeItem("projectToEditId")
             setProjectToEdit(null);
         } else {
-            const project = localStorage.getItem(projectId);
-    
-            if (project !== null) {
-                const newProj: Project = jsonToProject(projectId, JSON.parse(project));
-                localStorage.setItem("projectToEditId", newProj.getId());
-                setProjectToEdit(newProj);
+            for (var currProject of loadedProjects) {
+                if (currProject.getId() === projectId) {
+                    localStorage.setItem("projectToEditId", currProject.getId());
+                    setProjectToEdit(currProject);
+                }
             }
         }
     }
@@ -115,18 +137,12 @@ const Page = () => {
         })
         setLoadedProjects(newLoadedProjects);
 
-        if ((projectToEdit !== null) && (projectToEdit.getId() === projectId)) {
-            let newProj: Project | null = null;
+        if ((projectToEdit !== null) && (projectToEdit.getId() === projectId) ) {
+            let newProjectId: string | null = null;
             if (parsedIds.length > 0) {
-                const project = localStorage.getItem(parsedIds[0].toString());
-        
-                if (project !== null) {
-                    newProj = jsonToProject(parsedIds[0].toString(), JSON.parse(project));
-                    localStorage.setItem("projectToEditId", newProj.getId());
-                }
+                newProjectId = parsedIds[0];
             }
-
-            setProjectToEdit(newProj)
+            switchToProject(newProjectId);
         }
     }
 
@@ -140,10 +156,33 @@ const Page = () => {
             );
         } else {
             return (
-                <div className="projectEditorContainer" key={projectToRender.getId()}>
-                    <EditorCanvas projectToEdit={projectToRender}></EditorCanvas>
-                </div>
+                <EditorCanvas projectToEdit={projectToRender} key={projectToRender.getId()}/>
             );
+        }
+    }
+
+    function inputTerminalOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+        if (projectToEdit === null) {
+            setTerminalStatus("Error: A project must be open for the terminal to be used.");
+            event.preventDefault();
+            return false;
+        }
+
+        const formData: FormData = new FormData(event.currentTarget);
+        if ((formData.has("inputTerminal")) && (formData.get("inputTerminal") !== null)) {
+            let commandList: CommandJsonInterface[] = mapRawTextToCommands(formData.get("inputTerminal")!.toString());
+            let focusInfo: EditorContextInterface = readEditorContext(projectToEdit.getId());
+            let check: string | null = executeCommandList(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex], commandList);
+            if (check !== null) {
+                setTerminalStatus(check)
+                event.preventDefault();
+            } else {
+                setTerminalStatus("Finished Execution.");
+                setTerminalText("");
+                event.preventDefault();
+                const form = event.target as HTMLFormElement;
+                form.reset();
+            }
         }
     }
 
@@ -162,8 +201,48 @@ const Page = () => {
                 }
                 <div className="containerWithSeperators">
                     <button onClick={() => switchToProject(null)}>+</button>
-                </div>                
+                </div>
+                <div className="containerWithSeperators">
+                    <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
+                </div>
             </div>
+
+            {
+                terminalOpen &&                
+                <Rnd
+                    className="previewTileContainer"
+                    style = {{zIndex: 100}}
+                    default={{
+                        x: terminalPosition.x,
+                        y: terminalPosition.y,
+                        width: terminalSize.width,
+                        height: terminalSize.height
+                    }}
+                    minWidth={TERMINAL_MIN_WIDTH}
+                    minHeight={TERMINAL_MIN_HEIGHT}
+                    onDrag={(event: DraggableEvent, data: DraggableData) => setTerminalPosition({x: data.x, y: data.y})}
+                    onResize={(e, direction, elementRef) => setTerminalSize({width: elementRef.offsetWidth, height: elementRef.offsetHeight})}
+                    dragHandleClassName={"handle"}
+                    bounds=".projectMapperContainer"
+                >
+                    <div className="sideBySideContainer handleContainer">
+                        <div className="handle"/>
+                        <button onClick={() => setTerminalOpen(false)}>X</button>
+                    </div>
+
+                    <form onSubmit={inputTerminalOnSubmitHandler}>
+                        <textarea
+                            style={{ width: terminalSize.width - 6, height: terminalSize.height - 110, padding: 0, resize: "none" }}
+                            name="inputTerminal"
+                            rows={4}
+                            cols={40}
+                            onChange={(event) => setTerminalText(event.target.value)}
+                        />
+                        <p>{terminalStatus}</p>
+                        <button type="submit" style={{ width: terminalSize.width - 6 }}>Submit</button>
+                    </form>
+                </Rnd>
+            }
             
             <div className="editorContainer">
                 {renderEditor(projectToEdit)}

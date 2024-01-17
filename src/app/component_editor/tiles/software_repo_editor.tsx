@@ -74,20 +74,20 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
     }
 
     let dispSquareDim: number = 1;
-    while (dispSquareDim ** 2 < codeSamples.length) {
+    while (dispSquareDim ** 2 < props.softwareRepoComp.getCodeSamples().length) {
         dispSquareDim += 1;
     }
 
     return (
-        <div>
+        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
             <div className="sideBySideContainer projectEditorMenu">
                 <p>Init Repo Name: <input type="text" name="initRepoName" defaultValue={props.softwareRepoComp.getInitRepoName()} onChange={e => props.softwareRepoComp.setInitRepoName(e.target.value)}/></p>
                 <button onClick={addCodeSampleOnClickHandler}>Add Code Sample</button>
             </div>
 
-            <div className="difficultiesEditorWindow">
+            <div style={{flexGrow: 1}} className="difficultiesEditorWindow">
                 {
-                    codeSamples.map(function(currCodeSample: CodeSample, index: number) {
+                    props.softwareRepoComp.getCodeSamples().map(function(currCodeSample: CodeSample, index: number) {
                         const rowIndex: number = Math.floor(index / dispSquareDim);
                         const colIndex: number = index % dispSquareDim;
 
@@ -101,7 +101,9 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                                 style={{
                                     border: "solid 1px #ddd",
                                     background: "#f0f0f0",
-                                    overflow: "hidden"
+                                    overflow: "hidden",
+                                    display: "flex",
+                                    flexDirection: "column"
                                 }}
                                 default={{
                                     x: initialPosition["x"],
@@ -118,23 +120,23 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                                 bounds=".difficultiesEditorWindow"
                                 dragHandleClassName={"handle"}
                             >
-                                <div>
-                                    <div className="sideBySideContainer handleContainer">
-                                        <div className="handle"/>
-                                        <button onClick={() => deleteCodeSampleOnClickHandler(currCodeSample)}>X</button>
-                                    </div>
-                    
-                                    <div className="dont-move-draggable">
-                                        <p>Title: <input type="text" defaultValue={currCodeSample.getTitle()} onChange={e => currCodeSample.setTitle(e.target.value)}/></p>
-                                        <p>Language: <select defaultValue={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
-                                            {
-                                                supportedLanguages.map(function(currLanguage: string) {
-                                                    return <option value={currLanguage} key={currLanguage}>{currLanguage}</option>
-                                                })
-                                            }
-                                        </select></p>
+                                <div className="sideBySideContainer handleContainer">
+                                    <div className="handle"/>
+                                    <button onClick={() => deleteCodeSampleOnClickHandler(currCodeSample)}>X</button>
+                                </div>
+                
+                                <div className="dont-move-draggable" style={{display: "flex", flexDirection: "column", flexGrow: 1}}>
+                                    <p>Title: <input type="text" defaultValue={currCodeSample.getTitle()} onChange={e => currCodeSample.setTitle(e.target.value)}/></p>
+                                    <p>Language: <select value={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
+                                        {
+                                            supportedLanguages.map(function(currLanguage: string) {
+                                                return <option value={currLanguage} key={currLanguage}>{currLanguage}</option>
+                                            })
+                                        }
+                                    </select></p>
+                                    <div style={{flexGrow: 1}}>
                                         <Editor
-                                            height="90vh"
+                                            height="100%"
                                             language={currCodeSample.getLanguage()}
                                             value={currCodeSample.getCodeBlock()}
                                             onChange={(value: string | undefined) => codeBlockOnChangeHandler(currCodeSample, value)}

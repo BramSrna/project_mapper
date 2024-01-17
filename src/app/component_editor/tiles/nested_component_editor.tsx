@@ -18,6 +18,8 @@ import Xarrow, { Xwrapper } from "react-xarrows";
 import Modal from 'react-modal';
 import SimulatorAppearance from "../simulator/simulator_appearance";
 import { Vector3 } from "three";
+import { createBasicComponent } from "@/app/helper_functions";
+import "../../project_editor/project_editor.css";
 
 const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, changeFocus: (componentId: string) => void}) => {
     const [components, setComponents] = useState<ProjectComponent[]>([]);
@@ -29,9 +31,11 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     let prevClickedComponent: ProjectComponent | null = null;
 
     useEffect(() => {
-        const componentsData = [...props.nestedComponentComp.getChildComponents()];
-        setComponents(componentsData);
+        setComponents([...props.nestedComponentComp.getChildComponents()]);
+        setConnections(loadConnections());
+    }, [props.nestedComponentComp]);
 
+    function loadConnections() {
         const connectionsData: ProjectComponentConnection[] = [];
         for (const currComponent of props.nestedComponentComp.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
@@ -40,42 +44,12 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
                 }
             }
         }
-        setConnections(connectionsData);
-    }, [props.nestedComponentComp]);
+        return connectionsData;
+    }
 
     function addTileOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const componentType: string = event.target.value;
-        let newComponent: ProjectComponent;
-
-        let appearance = new SimulatorAppearance(null, "Box", new Vector3(0, 0, 0), {"width": 1, "height": 1, "depth": 1});
-        switch (componentType) {
-            case "Add Component":
-                return false;
-            case "NestedComponent":
-                newComponent = new NestedComponent(IdGenerator.generateId(), props.nestedComponentComp, "Nested Component", [], "", appearance, []);
-                break;
-            case "ComponentDescription":
-                newComponent = new ComponentDescription(IdGenerator.generateId(), props.nestedComponentComp, "Component Description", [], "", appearance, "", "");
-                break;
-            case "DocumentationSection":
-                newComponent = new DocumentationSection(IdGenerator.generateId(), props.nestedComponentComp, "Documentation Section", [], "", appearance, "");
-                break;
-            case "SoftwareRepo":
-                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.nestedComponentComp, "Software Repo", [], "", appearance, "", []);
-                break;
-            case "Todo":
-                newComponent = new Todo(IdGenerator.generateId(), props.nestedComponentComp, "Todo", [], "", appearance, []);
-                break;
-            case "UseCases":
-                newComponent = new UseCases(IdGenerator.generateId(), props.nestedComponentComp, "Use Cases", [], "", appearance, "", "", []);
-                break;
-            case "Difficulties":
-                newComponent = new Difficulties(IdGenerator.generateId(), props.nestedComponentComp, "Difficulties", [], "", appearance, []);
-                break;
-            default:
-                throw new Error("Unknown tile type: " + componentType);
-        }
-
+        let newComponent: ProjectComponent = createBasicComponent(componentType, props.nestedComponentComp);
         props.nestedComponentComp.addComponent(newComponent);
 
         setComponents([
@@ -96,7 +70,7 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     }
 
     function getProjectComponentsWithStartPosition() {
-        const entriesToSort: ProjectComponent[] = [...components];
+        const entriesToSort: ProjectComponent[] = [...props.nestedComponentComp.getChildComponents()];
         let columns: ProjectComponent[][] = [];
 
         while (entriesToSort.length > 0) {
@@ -224,7 +198,7 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
                     }
 
                     {
-                        connections.map(function(currConnection: ProjectComponentConnection) {
+                        loadConnections().map(function(currConnection: ProjectComponentConnection) {
                             return (
                                 <div key={currConnection.getId()}>
                                     <div onContextMenu={(event) => show({ id: currConnection.getId(), event: event })}>

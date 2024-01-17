@@ -35,14 +35,14 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
     return (
         <div>
             {
-                possibleSolutions.map(function(currPossibleSolution: PossibleSolution) {
+                props.difficulty.getPossibleSolutions().map(function(currPossibleSolution: PossibleSolution) {
                     return (
                         <div key={currPossibleSolution.getId()}>
                             <textarea
                                 name="documentation"
                                 rows={4}
                                 cols={40}
-                                defaultValue={currPossibleSolution.getDescription()}
+                                value={currPossibleSolution.getDescription()}
                                 onChange={e => currPossibleSolution.setDescription(e.target.value)}
                             />
                             <button onClick={() => deletePossibleSolutionOnClickHandler(currPossibleSolution)}>Delete Possible Solution</button>
@@ -92,7 +92,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
             
             <div className="difficultiesEditorWindow">
                 {
-                    difficulties.map(function(currDifficulty: DifficultyEntry, index: number) {
+                    props.difficultiesComp.getDifficulties().map(function(currDifficulty: DifficultyEntry, index: number) {
                         const rowIndex: number = Math.floor(index / dispSquareDim);
                         const colIndex: number = index % dispSquareDim;
 
@@ -133,7 +133,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                                             name="documentation"
                                             rows={4}
                                             cols={40}
-                                            defaultValue={currDifficulty.getDescription()}
+                                            value={currDifficulty.getDescription()}
                                             onChange={e => currDifficulty.setDescription(e.target.value)}
                                         />
                     
