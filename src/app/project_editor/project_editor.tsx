@@ -81,7 +81,6 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     }
 
     function getProjectComponentsWithStartPosition() {
-        console.log("HERE")
         const entriesToSort: ProjectComponent[] = [...props.projectToEdit.getChildComponents()];
         let columns: ProjectComponent[][] = [];
 
@@ -191,7 +190,6 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
         setView(newView);
     }
 
-    console.log("RENDER PROJECT EDITOR", components)
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">

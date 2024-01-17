@@ -24,8 +24,7 @@ const TodoEditor = (props: {todoComp: Todo}) => {
             newItem
         ]);
     }
-
-    console.log("RENDER TODO EDITOR")
+    
     return (
         <div>
             <table>
