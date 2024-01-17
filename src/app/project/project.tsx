@@ -14,6 +14,13 @@ import Mock from './project_component/components/software_repo/code_sample';
 import DifficultyEntry from './project_component/components/difficulties/difficulty_entry';
 import PossibleSolution from './project_component/components/difficulties/possible_solution';
 import NestedComponent, { ChildLayerJsonInterface } from './project_component/components/nested_component';
+import SimulatorAppearance from '../component_editor/simulator/simulator_appearance';
+import { Vector3 } from 'three';
+import { convertComponentType } from '../helper_functions';
+
+interface WatcherInterface {
+    [key: string]: Function[]
+}
 
 export interface ProjectJsonInterface {
     "projectName": string,
@@ -143,32 +150,7 @@ class Project {
             return componentToSwitch;
         }
 
-        let newComponent: ProjectComponent;
-        switch (newType) {
-            case "NestedComponent":
-                newComponent = new NestedComponent(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            case "ComponentDescription":
-                newComponent = new ComponentDescription(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "");
-                break;
-            case "DocumentationSection":
-                newComponent = new DocumentationSection(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "");
-                break;
-            case "SoftwareRepo":
-                newComponent = new SoftwareRepo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", []);
-                break;
-            case "Todo":
-                newComponent = new Todo(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            case "UseCases":
-                newComponent = new UseCases(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), "", "", []);
-                break;
-            case "Difficulties":
-                newComponent = new Difficulties(componentToSwitch.getId(), componentToSwitch.getParent(), componentToSwitch.getComponentName(), componentToSwitch.getConnections(), []);
-                break;
-            default:
-                throw new Error("Unknown tile type: " + newType);
-        }
+        let newComponent: ProjectComponent = convertComponentType(newType, componentToSwitch);
 
         this.removeComponent(componentToSwitch, false);
         this.addComponent(newComponent);
@@ -189,6 +171,15 @@ class Project {
             }
         }
         return orderedComponents;
+    }
+
+    getComponentWithName(name: string) {
+        for (var currComponent of this.getOrderedChildComponents()) {
+            if (currComponent.component.getComponentName() === name) {
+                return currComponent.component;
+            }
+        }
+        return null;
     }
 }
 

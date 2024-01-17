@@ -110,6 +110,15 @@ class UseCases extends ProjectComponent {
     getDeployFileContents() {
         return "";
     }
+
+    getUseCaseByDescription(description: string) {
+        for (var currItem of this.useCases) {
+            if (currItem.getDescription() === description) {
+                return currItem;
+            }
+        }
+        return null;
+    }
 }
 
 export default UseCases;

@@ -24,15 +24,15 @@ const TodoEditor = (props: {todoComp: Todo}) => {
             newItem
         ]);
     }
-
+    
     return (
         <div>
             <table>
                 <tbody>
                     {
-                        items.map(function(currItem: TodoItem) {
+                        props.todoComp.getItems().map(function(currItem: TodoItem) {
                             return (
-                                <tr key={currItem.getId()}>
+                                <tr key={currItem.getId() + currItem.getIsComplete().toString()}>
                                     <td><input type="checkbox" defaultChecked={currItem.getIsComplete()} onChange={e => currItem.setIsComplete(e.target.checked)}></input></td>
                                     <td><input type="text" defaultValue={currItem.getItemDescription()} onChange={e => currItem.setItemDescription(e.target.value)}/></td>
                                     <td><button onClick={() => deleteItemOnClickHandler(currItem)}>Delete Item</button></td>

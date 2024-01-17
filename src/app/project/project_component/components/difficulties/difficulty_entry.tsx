@@ -74,6 +74,15 @@ class DifficultyEntry {
         this.description = newDescription;
         this.saveToBrowser();
     }
+
+    getPossibleSolutionWithDescription(description: string) {
+        for (var currSolution of this.possibleSolutions) {
+            if (currSolution.getDescription() === description) {
+                return currSolution;
+            }
+        }
+        return null;
+    }
 }
 
 export default DifficultyEntry;

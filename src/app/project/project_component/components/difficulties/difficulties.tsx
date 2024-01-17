@@ -81,6 +81,15 @@ class Difficulties extends ProjectComponent {
     getDeployFileContents() {
         return "";
     }
+
+    getEntryByDescription(description: string) {
+        for (var currEntry of this.difficulties) {
+            if (currEntry.getDescription() === description) {
+                return currEntry;
+            }
+        }
+        return null;
+    }
 }
 
 export default Difficulties;

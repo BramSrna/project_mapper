@@ -150,6 +150,15 @@ abstract class ProjectComponent {
     getParent() {
         return this.parent;
     }
+
+    getConnection(targetComponent: ProjectComponent, type: string) {
+        for (var currConnection of this.connections) {
+            if ((currConnection.getEndId() === targetComponent.getId()) && (type === currConnection.getType())) {
+                return currConnection;
+            }
+        }
+        return null;
+    }
 }
 
 export default ProjectComponent;

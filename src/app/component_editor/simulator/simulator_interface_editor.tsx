@@ -76,16 +76,16 @@ const SimulatorInterfaceEditor = (props: {appearance: SimulatorAppearance}) => {
                 let boxSize: BoxSizeInterface = size as BoxSizeInterface;
                 return (
                     <div className="sideBySideContainer">
-                        <p>Width: <input type="text" defaultValue={boxSize.width} onChange={e => sizeOnChangeHandler({"width": e.target.value, "height": boxSize.height, "depth": boxSize.depth})}/></p>
-                        <p>Height: <input type="text" defaultValue={boxSize.height} onChange={e => sizeOnChangeHandler({"width": boxSize.width, "height": e.target.value, "depth": boxSize.depth})}/></p>
-                        <p>Depth: <input type="text" defaultValue={boxSize.depth} onChange={e => sizeOnChangeHandler({"width": boxSize.width, "height": boxSize.height, "depth": e.target.value})}/></p>
+                        <p>Width: <input type="text" value={boxSize.width} onChange={e => sizeOnChangeHandler({"width": e.target.value, "height": boxSize.height, "depth": boxSize.depth})}/></p>
+                        <p>Height: <input type="text" value={boxSize.height} onChange={e => sizeOnChangeHandler({"width": boxSize.width, "height": e.target.value, "depth": boxSize.depth})}/></p>
+                        <p>Depth: <input type="text" value={boxSize.depth} onChange={e => sizeOnChangeHandler({"width": boxSize.width, "height": boxSize.height, "depth": e.target.value})}/></p>
                     </div>
                 );
             case "Sphere":
                 let sphereSize: SphereSizeInterface = size as SphereSizeInterface;
                 return (
                     <div className="sideBySideContainer">
-                        <p>Radius: <input type="text" defaultValue={sphereSize.radius} onChange={e => sizeOnChangeHandler({"radius": e.target.value})}/></p>
+                        <p>Radius: <input type="text" value={sphereSize.radius} onChange={e => sizeOnChangeHandler({"radius": e.target.value})}/></p>
                     </div>
                 );
             default:
@@ -94,21 +94,21 @@ const SimulatorInterfaceEditor = (props: {appearance: SimulatorAppearance}) => {
     }
 
     return (
-        <div className="sideBySideContainer">
-            <div style={{height: "100vh", width: "50vw", display: "flex", flexDirection: "column"}}>
+        <div className="sideBySideContainer" style={{height: "100%"}}>
+            <div style={{height: "100%", width: "50%", display: "flex", flexDirection: "column"}}>
                 <p>Shape:<select onChange={e => shapeOnChangeHandler(e.target.value)} value={shape}>
                     <option value="Box">Box</option>
                     <option value="Sphere">Sphere</option>
                 </select></p>
                 <div className="sideBySideContainer">
-                    <p>X Position: <input type="text" defaultValue={position.x} onChange={e => setXPosition(e.target.value)}/></p>
-                    <p>Y Position: <input type="text" defaultValue={position.y} onChange={e => setYPosition(e.target.value)}/></p>
-                    <p>Z Position: <input type="text" defaultValue={position.z} onChange={e => setZPosition(e.target.value)}/></p>
+                    <p>X Position: <input type="text" value={props.appearance.getPosition().x} onChange={e => setXPosition(e.target.value)}/></p>
+                    <p>Y Position: <input type="text" value={props.appearance.getPosition().y} onChange={e => setYPosition(e.target.value)}/></p>
+                    <p>Z Position: <input type="text" value={props.appearance.getPosition().z} onChange={e => setZPosition(e.target.value)}/></p>
                 </div>
                 {getSizeFields()}
             </div>
 
-            <div style={{width: "50vw"}}>
+            <div style={{width: "50%", height: "100%"}}>
                 <Canvas camera={{ position: [1, 2, 3] }}>
                     {parseAppearance()}
                     <OrbitControls/>

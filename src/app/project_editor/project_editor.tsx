@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, useEffect, useState } from "react";
 import Project from "../project/project";
 import PreviewTileContainer from "./preview_tile_container";
 import Xarrow, { Xwrapper } from "react-xarrows";
@@ -21,6 +21,7 @@ import { Position } from "react-rnd";
 import NestedComponent from "../project/project_component/components/nested_component";
 import SimulatorAppearance from "../component_editor/simulator/simulator_appearance";
 import { Vector3 } from "three";
+import { createBasicComponent } from "../helper_functions";
 
 export interface ComponentPositionInterface {
     "component": ProjectComponent,
@@ -34,15 +35,18 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
     const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
     const [view, setView] = useState<string>("Roadmap");
+    const [watcherFlag, setWatcherFlag] = useState<string>("");
     
     const { show } = useContextMenu();
 
     let prevClickedComponent: ProjectComponent | null = null;
 
     useEffect(() => {
-        const componentsData = [...props.projectToEdit.getChildComponents()];
-        setComponents(componentsData);
+        setComponents([...props.projectToEdit.getChildComponents()]);
+        setConnections(loadConnections());
+    }, [props.projectToEdit]);
 
+    function loadConnections() {
         const connectionsData: ProjectComponentConnection[] = [];
         for (const currComponent of props.projectToEdit.getChildComponents()) {
             for (const currConnection of currComponent.getConnections()) {
@@ -51,42 +55,12 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                 }
             }
         }
-        setConnections(connectionsData);
-    }, [props.projectToEdit]);
+        return connectionsData;
+    }
 
     function addTileOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const componentType: string = event.target.value;
-        let newComponent: ProjectComponent;
-
-        let appearance = new SimulatorAppearance(null, "Box", new Vector3(0, 0, 0), {"width": 1, "height": 1, "depth": 1});
-        switch (componentType) {
-            case "Add Component":
-                return false;
-            case "NestedComponent":
-                newComponent = new NestedComponent(IdGenerator.generateId(), props.projectToEdit, "Nested Component", [], "", appearance, []);
-                break;
-            case "ComponentDescription":
-                newComponent = new ComponentDescription(IdGenerator.generateId(), props.projectToEdit, "Component Description", [], "", appearance, "", "");
-                break;
-            case "DocumentationSection":
-                newComponent = new DocumentationSection(IdGenerator.generateId(), props.projectToEdit, "Documentation Section", [], "", appearance, "");
-                break;
-            case "SoftwareRepo":
-                newComponent = new SoftwareRepo(IdGenerator.generateId(), props.projectToEdit, "Software Repo", [], "", appearance, "", []);
-                break;
-            case "Todo":
-                newComponent = new Todo(IdGenerator.generateId(), props.projectToEdit, "Todo", [], "", appearance, []);
-                break;
-            case "UseCases":
-                newComponent = new UseCases(IdGenerator.generateId(), props.projectToEdit, "Use Cases", [], "", appearance, "", "", []);
-                break;
-            case "Difficulties":
-                newComponent = new Difficulties(IdGenerator.generateId(), props.projectToEdit, "Difficulties", [], "", appearance, []);
-                break;
-            default:
-                throw new Error("Unknown tile type: " + componentType);
-        }
-
+        let newComponent: ProjectComponent = createBasicComponent(componentType, props.projectToEdit);
         props.projectToEdit.addComponent(newComponent);
 
         setComponents([
@@ -107,7 +81,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     }
 
     function getProjectComponentsWithStartPosition() {
-        const entriesToSort: ProjectComponent[] = [...components];
+        const entriesToSort: ProjectComponent[] = [...props.projectToEdit.getChildComponents()];
         let columns: ProjectComponent[][] = [];
 
         while (entriesToSort.length > 0) {
@@ -219,7 +193,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">
-                <p>Editing Project: <input type="text" defaultValue={props.projectToEdit.getProjectName()} onChange={(e)=> props.projectToEdit.setProjectName(e.target.value)} key={props.projectToEdit.getId()}/></p>
+                <p>Editing Project: <input type="text" value={props.projectToEdit.getProjectName()} onChange={(e)=> props.projectToEdit.setProjectName(e.target.value)} key={props.projectToEdit.getId()}/></p>
                 
                 <select onChange={addTileOnChangeHandler} value={"Add Component"}>
                     <option value="Add Component">Add Component</option>
@@ -253,7 +227,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                     }
 
                     {
-                        connections.map(function(currConnection: ProjectComponentConnection) {
+                        loadConnections().map(function(currConnection: ProjectComponentConnection) {
                             return (
                                 <div key={currConnection.getId()}>
                                     <div onContextMenu={(event) => show({ id: currConnection.getId(), event: event })}>

@@ -73,6 +73,15 @@ class Todo extends ProjectComponent {
     getDeployFileContents() {
         return "";
     }
+
+    getItemWithDescription(description: string) {
+        for (var currItem of this.items) {
+            if (currItem.getItemDescription() === description) {
+                return currItem;
+            }
+        }
+        return null;
+    }
 }
 
 export default Todo;

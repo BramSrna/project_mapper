@@ -87,6 +87,15 @@ class SoftwareRepo extends ProjectComponent {
         contents += `\ncd ${folderName}\n.\\startup.ps1`;
         return contents;
     }
+
+    getCodeSampleWithTitle(title: string) {
+        for (var currSample of this.codeSamples) {
+            if (currSample.getTitle() === title) {
+                return currSample;
+            }
+        }
+        return null;
+    }
 }
 
 export default SoftwareRepo;

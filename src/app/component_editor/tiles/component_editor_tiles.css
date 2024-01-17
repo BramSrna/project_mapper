@@ -1,5 +1,5 @@
 .handleContainer {
-    display: "flex"
+    display: flex
 }
 
 .handle {
@@ -12,5 +12,5 @@
 }
 
 .difficultiesEditorWindow {
-    height: 93vh;
+    height: 100%;
 }

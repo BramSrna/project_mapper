@@ -22,10 +22,12 @@ import { Vector3 } from "three";
 
 const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus: (componentId: string) => void}) => {
     const [component, setComponent] = useState<ProjectComponent>(props.componentToEdit);
-    const [editorView, setEditorView] = useState<string>("ComponentEditor")
+    const [editorView, setEditorView] = useState<string>("ComponentEditor");
+    const [appearance, setAppearance] = useState<SimulatorAppearance>(props.componentToEdit.getSimulatorAppearance());
 
     useEffect(() => {
         setComponent(props.componentToEdit);
+        setAppearance(props.componentToEdit.getSimulatorAppearance());
     }, [props.componentToEdit]);
 
     function renderComponentEditor() {
@@ -85,11 +87,11 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
     }
 
     return (
-        <div>
+        <div style={{ height: "100%", display: "flex", flexDirection: "column"}}>
             <div className="sideBySideContainer componentEditorMenu">
                 {renderComponentTreeSelect()}
 
-                <p>Editing Component: <input type="text" defaultValue={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
+                <p>Editing Component: <input type="text" value={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
 
                 <select value="Change Component Type" onChange={(event: ChangeEvent<HTMLSelectElement>) => componentTypeOnChangeHandler(event.target.value)}>
                     <option value="Change Component Type">Change Component Type</option>
@@ -108,7 +110,7 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
                 </select>
             </div>
             
-            <div>
+            <div style={{ height: "100%", display: "flex", flexDirection: "column"}}>
                 {renderComponentEditor()}
             </div>
         </div>

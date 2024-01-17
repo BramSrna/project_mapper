@@ -90,7 +90,7 @@ const PreviewTileContainer = (props: {parentComponent: ProjectComponent, initial
                 <button onClick={deleteComponent}>X</button>
             </div>
 
-            <input type="text" defaultValue={props.parentComponent.getComponentName()} onChange={e => props.parentComponent.setComponentName(e.target.value)}/>
+            <input type="text" defaultValue={props.parentComponent.getComponentName()} readOnly={true}/>
 
             <select value="Change View" onChange={(event) => event.target.value === "Change View" ? setView("Visualizer") : setView(event.target.value)}>
                 <option value="Change View">Change View</option>
