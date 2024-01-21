@@ -111,9 +111,9 @@ class UseCases extends ProjectComponent {
         return "";
     }
 
-    getUseCaseByDescription(description: string) {
+    getUseCaseWithId(id: string) {
         for (var currItem of this.useCases) {
-            if (currItem.getDescription() === description) {
+            if (currItem.getId() === id) {
                 return currItem;
             }
         }

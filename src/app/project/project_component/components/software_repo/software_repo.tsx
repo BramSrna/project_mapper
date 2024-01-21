@@ -88,9 +88,9 @@ class SoftwareRepo extends ProjectComponent {
         return contents;
     }
 
-    getCodeSampleWithTitle(title: string) {
+    getCodeSampleWithId(id: string) {
         for (var currSample of this.codeSamples) {
-            if (currSample.getTitle() === title) {
+            if (currSample.getId() === id) {
                 return currSample;
             }
         }

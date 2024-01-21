@@ -82,9 +82,9 @@ class Difficulties extends ProjectComponent {
         return "";
     }
 
-    getEntryByDescription(description: string) {
+    getEntryWithId(id: string) {
         for (var currEntry of this.difficulties) {
-            if (currEntry.getDescription() === description) {
+            if (currEntry.getId() === id) {
                 return currEntry;
             }
         }

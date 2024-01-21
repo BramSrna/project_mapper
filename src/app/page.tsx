@@ -108,6 +108,7 @@ const Page = () => {
 
     function switchToProject(projectId: string | null) {
         if (projectId === null) {
+            setTerminalOpen(false);
             localStorage.removeItem("projectToEditId")
             setProjectToEdit(null);
         } else {
@@ -170,9 +171,12 @@ const Page = () => {
 
         const formData: FormData = new FormData(event.currentTarget);
         if ((formData.has("inputTerminal")) && (formData.get("inputTerminal") !== null)) {
-            let commandList: CommandJsonInterface[] = mapRawTextToCommands(formData.get("inputTerminal")!.toString());
             let focusInfo: EditorContextInterface = readEditorContext(projectToEdit.getId());
-            let check: string | null = executeCommandList(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex], commandList);
+            let focusedComponent: ProjectComponent | Project | null = getFocusedComponent(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex]);
+
+            let commandList: CommandJsonInterface[] = mapRawTextToCommands(focusedComponent, formData.get("inputTerminal")!.toString());
+            
+            let check: string | null = executeCommandList(projectToEdit, focusedComponent, commandList);
             if (check !== null) {
                 setTerminalStatus(check)
                 event.preventDefault();
@@ -202,9 +206,11 @@ const Page = () => {
                 <div className="containerWithSeperators">
                     <button onClick={() => switchToProject(null)}>+</button>
                 </div>
-                <div className="containerWithSeperators">
-                    <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
-                </div>
+                {(projectToEdit !== null) &&
+                    <div className="containerWithSeperators">
+                        <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
+                    </div>
+                }
             </div>
 
             {
@@ -236,6 +242,7 @@ const Page = () => {
                             name="inputTerminal"
                             rows={4}
                             cols={40}
+                            value={terminalText}
                             onChange={(event) => setTerminalText(event.target.value)}
                         />
                         <p>{terminalStatus}</p>

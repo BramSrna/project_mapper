@@ -74,9 +74,9 @@ class Todo extends ProjectComponent {
         return "";
     }
 
-    getItemWithDescription(description: string) {
+    getItemWithId(id: string) {
         for (var currItem of this.items) {
-            if (currItem.getItemDescription() === description) {
+            if (currItem.getId() === id) {
                 return currItem;
             }
         }
