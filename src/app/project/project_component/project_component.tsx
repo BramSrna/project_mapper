@@ -3,6 +3,7 @@ import saveAs from "file-saver";
 import ProjectComponentConnection, { ProjectComponentConnectionJsonInterface } from "../project_component_connection";
 import NestedComponent from "./components/nested_component";
 import SimulatorAppearance, { SimulatorAppearanceJsonInterface } from "@/app/component_editor/simulator/simulator_appearance";
+import axios from "axios";
 
 export interface ProjectComponentToJsonInterface {
     "id": string,
@@ -22,6 +23,8 @@ abstract class ProjectComponent {
     simulatorBehaviour: string;
     simulatorAppearance: SimulatorAppearance;
 
+    saveCounter: number;
+
     abstract readonly type: string;
 
     constructor(id: string, parent: Project | NestedComponent, componentName: string, connections: ProjectComponentConnection[], simulatorBehaviour: string, simulatorAppearance: SimulatorAppearance) {
@@ -33,11 +36,15 @@ abstract class ProjectComponent {
         this.simulatorBehaviour = simulatorBehaviour;
         this.simulatorAppearance = simulatorAppearance;
 
+        this.saveCounter = 0;
+
         this.simulatorAppearance.setParentComponent(this);
     }
 
     abstract getSetupFileContents() : string;
     abstract getDeployFileContents() : string;
+    abstract toInputParagraph() : string;
+    abstract getComponentSpecificJson() : object;
 
     setParent(newParent: Project | NestedComponent) {
         this.parent = newParent;
@@ -108,6 +115,16 @@ abstract class ProjectComponent {
     }
 
     saveToBrowser() {
+        this.saveCounter += 1;
+        if (this.saveCounter > 10) {
+            axios.post("http://localhost:5000/upload_data", {
+                "id": this.id,
+                "input_paragraph": this.toInputParagraph(),
+                "component": this.type,
+                "component_info": this.getComponentSpecificJson()
+            });
+            this.saveCounter = 0;
+        }
         this.parent.saveToBrowser();
     }
 

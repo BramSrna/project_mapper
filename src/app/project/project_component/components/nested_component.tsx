@@ -111,7 +111,7 @@ class NestedComponent extends ProjectComponent {
         this.saveToBrowser();
     }
 
-    switchComponent(componentToSwitch: ProjectComponent, newType: string) {
+    async switchComponent(componentToSwitch: ProjectComponent, newType: string) {
         if (this.childComponents.indexOf(componentToSwitch) === -1) {
             return componentToSwitch;
         }
@@ -120,10 +120,7 @@ class NestedComponent extends ProjectComponent {
             return componentToSwitch;
         }
 
-        let newComponent: ProjectComponent = convertComponentType(newType, componentToSwitch);
-
-        this.removeComponent(componentToSwitch, false);
-        this.addComponent(newComponent);
+        let newComponent: ProjectComponent = await convertComponentType(newType, componentToSwitch);
 
         return newComponent;
     }
@@ -141,6 +138,28 @@ class NestedComponent extends ProjectComponent {
             }
         }
         return orderedComponents;
+    }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        for (var currComponent of this.childComponents) {
+            paragraph += currComponent.toInputParagraph().trim();
+            if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+                paragraph += ". ";
+            }
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const components = [];
+        for (const currComponent of this.childComponents) {
+            components.push(currComponent.toJSON());
+        }
+        const finalJson = {
+            "components": components
+        }
+        return finalJson;
     }
 }
 

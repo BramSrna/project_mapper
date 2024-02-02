@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Don't save the terminal_llm python virtual environment
-/terminal_llm/terminal_llm
+backend/backend_venv/*
 
 # dependencies
 /node_modules

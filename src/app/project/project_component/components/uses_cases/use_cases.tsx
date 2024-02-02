@@ -119,6 +119,38 @@ class UseCases extends ProjectComponent {
         }
         return null;
     }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        paragraph += this.startOperatingWall.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ". ";
+        }
+        paragraph += this.endOperatingWall.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ". ";
+        }
+        for (var currUseCase of this.useCases) {
+            paragraph += currUseCase.getDescription().trim();
+            if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+                paragraph += ". ";
+            }
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const useCasesAsJson: UseCaseItemJsonInterface[] = [];
+        for (const currUseCase of this.useCases) {
+            useCasesAsJson.push(currUseCase.toJSON());
+        }
+        const finalJson = {
+            "startOperatingWall": this.startOperatingWall,
+            "endOperatingWall": this.endOperatingWall,
+            "useCases": useCasesAsJson
+        }
+        return finalJson;
+    }
 }
 
 export default UseCases;

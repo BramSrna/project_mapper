@@ -55,12 +55,12 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
         }
     }
 
-    function componentTypeOnChangeHandler(newComponentType: string) {
+    async function componentTypeOnChangeHandler(newComponentType: string) {
         if (newComponentType === component.getType()) {
             return false;
         }
 
-        let newComp: ProjectComponent = props.componentToEdit.getParent().switchComponent(props.componentToEdit, newComponentType);
+        let newComp: ProjectComponent = await props.componentToEdit.getParent().switchComponent(props.componentToEdit, newComponentType);
         setComponent(newComp);
     }
 

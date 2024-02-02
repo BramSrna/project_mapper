@@ -39,7 +39,7 @@ const UseCasesEditor = (props: {useCasesComp: UseCases}) => {
                                 props.useCasesComp.getUseCases().map(function(currUseCase) {
                                     return (
                                         <tr key={currUseCase.getId()}>
-                                            <td><input type="text" value={currUseCase.getDescription()} onChange={e => currUseCase.setDescription(e.target.value)}/></td>
+                                            <td><input type="text" defaultValue={currUseCase.getDescription()} onChange={e => currUseCase.setDescription(e.target.value)}/></td>
                                             <td><button onClick={() => deleteUseCaseOnClickHandler(currUseCase)}>Delete Use Case</button></td>
                                         </tr>
                                     )

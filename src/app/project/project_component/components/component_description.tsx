@@ -65,6 +65,23 @@ class ComponentDescription extends ProjectComponent {
         this.missionStatement = newMissionStatement;
         this.saveToBrowser()
     }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        paragraph += this.endGoal.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ". ";
+        }
+        paragraph += this.missionStatement.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ".";
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        return this.getDisplayableContentsJson();
+    }
 }
 
 export default ComponentDescription;

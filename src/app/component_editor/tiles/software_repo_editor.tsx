@@ -127,7 +127,7 @@ const SoftwareRepoEditor = (props: {softwareRepoComp: SoftwareRepo}) => {
                 
                                 <div className="dont-move-draggable" style={{display: "flex", flexDirection: "column", flexGrow: 1}}>
                                     <p>Title: <input type="text" defaultValue={currCodeSample.getTitle()} onChange={e => currCodeSample.setTitle(e.target.value)}/></p>
-                                    <p>Language: <select value={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
+                                    <p>Language: <select defaultValue={currCodeSample.getLanguage()} onChange={e => currCodeSample.setLanguage(e.target.value)}>
                                         {
                                             supportedLanguages.map(function(currLanguage: string) {
                                                 return <option value={currLanguage} key={currLanguage}>{currLanguage}</option>

@@ -96,6 +96,34 @@ class SoftwareRepo extends ProjectComponent {
         }
         return null;
     }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        paragraph += this.initRepoName.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ". ";
+        }
+        for (var currItem of this.codeSamples) {
+            paragraph += currItem.getTitle().trim() + ", ";
+            paragraph += currItem.getLanguage().trim() + ". ";
+            paragraph += "\n```\n";
+            paragraph += currItem.getCodeBlock();
+            paragraph += "\n```\n";
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const codeSamplesAsJson: CodeSamplesJsonInterface[] = [];
+        for (const currSample of this.codeSamples) {
+            codeSamplesAsJson.push(currSample.toJSON());
+        }
+        const finalJson = {
+            "initRepoName": this.initRepoName,
+            "codeSamples": codeSamplesAsJson
+        }
+        return finalJson;
+    }
 }
 
 export default SoftwareRepo;

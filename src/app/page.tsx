@@ -162,7 +162,9 @@ const Page = () => {
         }
     }
 
-    function inputTerminalOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+    async function inputTerminalOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        
         if (projectToEdit === null) {
             setTerminalStatus("Error: A project must be open for the terminal to be used.");
             event.preventDefault();
@@ -174,7 +176,7 @@ const Page = () => {
             let focusInfo: EditorContextInterface = readEditorContext(projectToEdit.getId());
             let focusedComponent: ProjectComponent | Project | null = getFocusedComponent(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex]);
 
-            let commandList: CommandJsonInterface[] = mapRawTextToCommands(focusedComponent, formData.get("inputTerminal")!.toString());
+            let commandList: CommandJsonInterface[] = await mapRawTextToCommands(focusedComponent, formData.get("inputTerminal")!.toString());
             
             let check: string | null = executeCommandList(projectToEdit, focusedComponent, commandList);
             if (check !== null) {
