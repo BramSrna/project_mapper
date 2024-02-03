@@ -36,6 +36,9 @@ export async function mapRawTextToCommands(executionContext: Project | ProjectCo
 export function getBuildCommandsFromResponseData(componentType: string, responseData: any) {
     let commands: CommandJsonInterface[] = [];
 
+    let componentName: string = rebuildStringFromResponseData(responseData, "componentName");
+    commands.push({ "dependencies": [], "commandName": "SET_NAME", "commandParams": [componentName] });
+
     switch (componentType) {
         case "ComponentDescription":
             let missionStatement: string = rebuildStringFromResponseData(responseData, "missionStatement");

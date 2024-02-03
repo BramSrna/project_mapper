@@ -19,7 +19,7 @@ import ProjectComponent from "../project/project_component/project_component";
 import ProjectComponentConnection from "../project/project_component_connection";
 import { CommandJsonInterface, CommandParamFuncResolverInterface } from "./command_json_interface";
 
-function executeCommand(parentProject: Project, executionContext: Project | ProjectComponent, commandName: string, commandParams: string[]) {
+export function executeCommand(parentProject: Project, executionContext: Project | ProjectComponent, commandName: string, commandParams: string[]) {
     switch (commandName) {
         case "SET_NAME":
             if (commandParams.length !== 1) {

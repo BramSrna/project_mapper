@@ -20,7 +20,8 @@ DATA_PATH = os.path.join(dirname, "./data.json")
 LABEL_DICT = {
     "startOperatingWall": 0,
     "endOperatingWall": 1,
-    "useCase": 2
+    "useCase": 2,
+    "componentName": 3
 }
 
 def load_model():

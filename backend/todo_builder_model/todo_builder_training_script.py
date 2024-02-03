@@ -19,7 +19,8 @@ DATA_PATH = os.path.join(dirname, "./data.json")
 
 LABEL_DICT = {
     "complete": 0,
-    "incomplete": 1
+    "incomplete": 1,
+    "componentName": 2
 }
 
 def load_model():

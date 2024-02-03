@@ -21,7 +21,8 @@ LABEL_DICT = {
     "initRepoName": 0,
     "title": 1,
     "language": 2,
-    "codeBlock": 3
+    "codeBlock": 3,
+    "componentName": 4
 }
 
 def load_model():

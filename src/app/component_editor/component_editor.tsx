@@ -91,7 +91,7 @@ const ComponentEditor = (props: {componentToEdit: ProjectComponent, changeFocus:
             <div className="sideBySideContainer componentEditorMenu">
                 {renderComponentTreeSelect()}
 
-                <p>Editing Component: <input type="text" value={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
+                <p>Editing Component: <input type="text" defaultValue={component.getComponentName()} onChange={(event) => component.setComponentName(event.target.value)}/></p>
 
                 <select value="Change Component Type" onChange={(event: ChangeEvent<HTMLSelectElement>) => componentTypeOnChangeHandler(event.target.value)}>
                     <option value="Change Component Type">Change Component Type</option>

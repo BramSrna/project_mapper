@@ -119,6 +119,7 @@ abstract class ProjectComponent {
         if (this.saveCounter > 10) {
             axios.post("http://localhost:5000/upload_data", {
                 "id": this.id,
+                "component_name": this.componentName,
                 "input_paragraph": this.toInputParagraph(),
                 "component": this.type,
                 "component_info": this.getComponentSpecificJson()

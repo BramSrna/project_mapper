@@ -18,9 +18,8 @@ SAVED_MODEL_PATH = os.path.join(dirname, "./current_model")
 DATA_PATH = os.path.join(dirname, "./data.json")
 
 LABEL_DICT = {
-    "endGoal": 0,
-    "missionStatement": 1,
-    "componentName": 2
+    "componentName": 0,
+    "content": 1
 }
 
 def load_model():

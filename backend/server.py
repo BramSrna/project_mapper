@@ -8,6 +8,7 @@ import component_description_builder_model.component_description_builder_trainin
 import use_cases_builder_model.use_cases_builder_training_script
 import difficulties_builder_model.difficulties_builder_training_script
 import software_repo_builder_model.software_repo_builder_training_script
+import documentation_section_builder_model.documentation_section_builder_training_script
 import todo_builder_model.todo_builder_training_script
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -17,7 +18,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 classifier_map = {
     "ComponentDescription": component_description_builder_model.component_description_builder_training_script.run_classification,
-    "DocumentationSection": None,
+    "DocumentationSection": documentation_section_builder_model.documentation_section_builder_training_script.run_classification,
     "UseCases": use_cases_builder_model.use_cases_builder_training_script.run_classification,
     "Todo": todo_builder_model.todo_builder_training_script.run_classification,
     "SoftwareRepo": software_repo_builder_model.software_repo_builder_training_script.run_classification,
@@ -83,6 +84,10 @@ def upload_data():
 def save_component_info(requestJsonData):
     if (requestJsonData["component"] == "ComponentDescription"):
         data_json_path = "./component_description_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         write_json_datapoint_to_file(data_json_path, "endGoal_{}".format(requestJsonData["id"]), {
             "text": requestJsonData["component_info"]["endGoal"],
             "text_label": "endGoal"
@@ -92,10 +97,21 @@ def save_component_info(requestJsonData):
             "text_label": "missionStatement"
         })
     elif (requestJsonData["component"] == "DocumentationSection"):
-        # For DocumentationSections, all of the input raw text gets dumped directly into the text box, so not model is needed
-        pass
+        data_json_path = "./documentation_section_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
+        write_json_datapoint_to_file(data_json_path, "content_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_info"]["content"],
+            "text_label": "content"
+        })
     elif (requestJsonData["component"] == "UseCases"):
         data_json_path = "./use_cases_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         write_json_datapoint_to_file(data_json_path, "startOperatingWall_{}".format(requestJsonData["id"]), {
             "text": requestJsonData["component_info"]["startOperatingWall"],
             "text_label": "startOperatingWall"
@@ -111,6 +127,10 @@ def save_component_info(requestJsonData):
             })
     elif (requestJsonData["component"] == "Todo"):
         data_json_path = "./todo_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         for index, currTodoItem in enumerate(requestJsonData["component_info"]["items"]):
             write_json_datapoint_to_file(data_json_path, "todoItem_{}_{}".format(requestJsonData["id"], index), {
                 "text": currTodoItem["description"],
@@ -118,6 +138,10 @@ def save_component_info(requestJsonData):
             })
     elif (requestJsonData["component"] == "SoftwareRepo"):
         data_json_path = "./software_repo_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         write_json_datapoint_to_file(data_json_path, "initRepoName_{}".format(requestJsonData["id"]), {
             "text": requestJsonData["component_info"]["initRepoName"],
             "text_label": "initRepoName"
@@ -137,6 +161,10 @@ def save_component_info(requestJsonData):
             })
     elif (requestJsonData["component"] == "Difficulties"):
         data_json_path = "./difficulties_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         for index, currDifficultyEntry in enumerate(requestJsonData["component_info"]["difficulties"]):
             write_json_datapoint_to_file(data_json_path, "difficultyDescription_{}_{}".format(requestJsonData["id"], index), {
                 "text": currCodeSample["description"],
@@ -149,6 +177,10 @@ def save_component_info(requestJsonData):
                 })
     elif (requestJsonData["component"] == "NestedComponent"):
         data_json_path = "./nested_component_builder_model/data.json"
+        write_json_datapoint_to_file(data_json_path, "componentName_{}".format(requestJsonData["id"]), {
+            "text": requestJsonData["component_name"],
+            "text_label": "componentName"
+        })
         for index, currComponent in enumerate(requestJsonData["component_info"]["components"]):
             save_component_info(currComponent)
     else:

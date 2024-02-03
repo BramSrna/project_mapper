@@ -28,8 +28,8 @@ const UseCasesEditor = (props: {useCasesComp: UseCases}) => {
     return (
         <div>
             <p>Operating Walls:</p>
-            <p>Start Operating Wall: <input type="text" name="startOperatingWall" defaultValue={props.useCasesComp.getStartOperatingWall()} onChange={e => props.useCasesComp.setStartOperatingWall(e.target.value)}/></p>
-            <p>End Operating Wall: <input type="text" name="endOperatingWall" defaultValue={props.useCasesComp.getEndOperatingWall()} onChange={e => props.useCasesComp.setEndOperatingWall(e.target.value)}/></p>
+            <p>Start Operating Wall: <textarea defaultValue={props.useCasesComp.getStartOperatingWall()} onChange={e => props.useCasesComp.setStartOperatingWall(e.target.value)}/></p>
+            <p>End Operating Wall: <textarea defaultValue={props.useCasesComp.getEndOperatingWall()} onChange={e => props.useCasesComp.setEndOperatingWall(e.target.value)}/></p>
             <p>Use Cases:</p>
             {
                 <div>
