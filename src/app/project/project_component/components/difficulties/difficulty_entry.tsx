@@ -75,9 +75,9 @@ class DifficultyEntry {
         this.saveToBrowser();
     }
 
-    getPossibleSolutionWithDescription(description: string) {
+    getPossibleSolutionWithId(id: string) {
         for (var currSolution of this.possibleSolutions) {
-            if (currSolution.getDescription() === description) {
+            if (currSolution.getId() === id) {
                 return currSolution;
             }
         }

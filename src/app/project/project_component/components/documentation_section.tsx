@@ -55,6 +55,20 @@ class DocumentationSection extends ProjectComponent {
     getDeployFileContents() {
         return "";
     }
+
+    toInputParagraph() {
+        let paragraph: string = this.content.trim();
+        if ((this.content.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ".";
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        return {
+            "content": this.content
+        }
+    }
 }
 
 export default DocumentationSection;

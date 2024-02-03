@@ -74,13 +74,35 @@ class Todo extends ProjectComponent {
         return "";
     }
 
-    getItemWithDescription(description: string) {
+    getItemWithId(id: string) {
         for (var currItem of this.items) {
-            if (currItem.getItemDescription() === description) {
+            if (currItem.getId() === id) {
                 return currItem;
             }
         }
         return null;
+    }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        for (var currItem of this.items) {
+            paragraph += currItem.getItemDescription().trim();
+            if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+                paragraph += ". ";
+            }
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const itemsAsJson: TodoItemJsonInterface[] = [];
+        for (const currItem of this.items) {
+            itemsAsJson.push(currItem.toJSON());
+        }
+        const finalJson = {
+            "items": itemsAsJson
+        }
+        return finalJson;
     }
 }
 

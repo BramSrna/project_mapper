@@ -141,7 +141,7 @@ class Project {
         return null;
     }
 
-    switchComponent(componentToSwitch: ProjectComponent, newType: string) {
+    async switchComponent(componentToSwitch: ProjectComponent, newType: string) {
         if (this.childComponents.indexOf(componentToSwitch) === -1) {
             return componentToSwitch;
         }
@@ -150,10 +150,7 @@ class Project {
             return componentToSwitch;
         }
 
-        let newComponent: ProjectComponent = convertComponentType(newType, componentToSwitch);
-
-        this.removeComponent(componentToSwitch, false);
-        this.addComponent(newComponent);
+        let newComponent: ProjectComponent = await convertComponentType(newType, componentToSwitch);
 
         return newComponent;
     }

@@ -42,7 +42,7 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
                                 name="documentation"
                                 rows={4}
                                 cols={40}
-                                value={currPossibleSolution.getDescription()}
+                                defaultValue={currPossibleSolution.getDescription()}
                                 onChange={e => currPossibleSolution.setDescription(e.target.value)}
                             />
                             <button onClick={() => deletePossibleSolutionOnClickHandler(currPossibleSolution)}>Delete Possible Solution</button>
@@ -133,7 +133,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                                             name="documentation"
                                             rows={4}
                                             cols={40}
-                                            value={currDifficulty.getDescription()}
+                                            defaultValue={currDifficulty.getDescription()}
                                             onChange={e => currDifficulty.setDescription(e.target.value)}
                                         />
                     

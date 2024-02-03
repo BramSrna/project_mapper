@@ -82,13 +82,41 @@ class Difficulties extends ProjectComponent {
         return "";
     }
 
-    getEntryByDescription(description: string) {
+    getEntryWithId(id: string) {
         for (var currEntry of this.difficulties) {
-            if (currEntry.getDescription() === description) {
+            if (currEntry.getId() === id) {
                 return currEntry;
             }
         }
         return null;
+    }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        for (var currDifficulty of this.difficulties) {
+            paragraph += currDifficulty.getDescription().trim();
+            if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+                paragraph += ". ";
+            }
+            for (var currPossibleSolution of currDifficulty.getPossibleSolutions()) {
+                paragraph += currPossibleSolution.getDescription().trim();
+                if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+                    paragraph += ".";
+                }
+            }
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const difficultiesAsJson: DifficultyEntryJsonInterface[] = [];
+        for (const currDifficulty of this.difficulties) {
+            difficultiesAsJson.push(currDifficulty.toJSON());
+        }
+        const finalJson = {
+            "difficulties": difficultiesAsJson
+        }
+        return finalJson;
     }
 }
 

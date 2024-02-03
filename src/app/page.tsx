@@ -10,7 +10,7 @@ import IdGenerator from './id_generator';
 import { DraggableData, Position, Rnd } from 'react-rnd';
 import { CommandJsonInterface } from './terminal/command_json_interface';
 import { mapRawTextToCommands } from './terminal/command_mapper';
-import { executeCommandList } from './terminal/command_executor';
+import { executeCommand, executeCommandList } from './terminal/command_executor';
 import { DraggableEvent } from 'react-draggable';
 import { parse } from 'path';
 import NestedComponent, { ChildLayerJsonInterface } from './project/project_component/components/nested_component';
@@ -108,6 +108,7 @@ const Page = () => {
 
     function switchToProject(projectId: string | null) {
         if (projectId === null) {
+            setTerminalOpen(false);
             localStorage.removeItem("projectToEditId")
             setProjectToEdit(null);
         } else {
@@ -161,7 +162,9 @@ const Page = () => {
         }
     }
 
-    function inputTerminalOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+    async function inputTerminalOnSubmitHandler(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        
         if (projectToEdit === null) {
             setTerminalStatus("Error: A project must be open for the terminal to be used.");
             event.preventDefault();
@@ -170,9 +173,16 @@ const Page = () => {
 
         const formData: FormData = new FormData(event.currentTarget);
         if ((formData.has("inputTerminal")) && (formData.get("inputTerminal") !== null)) {
-            let commandList: CommandJsonInterface[] = mapRawTextToCommands(formData.get("inputTerminal")!.toString());
             let focusInfo: EditorContextInterface = readEditorContext(projectToEdit.getId());
-            let check: string | null = executeCommandList(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex], commandList);
+            let focusedComponent: ProjectComponent | Project | null = getFocusedComponent(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex]);
+
+            executeCommand(projectToEdit, focusedComponent, "CHANGE_FOCUS", [projectToEdit.getId()]);
+
+            focusedComponent = getFocusedComponent(projectToEdit, focusInfo.loadedFocusIds[focusInfo.focusedIndex]);
+
+            let commandList: CommandJsonInterface[] = await mapRawTextToCommands(focusedComponent, formData.get("inputTerminal")!.toString());
+            
+            let check: string | null = executeCommandList(projectToEdit, focusedComponent, commandList);
             if (check !== null) {
                 setTerminalStatus(check)
                 event.preventDefault();
@@ -202,9 +212,11 @@ const Page = () => {
                 <div className="containerWithSeperators">
                     <button onClick={() => switchToProject(null)}>+</button>
                 </div>
-                <div className="containerWithSeperators">
-                    <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
-                </div>
+                {(projectToEdit !== null) &&
+                    <div className="containerWithSeperators">
+                        <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
+                    </div>
+                }
             </div>
 
             {
@@ -236,6 +248,7 @@ const Page = () => {
                             name="inputTerminal"
                             rows={4}
                             cols={40}
+                            value={terminalText}
                             onChange={(event) => setTerminalText(event.target.value)}
                         />
                         <p>{terminalStatus}</p>

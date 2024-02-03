@@ -10,6 +10,10 @@ import Todo from "./project/project_component/components/todo/todo";
 import UseCases from "./project/project_component/components/uses_cases/use_cases";
 import ProjectComponent from "./project/project_component/project_component";
 import Project from "./project/project";
+import axios from "axios";
+import { CommandJsonInterface } from "./terminal/command_json_interface";
+import { getBuildCommandsFromResponseData } from "./terminal/command_mapper";
+import { executeCommandList } from "./terminal/command_executor";
 
 export function createBasicComponent(componentType: string, parent: Project | NestedComponent) {
     let appearance = new SimulatorAppearance(null, "Box", new Vector3(0, 0, 0), {"width": 1, "height": 1, "depth": 1});
@@ -42,7 +46,10 @@ export function createBasicComponent(componentType: string, parent: Project | Ne
     return newComponent;
 }
 
-export function convertComponentType(newType: string, componentToSwitch: ProjectComponent) {
+export async function convertComponentType(newType: string, componentToSwitch: ProjectComponent) {
+    let response = await axios.post("http://localhost:5000/run_component_builder_with_type", {"componentType": newType, "inputParagraph": componentToSwitch.toInputParagraph()});
+
+    console.log(response)
     let newComponent: ProjectComponent;
     switch (newType) {
         case "NestedComponent":
@@ -69,5 +76,16 @@ export function convertComponentType(newType: string, componentToSwitch: Project
         default:
             throw new Error("Unknown tile type: " + newType);
     }
+    componentToSwitch.getParent().removeComponent(componentToSwitch, false);
+    componentToSwitch.getParent().addComponent(newComponent);
+    let commands: CommandJsonInterface[] = [];
+    commands.push({ "dependencies": [], "commandName": "CHANGE_FOCUS", "commandParams": [newComponent.getId()] });
+    commands = commands.concat(getBuildCommandsFromResponseData(newType, response.data));
+    let parent: Project | ProjectComponent = componentToSwitch.getParent();
+    while (!(parent instanceof Project)) {
+        parent = parent.getParent();
+    }
+    console.log(commands)
+    executeCommandList(parent as Project, componentToSwitch.getParent(), commands);
     return newComponent;
 }

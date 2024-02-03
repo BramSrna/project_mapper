@@ -88,13 +88,41 @@ class SoftwareRepo extends ProjectComponent {
         return contents;
     }
 
-    getCodeSampleWithTitle(title: string) {
+    getCodeSampleWithId(id: string) {
         for (var currSample of this.codeSamples) {
-            if (currSample.getTitle() === title) {
+            if (currSample.getId() === id) {
                 return currSample;
             }
         }
         return null;
+    }
+
+    toInputParagraph() {
+        let paragraph: string = "";
+        paragraph += this.initRepoName.trim();
+        if ((paragraph.length > 0) && (paragraph[paragraph.length - 1] !== ".")) {
+            paragraph += ". ";
+        }
+        for (var currItem of this.codeSamples) {
+            paragraph += currItem.getTitle().trim() + ", ";
+            paragraph += currItem.getLanguage().trim() + ". ";
+            paragraph += "\n```\n";
+            paragraph += currItem.getCodeBlock();
+            paragraph += "\n```\n";
+        }
+        return paragraph.trim();
+    }
+
+    getComponentSpecificJson() {
+        const codeSamplesAsJson: CodeSamplesJsonInterface[] = [];
+        for (const currSample of this.codeSamples) {
+            codeSamplesAsJson.push(currSample.toJSON());
+        }
+        const finalJson = {
+            "initRepoName": this.initRepoName,
+            "codeSamples": codeSamplesAsJson
+        }
+        return finalJson;
     }
 }
 
