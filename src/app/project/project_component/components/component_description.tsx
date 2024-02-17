@@ -41,7 +41,7 @@ class ComponentDescription extends ProjectComponent {
     }
 
     getSetupFileContents() {
-        return `echo '${JSON.stringify(this.getDisplayableContentsJson())}' > "${this.componentName}.json"`;
+        return `Write-Output '${JSON.stringify(this.getDisplayableContentsJson())}' > "${this.componentName}.json"`;
     }
 
     getDeployFileContents() {

@@ -1,7 +1,7 @@
 import Difficulties from "@/app/project/project_component/components/difficulties/difficulties";
 import DifficultyEntry from "@/app/project/project_component/components/difficulties/difficulty_entry";
 import PossibleSolution from "@/app/project/project_component/components/difficulties/possible_solution";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Position, Rnd } from "react-rnd";
 import { useXarrow } from "react-xarrows";
 import "./component_editor_tiles.css";
@@ -56,11 +56,20 @@ const PossibleSolutionBlock = (props: {difficulty: DifficultyEntry}) => {
 }
 
 const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
+    let difficultiesEditorWindowRef = useRef<HTMLInputElement>(null);
+
     const updateXarrow = useXarrow();
     const [difficulties, setDifficulties] = useState<DifficultyEntry[]>([]);
+    const [difficultiesEditorWindowHeight, setDifficultiesEditorWindowHeight] = useState<number>(1080);
+    const [difficultiesEditorWindowWidth, setDifficultiesEditorWindowWidth] = useState<number>(1920);
 
     useEffect(() => {
         setDifficulties([...props.difficultiesComp.getDifficulties()]);
+
+        if ((difficultiesEditorWindowRef !== null) && (difficultiesEditorWindowRef.current !== null)) {
+            setDifficultiesEditorWindowHeight(difficultiesEditorWindowRef.current.offsetHeight);
+            setDifficultiesEditorWindowWidth(difficultiesEditorWindowRef.current.offsetWidth);
+        }
     }, [props.difficultiesComp]);
 
     function addDifficulty() {
@@ -79,9 +88,12 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
         }))
     }
 
-    let dispSquareDim: number = 1;
-    while (dispSquareDim ** 2 < difficulties.length) {
-        dispSquareDim += 1;
+    function getDispSquareDim() {
+        let dispSquareDim: number = 1;
+        while (dispSquareDim ** 2 < difficulties.length) {
+            dispSquareDim += 1;
+        }
+        return dispSquareDim;
     }
 
     return (
@@ -90,15 +102,25 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                 <button onClick={addDifficulty}>Add Difficulty</button>
             </div>
             
-            <div className="difficultiesEditorWindow">
+            <div className="difficultiesEditorWindow" ref={difficultiesEditorWindowRef}>
                 {
-                    props.difficultiesComp.getDifficulties().map(function(currDifficulty: DifficultyEntry, index: number) {
-                        const rowIndex: number = Math.floor(index / dispSquareDim);
-                        const colIndex: number = index % dispSquareDim;
+                    difficulties.map(function(currDifficulty: DifficultyEntry, index: number) {
+                        const colIndex: number = index % getDispSquareDim();
+                        const rowIndex: number = Math.floor(index / getDispSquareDim());
+
+                        let xPos: number = (colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50)) % difficultiesEditorWindowWidth;
+                        if ((xPos + DIFFICULTY_ENTRY_MIN_WIDTH) > difficultiesEditorWindowWidth) {
+                            xPos -= xPos + DIFFICULTY_ENTRY_MIN_WIDTH - difficultiesEditorWindowWidth;
+                        }
+
+                        let yPos: number = (rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)) % difficultiesEditorWindowHeight;
+                        if ((yPos + DIFFICULTY_ENTRY_MIN_HEIGHT) > difficultiesEditorWindowHeight) {
+                            yPos -= yPos + DIFFICULTY_ENTRY_MIN_HEIGHT - difficultiesEditorWindowHeight;
+                        }
 
                         const initialPosition: Position = {
-                            x: colIndex * (DIFFICULTY_ENTRY_MIN_WIDTH + 50),
-                            y: rowIndex * (DIFFICULTY_ENTRY_MIN_HEIGHT + 50)
+                            x: xPos,
+                            y: yPos
                         };
                         
                         return (
@@ -121,6 +143,7 @@ const DifficultiesEditor = (props: {difficultiesComp: Difficulties}) => {
                                 minHeight={DIFFICULTY_ENTRY_MIN_HEIGHT}
                                 key={currDifficulty.getId()}
                                 bounds=".difficultiesEditorWindow"
+                                dragHandleClassName={"handle"}
                             >
                                 <div>
                                     <div className="sideBySideContainer handleContainer">

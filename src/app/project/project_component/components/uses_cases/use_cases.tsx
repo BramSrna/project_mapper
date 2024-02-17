@@ -85,23 +85,23 @@ class UseCases extends ProjectComponent {
         let content: string = "";
         let initialized: boolean = false;
         if ((this.startOperatingWall !== "") || (this.endOperatingWall !== "")) {
-            content += `echo "Operating Walls:" > "${this.componentName}.md"`;
+            content += `Write-Output "Operating Walls:" > "${this.componentName}.md"`;
             if (this.startOperatingWall !== "") {
-                content += `echo "- Start: ${this.startOperatingWall}" >> "${this.componentName}.md"`;
+                content += `Write-Output "- Start: ${this.startOperatingWall}" >> "${this.componentName}.md"`;
             }
             if (this.endOperatingWall !== "") {
-                content += `echo "- End: ${this.endOperatingWall}" >> "${this.componentName}.md"`;
+                content += `Write-Output "- End: ${this.endOperatingWall}" >> "${this.componentName}.md"`;
             }
             initialized = true;
         }
         if (this.useCases.length > 0) {
             if (initialized) {
-                content += `echo "Use Cases:" >> "${this.componentName}.md"`
+                content += `Write-Output "Use Cases:" >> "${this.componentName}.md"`
             } else {
-                content += `echo "Use Cases:" > "${this.componentName}.md"`
+                content += `Write-Output "Use Cases:" > "${this.componentName}.md"`
             }
             for (const currCase of this.useCases) {
-                content += `echo "- ${currCase}" >> "${this.componentName}.md"`;
+                content += `Write-Output "- ${currCase}" >> "${this.componentName}.md"`;
             }
         }
         return `${content}`;

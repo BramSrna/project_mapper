@@ -167,7 +167,7 @@ def save_component_info(requestJsonData):
         })
         for index, currDifficultyEntry in enumerate(requestJsonData["component_info"]["difficulties"]):
             write_json_datapoint_to_file(data_json_path, "difficultyDescription_{}_{}".format(requestJsonData["id"], index), {
-                "text": currCodeSample["description"],
+                "text": currDifficultyEntry["description"],
                 "text_label": "difficultyDescription"
             })
             for index, currPossibleSolution in enumerate(currDifficultyEntry["possibleSolutions"]):
@@ -194,7 +194,10 @@ def write_json_datapoint_to_file(file_path, datapoint_id, datapoint):
 def read_json_from_file(file_path):
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
-            return(json.load(f))
+            try:
+                return(json.load(f))
+            except:
+                return {}
     return {}
 
 def write_json_to_file(file_path, data):

@@ -41,9 +41,9 @@ class DocumentationSection extends ProjectComponent {
         const lines: string[] = this.content.split("\n");
         for (let i: number = 0; i < lines.length; i++) {
             if (i === 0) {
-                content += `echo "${lines[i]}" > "${this.componentName}.md"`;
+                content += `Write-Output "${lines[i]}" > "${this.componentName}.md"`;
             } else {
-                content += `echo "${lines[i]}" >> "${this.componentName}.md"`;
+                content += `Write-Output "${lines[i]}" >> "${this.componentName}.md"`;
             }
             if (i < lines.length - 1) {
                 content += "\n";

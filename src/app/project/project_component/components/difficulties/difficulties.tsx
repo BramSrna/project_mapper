@@ -60,19 +60,26 @@ class Difficulties extends ProjectComponent {
             return "";
         }
 
-        let content: string = `echo "|Difficulty|Potential Solution(s)|" > "${this.componentName}.md"\n`;
-        content += `echo "|:---|:---|" >> "${this.componentName}.md"\n`
+        let content: string = `Write-Output "|Difficulty|Potential Solution(s)|" > "${this.componentName}.md"\n`;
+        content += `Write-Output "|:---|:---|" >> "${this.componentName}.md"\n`
 
         let currLineContent: string;
+        let solutionIndex: number;
+        let currSolutionDescription: string;
         for (const currDifficulty of this.difficulties) {
-            currLineContent = "|";
-            currLineContent += currDifficulty.getDescription();
-            currLineContent += "|";
-            for (const currSolution of currDifficulty.getPossibleSolutions()) {
-                currLineContent += `- ${currSolution}`;
+            solutionIndex = 0;
+            while (solutionIndex < currDifficulty.getPossibleSolutions().length) {
+                currSolutionDescription = currDifficulty.getPossibleSolutions()[solutionIndex].getDescription();
+                currLineContent = "|";
+                if (solutionIndex === 0) {
+                    currLineContent += currDifficulty.getDescription();
+                }
+                currLineContent += "|";
+                currLineContent += currSolutionDescription;
+                currLineContent += "|";
+                content += `\nWrite-Output "${currLineContent}" >> "${this.componentName}.md"`;
+                solutionIndex += 1;
             }
-            currLineContent += "|";
-            content += `\necho '${currLineContent}' >> "${this.componentName}.md"`;
         }
 
         return content;

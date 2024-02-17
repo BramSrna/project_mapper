@@ -1,5 +1,6 @@
 import os
 import sys
+from component_types import ComponentType
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
@@ -18,13 +19,13 @@ SAVED_MODEL_PATH = os.path.join(dirname, "./current_model")
 DATA_PATH = os.path.join(dirname, "./data.json")
 
 LABEL_DICT = {
-    "Difficulties": 0,
-    "SoftwareRepo": 1,
-    "Todo": 2,
-    "UseCases": 3,
-    "ComponentDescription": 4,
-    "DocumentationSection": 5,
-    "NestedComponent": 6
+    str(ComponentType.DIFFICULTIES): 0,
+    str(ComponentType.SOFTWARE_REPO): 1,
+    str(ComponentType.TODO): 2,
+    str(ComponentType.USE_CASES): 3,
+    str(ComponentType.COMPONENT_DESCRIPTION): 4,
+    str(ComponentType.DOCUMENTATION_SECTION): 5,
+    str(ComponentType.NESTED_COMPONENT): 6
 }
 
 def load_model():

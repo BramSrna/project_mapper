@@ -67,7 +67,7 @@ class Todo extends ProjectComponent {
                 content += "\n";
             }
         }
-        return `echo "${content}" > "${this.componentName}.md"`;
+        return `Write-Output "${content}" > "${this.componentName}.md"`;
     }
 
     getDeployFileContents() {

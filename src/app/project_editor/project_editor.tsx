@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, useEffect, useRef, useState } from "react";
 import Project from "../project/project";
 import PreviewTileContainer from "./preview_tile_container";
 import Xarrow, { Xwrapper } from "react-xarrows";
@@ -31,11 +31,15 @@ export interface ComponentPositionInterface {
 Modal.setAppElement(".root");
 
 const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId: string) => void}) => {
+    let projectEditorWindowRef = useRef<HTMLInputElement>(null);
+
     const [components, setComponents] = useState<ProjectComponent[]>([]);
     const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
     const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
     const [view, setView] = useState<string>("Roadmap");
     const [watcherFlag, setWatcherFlag] = useState<string>("");
+    const [projectEditorWindowHeight, setProjectEditorWindowHeight] = useState<number>(1080);
+    const [projectEditorWindowWidth, setProjectEditorWindowWidth] = useState<number>(1920);
     
     const { show } = useContextMenu();
 
@@ -44,11 +48,16 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     useEffect(() => {
         setComponents([...props.projectToEdit.getChildComponents()]);
         setConnections(loadConnections());
+
+        if ((projectEditorWindowRef !== null) && (projectEditorWindowRef.current !== null)) {
+            setProjectEditorWindowHeight(projectEditorWindowRef.current.offsetHeight);
+            setProjectEditorWindowWidth(projectEditorWindowRef.current.offsetWidth);
+        }
     }, [props.projectToEdit]);
 
     function loadConnections() {
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getChildComponents()) {
+        for (const currComponent of components) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === view) {
                     connectionsData.push(currConnection);
@@ -81,7 +90,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     }
 
     function getProjectComponentsWithStartPosition() {
-        const entriesToSort: ProjectComponent[] = [...props.projectToEdit.getChildComponents()];
+        const entriesToSort: ProjectComponent[] = [...components];
         let columns: ProjectComponent[][] = [];
 
         while (entriesToSort.length > 0) {
@@ -121,13 +130,22 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
         columns = columns.reverse();
 
         const finalObjArray: ComponentPositionInterface[] = [];
-        for (let columnIndex: number = 0; columnIndex < columns.length; columnIndex++) {
-            for (let componentIndex: number = 0; componentIndex < columns[columnIndex].length; componentIndex++) {
+        for (let colIndex: number = 0; colIndex < columns.length; colIndex++) {
+            for (let rowIndex: number = 0; rowIndex < columns[colIndex].length; rowIndex++) {
+                let xPos: number = (colIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH + 50)) % projectEditorWindowWidth;
+                if ((xPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH) > projectEditorWindowWidth) {
+                    xPos -= xPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH - projectEditorWindowWidth;
+                }
+
+                let yPos: number = (rowIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT + 50)) % projectEditorWindowHeight;
+                if ((yPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT) > projectEditorWindowHeight) {
+                    yPos -= yPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT - projectEditorWindowHeight;
+                }
                 finalObjArray.push({
-                    "component": columns[columnIndex][componentIndex],
+                    "component": columns[colIndex][rowIndex],
                     "position": {
-                        x: columnIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH + 50),
-                        y: componentIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT + 50)
+                        x: xPos,
+                        y: yPos
                     }
                 })
             }
@@ -179,7 +197,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const newView: string = event.target.value;
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.projectToEdit.getChildComponents()) {
+        for (const currComponent of components) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === newView) {
                     connectionsData.push(currConnection);
@@ -193,7 +211,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
     return (
         <div className="projectEditorContainer">
             <div className="sideBySideContainer projectEditorMenu">
-                <p>Editing Project: <input type="text" value={props.projectToEdit.getProjectName()} onChange={(e)=> props.projectToEdit.setProjectName(e.target.value)} key={props.projectToEdit.getId()}/></p>
+                <p>Editing Project: <input type="text" defaultValue={props.projectToEdit.getProjectName()} onChange={(e)=> props.projectToEdit.setProjectName(e.target.value)} key={props.projectToEdit.getId()}/></p>
                 
                 <select onChange={addTileOnChangeHandler} value={"Add Component"}>
                     <option value="Add Component">Add Component</option>
@@ -214,7 +232,7 @@ const ProjectEditor = (props: {projectToEdit: Project, changeFocus: (componentId
                 <button onClick={() => setSaveModalVisible(true)}>Save</button>
             </div>
 
-            <div className="projectEditorWindow">
+            <div className="projectEditorWindow" ref={projectEditorWindowRef}>
                 <Xwrapper>
                     {
                         getProjectComponentsWithStartPosition().map(function(currObj: ComponentPositionInterface) {

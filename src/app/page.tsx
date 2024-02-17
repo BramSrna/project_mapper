@@ -212,11 +212,11 @@ const Page = () => {
                 <div className="containerWithSeperators">
                     <button onClick={() => switchToProject(null)}>+</button>
                 </div>
-                {(projectToEdit !== null) &&
+                {/* {(projectToEdit !== null) &&
                     <div className="containerWithSeperators">
                         <button onClick={() => setTerminalOpen(true)}>Open Terminal</button>
                     </div>
-                }
+                } */}
             </div>
 
             {

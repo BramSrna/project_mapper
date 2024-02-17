@@ -11,7 +11,7 @@ import ProjectComponentConnection from "@/app/project/project_component_connecti
 import PreviewTileContainer from "@/app/project_editor/preview_tile_container";
 import { ComponentPositionInterface } from "@/app/project_editor/project_editor";
 import { ProjectEditorConstants } from "@/app/project_editor/project_editor_constants";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Item, Menu, useContextMenu } from "react-contexify";
 import { Position } from "react-rnd";
 import Xarrow, { Xwrapper } from "react-xarrows";
@@ -22,9 +22,13 @@ import { createBasicComponent } from "@/app/helper_functions";
 import "../../project_editor/project_editor.css";
 
 const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, changeFocus: (componentId: string) => void}) => {
+    let nestedComponentEditorWindowRef = useRef<HTMLInputElement>(null);
+
     const [components, setComponents] = useState<ProjectComponent[]>([]);
     const [connections, setConnections] = useState<ProjectComponentConnection[]>([]);
     const [view, setView] = useState<string>("Roadmap");
+    const [nestedComponentEditorWindowHeight, setNestedComponentEditorWindowHeight] = useState<number>(1080);
+    const [nestedComponentEditorWindowWidth, setNestedComponentEditorWindowWidth] = useState<number>(1920);
     
     const { show } = useContextMenu();
 
@@ -33,11 +37,16 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     useEffect(() => {
         setComponents([...props.nestedComponentComp.getChildComponents()]);
         setConnections(loadConnections());
+
+        if ((nestedComponentEditorWindowRef !== null) && (nestedComponentEditorWindowRef.current !== null)) {
+            setNestedComponentEditorWindowHeight(nestedComponentEditorWindowRef.current.offsetHeight);
+            setNestedComponentEditorWindowWidth(nestedComponentEditorWindowRef.current.offsetWidth);
+        }
     }, [props.nestedComponentComp]);
 
     function loadConnections() {
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.nestedComponentComp.getChildComponents()) {
+        for (const currComponent of components) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === view) {
                     connectionsData.push(currConnection);
@@ -70,7 +79,7 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     }
 
     function getProjectComponentsWithStartPosition() {
-        const entriesToSort: ProjectComponent[] = [...props.nestedComponentComp.getChildComponents()];
+        const entriesToSort: ProjectComponent[] = [...components];
         let columns: ProjectComponent[][] = [];
 
         while (entriesToSort.length > 0) {
@@ -111,12 +120,22 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
 
         const finalObjArray: ComponentPositionInterface[] = [];
         for (let columnIndex: number = 0; columnIndex < columns.length; columnIndex++) {
-            for (let componentIndex: number = 0; componentIndex < columns[columnIndex].length; componentIndex++) {
+            for (let rowIndex: number = 0; rowIndex < columns[columnIndex].length; rowIndex++) {
+                let xPos: number = (columnIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH + 50)) % nestedComponentEditorWindowWidth;
+                if ((xPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH) > nestedComponentEditorWindowWidth) {
+                    xPos -= xPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH - nestedComponentEditorWindowWidth;
+                }
+
+                let yPos: number = (rowIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT + 50)) % nestedComponentEditorWindowHeight;
+                if ((yPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT) > nestedComponentEditorWindowHeight) {
+                    yPos -= yPos + ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT - nestedComponentEditorWindowHeight;
+                }
+
                 finalObjArray.push({
-                    "component": columns[columnIndex][componentIndex],
+                    "component": columns[columnIndex][rowIndex],
                     "position": {
-                        x: columnIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_WIDTH + 50),
-                        y: componentIndex * (ProjectEditorConstants.PROJECT_TILE_CONTAINER_MIN_HEIGHT + 50)
+                        x: xPos,
+                        y: yPos
                     }
                 })
             }
@@ -153,7 +172,7 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
     function viewOnChangeHandler(event: React.ChangeEvent<HTMLSelectElement>) {
         const newView: string = event.target.value;
         const connectionsData: ProjectComponentConnection[] = [];
-        for (const currComponent of props.nestedComponentComp.getChildComponents()) {
+        for (const currComponent of components) {
             for (const currConnection of currComponent.getConnections()) {
                 if (currConnection.getType() === newView) {
                     connectionsData.push(currConnection);
@@ -185,7 +204,7 @@ const NestedComponentEditor = (props: {nestedComponentComp: NestedComponent, cha
                 </select>
             </div>
 
-            <div className="projectEditorWindow">
+            <div className="projectEditorWindow" ref={nestedComponentEditorWindowRef}>
                 <Xwrapper>
                     {
                         getProjectComponentsWithStartPosition().map(function(currObj: ComponentPositionInterface) {
